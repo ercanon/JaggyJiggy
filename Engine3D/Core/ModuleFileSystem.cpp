@@ -18,14 +18,12 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	char* basePath = SDL_GetBasePath();
 	systemBasePath = std::string(basePath);
 	PHYSFS_init(nullptr);
-	AddPath(basePath);
 	SDL_free(basePath);
 		
-	AddPath("Assets");
-	AddPath("Assets\Textures");
-	AddPath("Assets\Models");
-	
-	int kk = 0;
+	AddPath(".");
+	AddPath("./Assets");
+	AddPath("./Assets/Textures");
+	AddPath("./Assets/Models");
 }
 
 // Destructor
@@ -132,7 +130,6 @@ void ModuleFileSystem::CreateLibraryDirectories()
 {
 	CreateDir("Assets/Models/");
 	CreateDir("Assets/Textures/");
-	CreateDir("Assets/f/");
 }
 
 // Add a new zip file or folder

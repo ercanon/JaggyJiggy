@@ -88,7 +88,6 @@ bool Application::Init()
 	{
 		ret = modules[i]->Start();
 	}
-
 	
 	ms_timer.Start();
 	PERF_PEEK(ptimer);
@@ -98,9 +97,10 @@ bool Application::Init()
 
 void Application::LoadEngineConfig()
 {
-	unsigned fileSize = App->fileSystem->Size("engineConfig.cfg");
-	char* buffer = new char[fileSize];
-	if (App->fileSystem->Read("engineConfig.cfg", buffer, fileSize))
+	char* buffer = nullptr;
+	uint bytesFile = App->fileSystem->Load("engineConfig.cfg", &buffer);
+
+	if (bytesFile)
 	{
 		rapidjson::Document document;
 		if (document.Parse<rapidjson::kParseStopWhenDoneFlag>(buffer).HasParseError())
