@@ -51,7 +51,6 @@ void GameObject::OnGui()
 {
 	if (App->scene->root != this)
 	{
-		//ImGui::InputTextString("%s", &name);
 		ImGui::Text("%s", name.c_str());
 		ImGui::Separator();
 
