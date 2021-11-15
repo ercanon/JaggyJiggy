@@ -22,6 +22,20 @@ void ComponentMaterial::OnGui()
 			ImGui::Text("Name: %s", textureName.c_str());
 			ImGui::Image((ImTextureID)textureId, ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::Text("Size: %d x %d", width, height);
+
+			if (ImGui::TreeNode("Texture List"))
+			{
+				for (auto& t : App->textures->textures)
+				{
+					ImGui::PushID(t.second.id);
+					if (ImGui::ImageButton((ImTextureID)t.second.id, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0)))
+					{
+						SetTexture(t.second);
+					}
+					ImGui::PopID();
+				}
+				ImGui::TreePop();
+			}
 		}
 	}
 }

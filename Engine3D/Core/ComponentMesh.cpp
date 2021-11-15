@@ -21,11 +21,14 @@ ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent
 	case Shape::CUBE:
 		CopyParMesh(par_shapes_create_cube());		
 		break;
-	case Shape::CYLINDER:
-		CopyParMesh(par_shapes_create_cylinder(20, 20));
-		break;
 	case Shape::SPHERE:
 		CopyParMesh(par_shapes_create_parametric_sphere(20, 20));
+		break;
+	case Shape::PLANE:
+		CopyParMesh(par_shapes_create_plane(20, 20));
+		break;
+	case Shape::PYRAMID:
+		CopyParMesh(par_shapes_create_tetrahedron());
 		break;
 	}
 }

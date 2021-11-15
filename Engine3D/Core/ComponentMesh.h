@@ -15,7 +15,8 @@ public:
 	{
 		CUBE,
 		SPHERE,
-		CYLINDER
+		PLANE,
+		PYRAMID
 	};
 
 	ComponentMesh(GameObject* parent);
