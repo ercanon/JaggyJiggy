@@ -147,6 +147,8 @@ void Application::FinishUpdate()
 	}
 
 	uint32 last_frame_ms = frame_time.Read();
+	float wait = (1000.f / (float)cap) - (float)last_frame_ms;
+	SDL_Delay(static_cast<Uint32>(fabs(wait)));
 
 }
 

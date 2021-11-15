@@ -26,12 +26,13 @@ public:
 	Frustum cameraFrustum;
 	float4x4 viewMatrix;
 	float aspectRatio = 1.f;
-	float verticalFOV = 60.f;
-	float nearPlaneDistance = 0.1f;
+	float verticalFOV = 100.f;
+	float nearPlaneDistance = 1.f;
 	float farPlaneDistance = 5000.f;
-	float cameraSensitivity = .5f; 
+	float cameraSensitivity = .005f; 
 	float cameraSpeed = 60.f;
 	bool projectionIsDirty = false;
+	bool isMouseFocused = false;
 
 private:
 

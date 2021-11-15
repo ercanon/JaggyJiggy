@@ -101,7 +101,7 @@ update_status ModuleCamera3D::Update(float dt)
 
 	bool hasRotated = false;
 
-	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+	if(App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT && isMouseFocused)
 	{
 		int dx = -App->input->GetMouseXMotion();
 		int dy = -App->input->GetMouseYMotion();

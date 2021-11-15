@@ -244,10 +244,20 @@ void ModuleEditor::About_Window() {
     ImGui::Begin("About 3D Engine", &showAboutWindow);
 
     ImGui::Separator();
-    ImGui::Text("3D Engine\n");
+    ImGui::Text("JAGGYJIGGY v0.75");
     ImGui::Separator();
+    ImGui::BulletText("Link: https://github.com/ercanon/JaggyJiggy \n");
 
-    ImGui::Text("3rd Party Libraries used: ");
+    ImGui::Separator();
+    ImGui::Text("AUTORS");
+    ImGui::Separator();
+    ImGui::BulletText("Alex Gesti: https://github.com/alexgesti \n");
+    ImGui::BulletText("Raul Cano: https://github.com/ercanon \n");
+    ImGui::BulletText("Pau Motta: https://github.com/paumotta \n");
+
+    ImGui::Separator();
+    ImGui::Text("3RD PARTY LIBRARIES");
+    ImGui::Separator();
     ImGui::BulletText("SDL v2.0.12");
     ImGui::BulletText("Glew v2.1.0");
     ImGui::BulletText("OpenGL v3.1.0");
@@ -262,6 +272,8 @@ void ModuleEditor::About_Window() {
     ImGui::Separator();
 
     ImGui::Text("MIT License\n\n");
+    ImGui::Text("Copyright (c) 2021 ercanon, pixelcuak & paumotta");
+    ImGui::Text("\n");
     ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\n\nof this software and associated documentation files (the 'Software'), to deal\n");
     ImGui::Text("in the Software without restriction, including without limitation the rights\n\nto use, copy, modify, merge, publish, distribute, sublicense, and /or sell\n");
     ImGui::Text("copies of the Software, and to permit persons to whom the Software is\n\nfurnished to do so, subject to the following conditions : \n");
@@ -272,9 +284,6 @@ void ModuleEditor::About_Window() {
     ImGui::Text("FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n");
     ImGui::Text("LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n");
     ImGui::Text("SOFTWARE.\n");
-
-    //ImGui::Separator();
-
 
     ImGui::End();
 
@@ -484,7 +493,7 @@ void ModuleEditor::UpdateWindowStatus() {
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
 
         //Just cleaning gameObjects(not textures,buffers...)
-        if (ImGui::Button("Clear", { 60,20 })) 
+        /*if (ImGui::Button("Clear", {60,20}))
         {
             App->editor->gameobjectSelected = nullptr;
             App->scene->CleanUp(); //Clean GameObjects 
@@ -493,7 +502,7 @@ void ModuleEditor::UpdateWindowStatus() {
         if (ImGui::Button("New", { 60,20 }))
         {
             App->scene->CreateGameObject();
-        }
+        }*/
         std::stack<GameObject*> S;
         std::stack<uint> indents;
         S.push(App->scene->root);
@@ -586,6 +595,10 @@ void ModuleEditor::UpdateWindowStatus() {
         }
         lastViewportSize = viewportSize;
         ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        
+        if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
+        else App->camera->isMouseFocused = false;
+        
         ImGui::End();
     }
     

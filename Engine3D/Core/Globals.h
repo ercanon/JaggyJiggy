@@ -46,5 +46,5 @@ enum update_status
 #define WIN_BORDERLESS false
 #define WIN_FULLSCREEN_DESKTOP false
 #define VSYNC true
-#define TITLE "3D Engine"
+#define TITLE "JaggyJiggy"
 #define ORGANITZATION "CITM UPC 2021-2022"
