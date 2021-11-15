@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "ImGui/imgui.h"
 
 #define MAX_MOUSE_BUTTONS 5
 
@@ -60,6 +61,7 @@ public:
 	{
 		return mouse_y_motion;
 	}
+	void LogInput(uint key, uint state);
 
 
 private:
@@ -74,4 +76,6 @@ private:
 
 public:
 	const char* filePath;
+	ImGuiTextBuffer input;
+	bool scroll;
 };
