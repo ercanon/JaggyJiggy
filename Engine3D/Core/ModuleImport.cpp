@@ -43,6 +43,7 @@ update_status ModuleImport::Update(float dt) {
 	return UPDATE_CONTINUE;
 }
 
+
 bool ModuleImport::LoadGeometry(const char* path) {
 
 	//-- Own structure	
@@ -76,7 +77,7 @@ bool ModuleImport::LoadGeometry(const char* path) {
 		for (size_t i = 0; i < scene->mNumMeshes; i++)
 		{		
 			std::vector<char> fileBuffer;
-			uint bufferPointer = 0u;
+			uint bufferPointer = 0;
 
 			bool nameFound = false;
 			std::string name;
@@ -166,6 +167,107 @@ bool ModuleImport::LoadGeometry(const char* path) {
 		RELEASE_ARRAY(buffer);
 	}
 	else 
+		LOG("Error loading scene %s", path);
+
+	RELEASE_ARRAY(buffer);
+
+	return true;
+}
+
+bool ModuleImport::LoadGeometry(const char* path) {
+
+	//-- Own structure	
+	GameObject* root = nullptr;
+	std::string new_root_name(path);
+
+	//-- Assimp stuff
+	aiMesh* assimpMesh = nullptr;
+	const aiScene* scene = nullptr;
+	aiMaterial* texture = nullptr;
+	aiString texturePath;
+
+	//Create path buffer and import to scene
+	char* buffer = nullptr;
+	uint bytesFile = App->fileSystem->Load(path, &buffer);
+
+	if (buffer == nullptr) {
+		std::string normPathShort = "Assets/Models/" + App->fileSystem->SetNormalName(path);
+		bytesFile = App->fileSystem->Load(normPathShort.c_str(), &buffer);
+	}
+	if (buffer != nullptr) {
+		scene = aiImportFileFromMemory(buffer, bytesFile, aiProcessPreset_TargetRealtime_MaxQuality, NULL);
+	}
+	else {
+		scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+	}
+
+
+	if (scene != nullptr && scene->HasMeshes()) {
+		//Use scene->mNumMeshes to iterate on scene->mMeshes array
+		for (size_t i = 0; i < scene->mNumMeshes; i++)
+		{
+			std::vector<char> bytes;
+			uint bytesPointer = 0;
+
+			assimpMesh = scene->mMeshes[i];
+
+			// -- Store index --//
+			StoreInBuffer(bytes, bytesPointer, sizeof(float3), &assimpMesh->mNumVertices);
+			if (assimpMesh->HasFaces())
+			{
+				uint NumIndices = assimpMesh->mNumFaces * 3;
+				StoreInBuffer(bytes, bytesPointer, sizeof(uint), &NumIndices);
+			}
+			if (assimpMesh->HasNormals())
+				StoreInBuffer(bytes, bytesPointer, sizeof(float3), &assimpMesh->mNumVertices);
+			if (assimpMesh->HasTextureCoords(0))
+				StoreInBuffer(bytes, bytesPointer, sizeof(float2), &assimpMesh->mNumVertices);
+
+			if (scene->HasMaterials()) 
+			{
+				texture = scene->mMaterials[assimpMesh->mMaterialIndex];
+
+				if (texture != nullptr) {
+					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &texturePath);
+					std::string new_path(texturePath.C_Str());
+					if (new_path.size() > 0) {
+						std::string texturePath = "Assets/Textures/" + new_path;
+						if (!App->textures->Find(texturePath))
+							const TextureObject& textureObject = App->textures->Load(texturePath);
+						else const TextureObject& textureObject = App->textures->Get(texturePath);
+					}
+				}
+			}
+
+			// -- Store vertex --//
+			StoreInBuffer(bytes, bytesPointer, sizeof(float3) * assimpMesh->mNumVertices, &assimpMesh->mVertices);
+
+			// -- Store index --//
+			if (assimpMesh->HasFaces()) 
+			{
+				for (size_t i = 0; i < assimpMesh->mNumFaces; i++)
+				{
+					if (assimpMesh->mFaces[i].mNumIndices != 3)
+						LOG("WARNING, geometry face with != 3 indices!")
+					else StoreInBuffer(bytes, bytesPointer, sizeof(uint) * assimpMesh->mFaces[i].mNumIndices, &assimpMesh->mFaces[i].mIndices);
+				}
+			}
+
+			// -- Store Normals info --//
+			if (assimpMesh->HasNormals()) 
+				StoreInBuffer(bytes, bytesPointer, sizeof(float3) * assimpMesh->mNumVertices, &assimpMesh->mNormals);
+
+			// -- Store UV info --//
+			if (assimpMesh->HasTextureCoords(0))
+			{
+				for (size_t j = 0; j < assimpMesh->mNumVertices; ++j)
+					StoreInBuffer(bytes, bytesPointer, sizeof(float2), &assimpMesh->mTextureCoords[0][j]);
+			}
+		}
+		aiReleaseImport(scene);
+		RELEASE_ARRAY(buffer);
+	}
+	else
 		LOG("Error loading scene %s", path);
 
 	RELEASE_ARRAY(buffer);
