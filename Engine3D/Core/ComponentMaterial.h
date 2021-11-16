@@ -1,17 +1,8 @@
 #pragma once
 
 #include "Component.h"
-#include "Assimp/include/material.h"
-#include "Devil/include/il.h"
 
 struct TextureObject;
-
-namespace MaterialImporter
-{
-	void Import(const aiMaterial* material, TextureObject* ourMaterial);
-	uint64 Save(const TextureObject* ourMaterial, char** fileBuffer);
-	void Load(const char* fileBuffer, TextureObject* ourMaterial);
-};
 
 class ComponentMaterial : public Component {
 

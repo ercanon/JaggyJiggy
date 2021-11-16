@@ -155,7 +155,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				else if (fileName.substr(fileName.find_last_of(".")) == ".jpg" || fileName.substr(fileName.find_last_of(".")) == ".png" || fileName.substr(fileName.find_last_of(".")) == ".PNG" || fileName.substr(fileName.find_last_of(".")) == ".JPG")
 				{
 					LOG("Path of file dropped will be %s", filePath);
-					std::string realFileName = fileName.substr(fileName.find_last_of("\\") + 1); 					
+					std::string realFileName = fileName.substr(fileName.find_last_of("\\") + 1);
 					if (App->textures->Find(realFileName))
 					{
 						TextureObject texture = App->textures->Get(realFileName);
@@ -182,6 +182,7 @@ update_status ModuleInput::PreUpdate(float dt)
 					}
 				}
 			};
+
 			SDL_free(&filePath);
 			break;
 		}

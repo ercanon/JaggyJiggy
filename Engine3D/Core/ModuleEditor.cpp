@@ -335,13 +335,15 @@ void ModuleEditor::MenuBar() {
     {
         /* ---- FILE ---- */
         if (ImGui::BeginMenu("File")) {
-            /*
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
             
             }
+            if (ImGui::MenuItem("Load", "Ctrl + L"))
+            {
+
+            }
             ImGui::Separator();
-            */
             if (ImGui::MenuItem("Exit", "(Alt+F4)")) App->closeEngine = true;
             ImGui::EndMenu();
         }
