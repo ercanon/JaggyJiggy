@@ -153,7 +153,6 @@ bool ModuleImport::LoadGeometry(const char* path) {
 		}
 		aiReleaseImport(scene);		
 		RELEASE_ARRAY(buffer);
-
 	}
 	else 
 		LOG("Error loading scene %s", path);

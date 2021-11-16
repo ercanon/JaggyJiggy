@@ -22,8 +22,12 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 		
 	AddPath(".");
 	AddPath("./Assets");
-	AddPath("./Assets/Textures");
 	AddPath("./Assets/Models");
+	AddPath("./Assets/Textures");
+	AddPath("./Assets/Animation");
+	AddPath("./Library/Meshes");
+	AddPath("./Library/Materials");
+	AddPath("./Library/Animation");
 }
 
 // Destructor
@@ -130,6 +134,10 @@ void ModuleFileSystem::CreateLibraryDirectories()
 {
 	CreateDir("Assets/Models/");
 	CreateDir("Assets/Textures/");
+	CreateDir("Assets/Animation/");
+	CreateDir("Library/Meshes/");
+	CreateDir("Library/Materials/");
+	CreateDir("Library/Animation/");
 }
 
 // Add a new zip file or folder

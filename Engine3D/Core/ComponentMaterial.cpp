@@ -40,6 +40,7 @@ void ComponentMaterial::OnGui()
 	}
 }
 
+/*
 uint64 MaterialImporter::Save(const TextureObject* ourMaterial, char** fileBuffer)
 {
 	ILuint size;
@@ -53,4 +54,5 @@ uint64 MaterialImporter::Save(const TextureObject* ourMaterial, char** fileBuffe
 		RELEASE_ARRAY(data);
 	}
 }
+*/
 
