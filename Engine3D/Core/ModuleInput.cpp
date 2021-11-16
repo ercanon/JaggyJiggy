@@ -165,7 +165,6 @@ update_status ModuleInput::PreUpdate(float dt)
 							{
 								material->SetTexture(texture);
 							}
-
 						}
 					}
 					else
@@ -177,7 +176,6 @@ update_status ModuleInput::PreUpdate(float dt)
 							{
 								material->SetTexture(texture);
 							}
-
 						}
 					}
 				}
