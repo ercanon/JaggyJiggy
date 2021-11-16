@@ -17,6 +17,7 @@ public:
 	bool CleanUp() override;
 
 	bool LoadGeometry(const char* path);
+	void StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, unsigned bytes, void* data);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
 
