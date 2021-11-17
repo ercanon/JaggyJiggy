@@ -37,6 +37,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showInspectorWindow = true;
     showGameWindow = true;
     showSceneWindow = true;
+    showTextures = true;
 
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
@@ -49,7 +50,8 @@ ModuleEditor::~ModuleEditor()
 {
 }
 
-bool ModuleEditor::Init() {
+bool ModuleEditor::Init() 
+{
     bool ret = true;
 
     return ret;
@@ -82,7 +84,8 @@ bool ModuleEditor::Start()
     return ret;
 }
 
-update_status ModuleEditor::PreUpdate(float dt) {
+update_status ModuleEditor::PreUpdate(float dt) 
+{
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -98,7 +101,8 @@ update_status ModuleEditor::Update(float dt)
 {
     DrawGrid();
     //Creating MenuBar item as a root for docking windows
-    if (DockingRootItem("Viewport", ImGuiWindowFlags_MenuBar)) {
+    if (DockingRootItem("Viewport", ImGuiWindowFlags_MenuBar)) 
+    {
         MenuBar();
         ImGui::End();
     }
@@ -109,7 +113,8 @@ update_status ModuleEditor::Update(float dt)
     return UPDATE_CONTINUE;
 }
 
-update_status ModuleEditor::PostUpdate(float dt) {
+update_status ModuleEditor::PostUpdate(float dt) 
+{
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
@@ -238,7 +243,8 @@ void ModuleEditor::DrawGrid()
 
 }
 
-void ModuleEditor::About_Window() {
+void ModuleEditor::About_Window() 
+{
 
     ImGui::Begin("About 3D Engine", &showAboutWindow);
 
@@ -288,7 +294,8 @@ void ModuleEditor::About_Window() {
 
 }
 
-void ModuleEditor::UpdateText(const char* text) {
+void ModuleEditor::UpdateText(const char* text) 
+{
     consoleText.appendf(text);
 }
 
@@ -322,19 +329,21 @@ void ModuleEditor::BeginDock(char* dockSpaceId, ImGuiDockNodeFlags dockFlags, Im
 {
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) 
+    {
         ImGuiID dock = ImGui::GetID(dockSpaceId);
         ImGui::DockSpace(dock, size, dockFlags);
     }
 }
 
-void ModuleEditor::MenuBar() {
-
+void ModuleEditor::MenuBar() 
+{
     /* ---- MAIN MENU BAR DOCKED ----*/
     if (ImGui::BeginMainMenuBar()) 
     {
         /* ---- FILE ---- */
-        if (ImGui::BeginMenu("File")) {
+        if (ImGui::BeginMenu("File")) 
+        {
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
             
@@ -349,26 +358,30 @@ void ModuleEditor::MenuBar() {
         }
 
         /* ---- GAMEOBJECTS ---- */
-        if (ImGui::BeginMenu("GameObject")) {
-
-            if (ImGui::MenuItem("Create empty GameObject")) {
+        if (ImGui::BeginMenu("GameObject")) 
+        {
+            if (ImGui::MenuItem("Create empty GameObject")) 
                 App->scene->CreateGameObject();
-            }
 
-            if (ImGui::BeginMenu("3D Objects")) {
-                if (ImGui::MenuItem("Cube")) {
+            if (ImGui::BeginMenu("3D Objects")) 
+            {
+                if (ImGui::MenuItem("Cube")) 
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cube");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CUBE);
                 }
-                if (ImGui::MenuItem("Sphere")) {
+                if (ImGui::MenuItem("Sphere")) 
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::SPHERE);
                 }
-                if (ImGui::MenuItem("Plane")) {
+                if (ImGui::MenuItem("Plane")) 
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Plane");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PLANE);
                 }
-                if (ImGui::MenuItem("Pyramid")) {
+                if (ImGui::MenuItem("Pyramid")) 
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Pyramid");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PYRAMID);
                 }
@@ -377,14 +390,14 @@ void ModuleEditor::MenuBar() {
             ImGui::EndMenu();
         }
 
-
         /* ---- WINDOW ----*/
-        if (ImGui::BeginMenu("Window")) {
-
+        if (ImGui::BeginMenu("Window")) 
+        {
             if (ImGui::MenuItem("Examples")) showDemoWindow = !showDemoWindow;
             ImGui::Separator();
 
-            if (ImGui::BeginMenu("Workspace Style")) {
+            if (ImGui::BeginMenu("Workspace Style")) 
+            {
                 if (ImGui::MenuItem("Dark")) 
                     ImGui::StyleColorsDark();
                 if (ImGui::MenuItem("Classic")) 
@@ -407,6 +420,8 @@ void ModuleEditor::MenuBar() {
                 showGameWindow = !showGameWindow;
             if (ImGui::MenuItem("Console")) 
                 showConsoleWindow = !showConsoleWindow;
+            if (ImGui::MenuItem("Textures"))
+                showTextures = !showTextures;
 
             ImGui::Separator();
             if (ImGui::MenuItem("Configuration")) 
@@ -417,7 +432,8 @@ void ModuleEditor::MenuBar() {
         }
 
         /* ---- HELP ----*/
-        if (ImGui::BeginMenu("Help")) {
+        if (ImGui::BeginMenu("Help")) 
+        {
             if (ImGui::MenuItem("About")) 
                 showAboutWindow = !showAboutWindow;
             ImGui::EndMenu();
@@ -427,7 +443,8 @@ void ModuleEditor::MenuBar() {
     ImGui::EndMainMenuBar();
 }
 
-void ModuleEditor::UpdateWindowStatus() {
+void ModuleEditor::UpdateWindowStatus() 
+{
 
     //Demo
     if (showDemoWindow) 
@@ -442,6 +459,17 @@ void ModuleEditor::UpdateWindowStatus() {
     {
         ImGui::Begin("Configuration", &showConfWindow);        
         App->OnGui();
+        ImGui::End();
+    }
+
+    //Textures
+    if (showTextures)
+    {
+        ImGui::Begin("Textures", &showTextures);
+        for (auto& t : App->textures->textures)
+        {
+            ImGui::Image((ImTextureID)t.second.id, ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+        }
         ImGui::End();
     }
         
@@ -526,7 +554,8 @@ void ModuleEditor::UpdateWindowStatus() {
                     ImGui::EndDragDropTarget();
                 }
 
-                if (ImGui::IsItemClicked()) {
+                if (ImGui::IsItemClicked()) 
+                {
                     gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
                     gameobjectSelected = go;
                     gameobjectSelected->isSelected = !gameobjectSelected->isSelected;

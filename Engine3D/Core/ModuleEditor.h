@@ -59,6 +59,7 @@ public:
 	bool showHierarchyWindow;
 	bool showSceneWindow;
 	bool showGameWindow;
+	bool showTextures;
 	bool showConsoleWindow;
 
 	ImGuiTextBuffer consoleText;
