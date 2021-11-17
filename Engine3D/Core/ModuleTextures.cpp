@@ -156,7 +156,7 @@ const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMa
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			textures.insert(std::make_pair(path, TextureObject(path, static_cast<uint>(textureId), width, height)));
+			Save(path);
 
 			delete[] data;
 			return textures[path];
@@ -166,6 +166,7 @@ const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMa
 	}
 	return textures["BLACK_FALLBACK"];
 }
+
 const TextureObject& ModuleTextures::Get(const std::string& path)
 {
 	const auto textureId = textures.find(path);
@@ -185,18 +186,18 @@ bool ModuleTextures::Find(const std::string& path) const
 	return false;
 }
 
-void ModuleTextures::Save(const ModuleTextures* Material, char** fileBuffer)
+void ModuleTextures::Save(const std::string& path)
 {
 	ILuint size;
 	ILubyte* data;
 	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
 	size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
-	if (size > 0) {
+	if (size > 0) 
+	{
 		data = new ILubyte[size]; // allocate data buffer
-		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
-			//*fileBuffer = (char*)data; /*---Edit---*/
+		if (ilSaveL(IL_DDS, data, size) > 0); // Save to buffer with the ilSaveIL function
+			
 		RELEASE_ARRAY(data);
 	}
 }
-
 

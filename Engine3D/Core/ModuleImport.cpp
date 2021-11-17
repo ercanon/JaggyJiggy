@@ -226,6 +226,7 @@ bool ModuleImport::LoadGeometry(const char* path) {
 			if (assimpMesh->HasTextureCoords(0))
 				StoreInBuffer(bytes, bytesPointer, sizeof(float2), &assimpMesh->mNumVertices);
 
+			// -- Material --//
 			if (scene->HasMaterials()) 
 			{
 				texture = scene->mMaterials[assimpMesh->mMaterialIndex];
