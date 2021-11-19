@@ -156,7 +156,7 @@ const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMa
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			Save(path);
+			Save(path.c_str());
 
 			delete[] data;
 			return textures[path];
@@ -186,7 +186,7 @@ bool ModuleTextures::Find(const std::string& path) const
 	return false;
 }
 
-void ModuleTextures::Save(const std::string& path)
+void ModuleTextures::Save(const char* path)
 {
 	ILuint size;
 	ILubyte* data;
@@ -195,8 +195,11 @@ void ModuleTextures::Save(const std::string& path)
 	if (size > 0) 
 	{
 		data = new ILubyte[size]; // allocate data buffer
-		if (ilSaveL(IL_DDS, data, size) > 0); // Save to buffer with the ilSaveIL function
-			
+		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
+		{
+			std::string pathShort = "Library/Materials/" + App->fileSystem->SetNormalName(path);
+			App->fileSystem->Save(pathShort.c_str(), (char*)data, size);
+		}
 		RELEASE_ARRAY(data);
 	}
 }

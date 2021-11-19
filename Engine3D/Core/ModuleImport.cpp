@@ -269,6 +269,9 @@ bool ModuleImport::LoadGeometry(const char* path) {
 				for (size_t j = 0; j < assimpMesh->mNumVertices; ++j)
 					StoreInBuffer(bytes, bytesPointer, sizeof(float2), &assimpMesh->mTextureCoords[0][j]);
 			}
+
+			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNormalName(path);
+			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 		}
 		aiReleaseImport(scene);
 		RELEASE_ARRAY(buffer);
