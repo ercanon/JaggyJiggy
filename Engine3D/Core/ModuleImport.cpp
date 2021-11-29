@@ -43,7 +43,6 @@ update_status ModuleImport::Update(float dt) {
 	return UPDATE_CONTINUE;
 }
 
-/*
 bool ModuleImport::LoadGeometry(const char* path) 
 {
 	//-- Own structure	
@@ -181,8 +180,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 	return true;
 }
-*/
-
+/*
 bool ModuleImport::LoadGeometry(const char* path) {
 
 	//-- Assimp stuff
@@ -281,7 +279,7 @@ bool ModuleImport::LoadGeometry(const char* path) {
 	RELEASE_ARRAY(buffer);
 
 	return true;
-}
+}*/
 
 void ModuleImport::StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, unsigned bytes, void* data)
 {
