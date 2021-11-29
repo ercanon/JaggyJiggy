@@ -117,7 +117,7 @@ void ComponentMesh::ComputeNormals()
 
 void ComponentMesh::GenerateBounds()
 {
-	
+	// Generate local AABB (?)
 	localAABB.SetNegativeInfinity();
 	localAABB.Enclose(&vertices[0], vertices.size());
 		

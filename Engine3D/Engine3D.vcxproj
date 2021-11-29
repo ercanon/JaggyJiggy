@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\Color.cpp" />
+    <ClCompile Include="Core\ComponentCamera.cpp" />
     <ClCompile Include="Core\ComponentMaterial.cpp" />
     <ClCompile Include="Core\ComponentMesh.cpp" />
     <ClCompile Include="Core\GameObject.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="Core\Assimp\include\version.h" />
     <ClInclude Include="Core\Color.h" />
     <ClInclude Include="Core\Component.h" />
+    <ClInclude Include="Core\ComponentCamera.h" />
     <ClInclude Include="Core\ComponentMaterial.h" />
     <ClInclude Include="Core\ComponentMesh.h" />
     <ClInclude Include="Core\DevIL\include\config.h" />

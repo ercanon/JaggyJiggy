@@ -179,6 +179,9 @@
     <ClCompile Include="Core\Application.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ComponentCamera.cpp">
+      <Filter>Engine\GameObjects - Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ImGui\imconfig.h">
@@ -702,6 +705,9 @@
     </ClInclude>
     <ClInclude Include="Core\Application.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ComponentCamera.h">
+      <Filter>Engine\GameObjects - Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

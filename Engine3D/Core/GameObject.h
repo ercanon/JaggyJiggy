@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <string>
+#include "Geometry/OBB.h"
+#include "Geometry/AABB.h"
 
 class Component;
 class ComponentTransform;
@@ -50,6 +52,11 @@ public:
 	
 	bool active = true;
 	bool isSelected = false;
+
+private:
+	
+	OBB globalOBB;
+	AABB globalAABB;
 
 };
 
