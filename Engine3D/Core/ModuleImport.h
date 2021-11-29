@@ -20,5 +20,5 @@ public:
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
 
-
+	void StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, unsigned bytes, void* data);
 };
