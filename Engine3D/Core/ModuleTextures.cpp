@@ -156,7 +156,7 @@ const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMa
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			Save(path.c_str());
+			textures.insert(std::make_pair(path, TextureObject(path, static_cast<uint>(textureId), width, height)));
 
 			delete[] data;
 			return textures[path];

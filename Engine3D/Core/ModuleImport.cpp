@@ -69,10 +69,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 			aiMesh* assimpMesh = scene->mMeshes[i];
 
-			std::string name;
-			FindNodeName(scene, i, name);
-			unsigned int sizeName = name.size();
-
+			// -- Store header --//
 			unsigned int NumIndices = 0;
 			if (assimpMesh->HasFaces())
 				NumIndices = assimpMesh->mNumFaces * 3;
@@ -85,35 +82,36 @@ bool ModuleImport::LoadGeometry(const char* path)
 			if (assimpMesh->HasTextureCoords(0))
 				NumCoords = assimpMesh->mNumVertices;
 
-			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &sizeName);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &assimpMesh->mNumVertices);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &NumIndices);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &NumNormals);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &NumCoords);
 
 			// -- Store name --//
-			const char* charName = name.c_str();
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*) * sizeName, &charName);
+			std::string name;
+			char charName[1024];
+			FindNodeName(scene, i, name);
+			strcpy(charName, name.c_str());
+
+			StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &name);
 
 			// -- Store material --//
-			if (scene->HasMaterials()) 
+			if (scene->HasMaterials())
 			{
-				aiMaterial* texture = scene->mMaterials[assimpMesh->mMaterialIndex];
+				std::string texturePath;
+				char charTexturePath[1024];
 
+				aiMaterial* texture = scene->mMaterials[assimpMesh->mMaterialIndex];
 				if (texture != nullptr)
 				{
-					aiString texturePath;
+					aiString path;
 
-					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &texturePath);
-					std::string new_path(texturePath.C_Str());
-					if (new_path.size() > 0) 
-					{
-						std::string texturePath = "Assets/Textures/" + new_path;
-						if (!App->textures->Find(texturePath))
-							const TextureObject& textureObject = App->textures->Load(texturePath);
-						else const TextureObject& textureObject = App->textures->Get(texturePath);
-					}
+					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &path);
+					texturePath = path.C_Str();
 				}
+				strcpy(charTexturePath, texturePath.c_str());
+
+				StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charTexturePath);
 			}
 
 			// -- Store vertex --//
@@ -124,17 +122,17 @@ bool ModuleImport::LoadGeometry(const char* path)
 			{
 				std::vector<uint> indices = std::vector<uint>(assimpMesh->mNumFaces * 3);
 
-				for (size_t i = 0; i < assimpMesh->mNumFaces; i++)
+				for (size_t f = 0; f < assimpMesh->mNumFaces; f++)
 				{
-					if (assimpMesh->mFaces[i].mNumIndices != 3)
+					if (assimpMesh->mFaces[f].mNumIndices != 3)
 					{
 						LOG("WARNING, geometry face with != 3 indices!");
-						assert(assimpMesh->mFaces[i].mNumIndices == 3);
+						assert(assimpMesh->mFaces[f].mNumIndices == 3);
 					}
 
-					indices[(i * 3)] = assimpMesh->mFaces[i].mIndices[0];
-					indices[(i * 3) + 1] = assimpMesh->mFaces[i].mIndices[1];
-					indices[(i * 3) + 2] = assimpMesh->mFaces[i].mIndices[2];
+					indices[(f * 3)] = assimpMesh->mFaces[f].mIndices[0];
+					indices[(f * 3) + 1] = assimpMesh->mFaces[f].mIndices[1];
+					indices[(f * 3) + 2] = assimpMesh->mFaces[f].mIndices[2];
 				}
 				StoreInBuffer(bytes, bytesPointer, sizeof(uint) * NumIndices, &indices[0]);
 			}
@@ -146,8 +144,13 @@ bool ModuleImport::LoadGeometry(const char* path)
 			// -- Store UV info --//
 			if (assimpMesh->HasTextureCoords(0))
 			{
-				for (size_t j = 0; j < assimpMesh->mNumVertices; ++j)
-					StoreInBuffer(bytes, bytesPointer, sizeof(float2), &assimpMesh->mTextureCoords[0][j]);
+				std::vector<float2> coords = std::vector<float2>(assimpMesh->mNumVertices);
+
+				for (size_t c = 0; c < assimpMesh->mNumVertices; ++c)
+					coords[c] = {	assimpMesh->mTextureCoords[0][c].x, 
+									assimpMesh->mTextureCoords[0][c].y	};
+
+				StoreInBuffer(bytes, bytesPointer, sizeof(float2) * NumCoords, &coords[0]);
 			}
 
 			// -- Save file --//
@@ -155,13 +158,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
-			ComponentMesh* mesh = LoadMeshFile(pathShort.c_str());
-			if (mesh != nullptr)
-			{
-				mesh->GenerateBuffers();
-				mesh->GenerateBounds();
-				mesh->ComputeNormals();
-			}
+			LoadMeshFile(pathShort.c_str());
 		}
 		aiReleaseImport(scene);
 		RELEASE_ARRAY(buffer);
@@ -181,7 +178,7 @@ void ModuleImport::StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, u
 	pointer += bytes;
 }
 
-ComponentMesh* ModuleImport::LoadMeshFile(const char* pathfile)
+void ModuleImport::LoadMeshFile(const char* pathfile)
 {
 	char* buffer;
 	uint bytes = App->fileSystem->Load(pathfile, &buffer);
@@ -189,26 +186,36 @@ ComponentMesh* ModuleImport::LoadMeshFile(const char* pathfile)
 	if (bytes > 0)
 	{
 		// -- Header --//
-		unsigned sizeName, numVertices, numIndices, numNormals, numCoords;
-		memcpy(&sizeName, &buffer[0], sizeof(unsigned int));
-		memcpy(&numVertices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
-		memcpy(&numIndices, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
-		memcpy(&numNormals, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
-		memcpy(&numCoords, &buffer[sizeof(unsigned int) * 4], sizeof(unsigned int));
+		unsigned numVertices, numIndices, numNormals, numCoords;
+		memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
+		memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
+		memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
+		memcpy(&numCoords, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
 
 		// -- Byte pointer --//
-		unsigned nameOffset = 5 * sizeof(unsigned);
-		unsigned verticesOffset = nameOffset + (sizeof(char*) * sizeName);
+		unsigned nameOffset = 4 * sizeof(unsigned);
+		unsigned textureOffset = nameOffset + (sizeof(char) * 1024);
+		unsigned verticesOffset = textureOffset + (sizeof(char) * 1024);
 		unsigned indicesOffset = verticesOffset + (sizeof(float3) * numVertices);
 		unsigned normalsOffset = indicesOffset + (sizeof(uint) * numIndices);
 		unsigned coordsOffset = normalsOffset + (sizeof(float3) * numNormals);
-		unsigned materialsOffset = coordsOffset + (sizeof(float2) * numCoords);
 
 		// -- Create mesh --//
-		const char* name;
-		memcpy(&name, &buffer[nameOffset], sizeof(char*) * sizeName);
-		GameObject* newGameObject = App->scene->CreateGameObject(name);
+		char charName[1024];
+		memcpy(&charName[0], &buffer[nameOffset], sizeof(char) * 1024);
+		std::string name(charName);
+
+		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
 		ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
+
+		char charTexturePath[1024];
+		memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
+		std::string texturePath(charTexturePath);
+		newMesh->texturePath = texturePath;
+		
+		const TextureObject& textureObject = App->textures->Load(texturePath);
+		ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+		materialComp->SetTexture(textureObject);
 
 		newMesh->numVertices = numVertices;
 		newMesh->numIndices = numIndices;
@@ -234,11 +241,12 @@ ComponentMesh* ModuleImport::LoadMeshFile(const char* pathfile)
 			memcpy(&newMesh->texCoords[0], &buffer[coordsOffset], sizeof(float2) * numCoords);
 		}
 
-		RELEASE(buffer);
-		return newMesh;
+		newMesh->GenerateBuffers();
+		newMesh->GenerateBounds();
+		newMesh->ComputeNormals();
 	}
+
 	RELEASE(buffer);
-	return nullptr;
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)
