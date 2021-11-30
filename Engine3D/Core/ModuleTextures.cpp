@@ -197,7 +197,7 @@ void ModuleTextures::Save(const char* path)
 		data = new ILubyte[size]; // allocate data buffer
 		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
 		{
-			std::string pathShort = "Library/Materials/" + App->fileSystem->SetNormalName(path, true) + ".fuk";
+			std::string pathShort = "Library/Materials/" + App->fileSystem->SetNameFile(path, ".fuk");
 			App->fileSystem->Save(pathShort.c_str(), (char*)data, size);
 		}
 		RELEASE_ARRAY(data);
