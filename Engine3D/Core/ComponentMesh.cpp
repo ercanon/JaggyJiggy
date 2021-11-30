@@ -117,7 +117,7 @@ void ComponentMesh::ComputeNormals()
 
 void ComponentMesh::GenerateBounds()
 {
-	// Generate local AABB (?)
+	// Generate local AABB
 	localAABB.SetNegativeInfinity();
 	localAABB.Enclose(&vertices[0], vertices.size());
 		
@@ -128,6 +128,14 @@ void ComponentMesh::GenerateBounds()
 
 	radius = sphere.r;
 	centerPoint = sphere.pos;
+
+	// Generate global OBB
+	owner->globalOBB = localAABB;
+	owner->globalOBB.Transform(owner->transform->transformMatrix);
+
+	// Generate global AABB
+	owner->globalAABB.SetNegativeInfinity();
+	owner->globalAABB.Enclose(owner->globalOBB);
 }
 
 void ComponentMesh::DrawNormals() const
@@ -167,6 +175,9 @@ float3 ComponentMesh::GetCenterPointInWorldCoords() const
 
 bool ComponentMesh::Update(float dt)
 {
+	// Update AABB/OBB
+	owner->globalOBB.Transform(owner->transform->transformMatrix);
+	owner->globalAABB.Transform(owner->transform->transformMatrix);
 
 	drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

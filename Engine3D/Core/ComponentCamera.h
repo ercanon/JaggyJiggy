@@ -1,23 +1,13 @@
 #pragma once
 
 /*#include "Component.h"
-#include "MathGeoLib/include/Math/float3.h"
+#include "Math/float3.h"
 
-class Camera;
-class ComponentTransform;
-
-class ComponentCamera : public Component
-{
-public:
-	ComponentCamera(GameObject* parent, Camera* cam);
-	~ComponentCamera();
-
-	bool Update(float dt);
+class ComponentCamera : public Component {
 
 public:
-	float3 offset = float3::zero;
-	
-private: 
-	Camera* cam = nullptr;
-	ComponentTransform* trans = nullptr;
+
+	ComponentCamera(GameObject* parent);
+
+	bool Update(float dt) override;
 };*/

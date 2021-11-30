@@ -53,8 +53,6 @@ public:
 	bool active = true;
 	bool isSelected = false;
 
-private:
-	
 	OBB globalOBB;
 	AABB globalAABB;
 
