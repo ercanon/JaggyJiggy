@@ -546,8 +546,8 @@ std::string ModuleFileSystem::GetUniqueName(const char* path, const char* name) 
 	return finalName;
 }
 
-std::string ModuleFileSystem::SetNormalName(const char* path) 
-{
+std::string ModuleFileSystem::SetNormalName(const char* path, bool type) {
+
 	std::string name(path);
 	std::string new_name;
 	bool found = false;
@@ -563,21 +563,11 @@ std::string ModuleFileSystem::SetNormalName(const char* path)
 	}
 	else {
 		new_name = name.substr(name.find_last_of('/') + 1);
+		if (type)
+		{
+			std::string end = new_name.substr(new_name.find_last_of('.'));
+			new_name = new_name.substr(0, new_name.length() - end.length());
+		}
 	}
 	return new_name;
-}
-
-std::string ModuleFileSystem::SetNameExtension(const char* path, const char* type)
-{
-	std::string new_file = SetNormalName(path);
-
-	if (type != nullptr)
-	{
-		std::string end = new_file.substr(new_file.find_last_of('.'));
-		new_file = new_file.substr(0, new_file.length() - end.size());
-
-		return new_file + type;
-	}
-	else
-		return new_file;
 }
