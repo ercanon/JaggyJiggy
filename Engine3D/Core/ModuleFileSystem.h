@@ -64,7 +64,9 @@ public:
 
 	std::string GetUniqueName(const char* path, const char* name) const;
 
-	std::string SetNormalName(const char* path, bool type = false);
+	std::string SetNormalName(const char* path);
+
+	std::string SetNameExtension(const char* path, const char* type = nullptr);
 
 	std::string systemBasePath;
 };

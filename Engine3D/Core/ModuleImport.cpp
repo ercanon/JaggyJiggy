@@ -7,7 +7,6 @@
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
 #include "ComponentMesh.h"
-#include "ComponentMaterial.h"
 #include "GameObject.h"
 
 #include <vector>
@@ -246,13 +245,8 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &texturePath);
 					std::string new_path(texturePath.C_Str());
-					if (new_path.size() > 0) 
-					{
-						std::string texturePath = "Assets/Textures/" + new_path;
-						if (!App->textures->Find(texturePath))
-							const TextureObject& textureObject = App->textures->Load(texturePath);
-						else const TextureObject& textureObject = App->textures->Get(texturePath);
-					}
+					if (new_path.size() > 0)
+						LoadMaterials(new_path.c_str());
 				}
 			}
 
@@ -291,7 +285,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNormalName(path, true) + ".fuk";
+			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameExtension(path, ".fuk");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -309,6 +303,22 @@ bool ModuleImport::LoadGeometry(const char* path)
 	else LOG("Error loading scene %s", path);
 
 	RELEASE_ARRAY(buffer);
+
+	return true;
+}
+
+bool ModuleImport::LoadMaterials(const char* path)
+{
+	std::string texturePath = "Assets/Textures/" + App->fileSystem->SetNameExtension(path, ".fuk");
+	TextureObject* texture;
+
+	if (App->fileSystem->Exists(texturePath))
+		texture = LoadMaterialFile(texturePath.c_str());
+	else
+	{
+		App->textures->Save(texturePath.c_str());
+		texture = LoadMaterialFile(texturePath.c_str());
+	}
 
 	return true;
 }
@@ -376,6 +386,21 @@ ComponentMesh* ModuleImport::LoadMeshFile(const char* pathfile)
 
 		RELEASE(buffer);
 		return newMesh;
+	}
+	RELEASE(buffer);
+	return nullptr;
+}
+
+TextureObject* ModuleImport::LoadMaterialFile(const char* pathfile)
+{
+	char* buffer;
+	uint bytes = App->fileSystem->Load(pathfile, &buffer);
+
+	if (bytes > 0)
+	{
+
+		RELEASE(buffer);
+		//return newMesh;
 	}
 	RELEASE(buffer);
 	return nullptr;
