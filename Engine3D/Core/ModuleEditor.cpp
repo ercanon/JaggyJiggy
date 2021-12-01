@@ -41,6 +41,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
     gameobjectSelected = nullptr;
+    newCam = nullptr;
 }
 
 
@@ -386,6 +387,13 @@ void ModuleEditor::MenuBar()
                 }
                 ImGui::EndMenu();
             }
+
+            if (ImGui::MenuItem("Camera") && newCam == nullptr)
+            {
+                GameObject* newGameObject = App->scene->CreateGameObject("Camera");
+                newCam = new ComponentCamera(newGameObject, true);
+            }
+
             ImGui::EndMenu();
         }
 
@@ -587,6 +595,20 @@ void ModuleEditor::UpdateWindowStatus()
     if (showGameWindow) 
     {
         ImGui::Begin("Game", &showGameWindow, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar);
+
+        if (newCam != nullptr)
+        {
+            ImVec2 viewportSize = ImGui::GetCurrentWindow()->Size;
+            if (viewportSize.x != lastViewportSize2.x || viewportSize.y != lastViewportSize2.y)
+            {
+                newCam->aspectRatio = viewportSize.x / viewportSize.y;
+                newCam->RecalculateProjection();
+            }
+
+            lastViewportSize2 = viewportSize;
+            //ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        }
+
         ImGui::End();
     }
 
@@ -602,7 +624,7 @@ void ModuleEditor::UpdateWindowStatus()
         }
 
         lastViewportSize = viewportSize;
-        ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        //ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         
         if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
         else App->camera->isMouseFocused = false;

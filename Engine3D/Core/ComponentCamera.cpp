@@ -3,45 +3,65 @@
 #include "GameObject.h"
 #include "ModuleCamera3D.h"
 
-//ComponentCamera::ComponentCamera(GameObject* parent) : Component(parent) {
-//
-//	cameraFrustum.type = FrustumType::PerspectiveFrustum;
-//	cameraFrustum.nearPlaneDistance = 1.f;
-//	cameraFrustum.farPlaneDistance = 5000.f;
-//	cameraFrustum.up = float3(0.0f, 1.0f, 0.0f);
-//	cameraFrustum.front = float3(0.0f, 0.0f, 1.0f); 
-//	cameraFrustum.pos = float3(0.0f, 5.0f, -15.0f);
-//	cameraFrustum.verticalFov = 60.0f * DEGTORAD;
-//	cameraFrustum.horizontalFov = 2.0f * atanf(tanf(cameraFrustum.verticalFov / 2.0f) * 1.3f);
-//	
-//}	
-//// NOW THIS!
-//bool ComponentCamera::Update(float dt) 
-//{
-//	
-//	return UPDATE_CONTINUE;
-//}
-//
-//void LookAt(const float3& point) {
-//
-//}
-//
-//void CalculateViewMatrix() {
-//
-//}
-//
-//void RecalculateProjection() {
-//
-//}
-//
-//void OnGui() {
-//
-//}
-//
-//void OnSave(JSONWriter& writer) {
-//
-//}
-//
-//void OnLoad(const JSONReader& reader) {
-//
-//}
+ComponentCamera::ComponentCamera(GameObject* parent) : Component(parent) {}	
+
+ComponentCamera::ComponentCamera(GameObject* parent, bool CanCam) : Component(parent)
+{
+	right = float3(1.0f, 0.0f, 0.0f);
+	up = float3(0.0f, 1.0f, 0.0f);
+	front = float3(0.0f, 0.0f, 1.0f);
+
+	position = float3(20.0f, 10.0f, -30.0f);
+	reference = float3(0.0f, 0.0f, 0.0f);
+
+	CalculateViewMatrix();
+
+	LookAt(float3::zero);
+}
+
+ComponentCamera::~ComponentCamera() {}
+
+void ComponentCamera::LookAt(const float3& point) {
+	reference = point;
+
+	front = (reference - position).Normalized();
+	right = float3(0.0f, 1.0f, 0.0f).Cross(front).Normalized();
+	up = front.Cross(right);
+
+	CalculateViewMatrix();
+}
+
+void ComponentCamera::CalculateViewMatrix() {
+	if (projectionIsDirty)
+		RecalculateProjection();
+
+	cameraFrustum.pos = position;
+	cameraFrustum.front = front.Normalized();
+	cameraFrustum.up = up.Normalized();
+	float3::Orthonormalize(cameraFrustum.front, cameraFrustum.up);
+	right = up.Cross(front);
+	viewMatrix = cameraFrustum.ViewMatrix();
+}
+
+void ComponentCamera::RecalculateProjection() {
+	cameraFrustum.type = FrustumType::PerspectiveFrustum;
+	cameraFrustum.nearPlaneDistance = nearPlaneDistance;
+	cameraFrustum.farPlaneDistance = farPlaneDistance;
+	cameraFrustum.verticalFov = (verticalFOV * 3.141592 / 2) / 180.f;
+	cameraFrustum.horizontalFov = 2.f * atanf(tanf(cameraFrustum.verticalFov * 0.5f) * aspectRatio);
+}
+
+void ComponentCamera::OnGui() {
+
+	if (ImGui::CollapsingHeader("TestCam"))
+	{
+	}
+}
+
+/*void OnSave(JSONWriter& writer) { //Needed?
+
+}
+
+void OnLoad(const JSONReader& reader) { //Needed?
+
+}*/

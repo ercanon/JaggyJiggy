@@ -3,6 +3,7 @@
 #include "Globals.h"
 
 #include "ImGui/imgui.h"
+#include "ComponentCamera.h"
 #include <string>
 
 //Forward declaration
@@ -69,7 +70,9 @@ public:
 	ImGuiWindowFlags sceneWindow = 0;
 
 	GameObject* gameobjectSelected;
+	ComponentCamera* newCam;
 
 	ImVec2 lastViewportSize;
+	ImVec2 lastViewportSize2;
 
 };

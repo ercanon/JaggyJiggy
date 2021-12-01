@@ -8,19 +8,11 @@
 #include "glew.h"
 #include <gl/GL.h>
 
-ModuleViewportFrameBuffer::ModuleViewportFrameBuffer(Application* app, bool start_enabled) : Module(app, start_enabled){
+ModuleViewportFrameBuffer::ModuleViewportFrameBuffer(){}
 
-	show_viewport_window = true;
-}
+ModuleViewportFrameBuffer::~ModuleViewportFrameBuffer(){}
 
-ModuleViewportFrameBuffer::~ModuleViewportFrameBuffer()
-{}
-
-bool  ModuleViewportFrameBuffer::Init() {
-	return true;
-}
-
-bool ModuleViewportFrameBuffer::Start() {
+void ModuleViewportFrameBuffer::Start() {
 
 	bool ret = false;
 	glGenFramebuffers(1, &frameBuffer);
@@ -48,35 +40,25 @@ bool ModuleViewportFrameBuffer::Start() {
 	//After binding tex data, we must unbind renderbuffer and framebuffer not usefull anymore
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-	return true;
 }
 
-update_status ModuleViewportFrameBuffer::PreUpdate(float dt) {
+void ModuleViewportFrameBuffer::PreUpdate() {
 
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	return UPDATE_CONTINUE;
+
 }
 
 
-update_status ModuleViewportFrameBuffer::PostUpdate(float dt) {
-
-	
+void ModuleViewportFrameBuffer::PostUpdate() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	return UPDATE_CONTINUE;
 }
 
-bool ModuleViewportFrameBuffer::CleanUp() {
+void ModuleViewportFrameBuffer::CleanUp() {
 
 	texture ? glDeleteTextures(1, &texture) : 0;
 	frameBuffer ? glDeleteFramebuffers(1, &frameBuffer) : 0;
 	renderBufferoutput ? glDeleteRenderbuffers(1, &renderBufferoutput): 0;
 
-	return true;
 }

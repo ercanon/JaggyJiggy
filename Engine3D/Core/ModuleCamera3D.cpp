@@ -97,6 +97,9 @@ update_status ModuleCamera3D::Update(float dt)
 
 	position += newPos;
 
+	// Recalculate matrix -------------
+	if (!newPos.Equals(float3::zero)) CalculateViewMatrix();
+
 	// Mouse motion ----------------
 
 	bool hasRotated = false;
@@ -187,7 +190,6 @@ void ModuleCamera3D::CalculateViewMatrix()
 {
 	if (projectionIsDirty)
 		RecalculateProjection();
-
 	cameraFrustum.pos = position;
 	cameraFrustum.front = front.Normalized();
 	cameraFrustum.up = up.Normalized();
