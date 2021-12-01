@@ -161,9 +161,9 @@ const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std:
 			glBindTexture(GL_TEXTURE_2D, 0);
 
 		}
-	}
 
-	delete[] data;
+		delete[] data;
+	}
 }
 
 // Load new texture from file path

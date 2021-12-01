@@ -96,7 +96,6 @@ void ComponentMesh::GenerateBuffers() {
 
 void ComponentMesh::ComputeNormals()
 {
-
 	numNormalFaces = numIndices * 3;
 	faceNormals.resize(numNormalFaces);
 	faceCenters.resize(numNormalFaces);

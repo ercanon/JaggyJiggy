@@ -52,7 +52,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 	if (buffer == nullptr) 
 	{
-		std::string normPathShort = "Assets/Models/" + App->fileSystem->SetNameFile(path);
+		std::string normPathShort = App->fileSystem->SetNameFile(path);
 		bytesFile = App->fileSystem->Load(normPathShort.c_str(), &buffer);
 	}
 	if (buffer != nullptr) 
@@ -91,7 +91,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			std::string name;
 			char charName[1024];
 			FindNodeName(scene, i, name);
-			strcpy(charName, name.c_str());
+			strncpy(charName, name.c_str(), sizeof(charName));
 
 			StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charName);
 
@@ -108,14 +108,18 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &path);
 					texturePath = path.C_Str();
+					if (texturePath.size() > 0)
+					{
+						texturePath = App->fileSystem->SetNameFile(texturePath.c_str());
+						std::string textureFile(texturePath);
 
-					std::string textureFile(texturePath);
-					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(texturePath.c_str(), ".fuk");
+						texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
 
-					if (!App->fileSystem->Exists(texturePath))
-						App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
+						if (!App->fileSystem->Exists(texturePath))
+							App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
+					}
 				}
-				strcpy(charTexturePath, texturePath.c_str());
+				strncpy(charTexturePath, texturePath.c_str(), sizeof(charTexturePath));
 
 				StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charTexturePath);
 			}
@@ -131,10 +135,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 				for (size_t f = 0; f < assimpMesh->mNumFaces; f++)
 				{
 					if (assimpMesh->mFaces[f].mNumIndices != 3)
-					{
 						LOG("WARNING, geometry face with != 3 indices!");
-						assert(assimpMesh->mFaces[f].mNumIndices == 3);
-					}
 
 					indices[(f * 3)] = assimpMesh->mFaces[f].mIndices[0];
 					indices[(f * 3) + 1] = assimpMesh->mFaces[f].mIndices[1];
@@ -160,7 +161,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(path, ".fuk");
+			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -220,17 +221,20 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		std::string texturePath(charTexturePath);
 		newMesh->texturePath = texturePath;
 		
-		if (!App->textures->Find(texturePath))
+		if (texturePath.size() > 0)
 		{
-			const TextureObject& textureObject = App->textures->Load(texturePath);
-			ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
-			materialComp->SetTexture(textureObject);
-		}
-		else
-		{
-			const TextureObject& textureObject = App->textures->Get(texturePath);
-			ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
-			materialComp->SetTexture(textureObject);
+			if (!App->textures->Find(texturePath))
+			{
+				const TextureObject& textureObject = App->textures->Load(texturePath);
+				ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+				materialComp->SetTexture(textureObject);
+			}
+			else
+			{
+				const TextureObject& textureObject = App->textures->Get(texturePath);
+				ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+				materialComp->SetTexture(textureObject);
+			}
 		}
 
 
