@@ -189,6 +189,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				{
 
 				}
+				else LOG("File %s could not be readed. This engine do not support this kind of files.", filePath)
 			};
 
 			SDL_free(&filePath);
