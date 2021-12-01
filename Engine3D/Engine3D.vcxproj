@@ -69,6 +69,7 @@
     <ClCompile Include="Core\ModuleTextures.cpp" />
     <ClCompile Include="Core\ModuleWindow.cpp" />
     <ClCompile Include="Core\par_shapes.cpp" />
+    <ClCompile Include="Core\pcg-c\include\pcg_basic.c" />
     <ClCompile Include="Core\PerfTimer.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Core\ComponentTransform.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="Core\p2Defs.h" />
     <ClInclude Include="Core\par_shapes.h" />
     <ClInclude Include="Core\PathNode.h" />
+    <ClInclude Include="Core\pcg-c\include\pcg_basic.h" />
     <ClInclude Include="Core\PerfTimer.h" />
     <ClInclude Include="Core\PhysFS\include\physfs.h" />
     <ClInclude Include="Core\rapidjson-1.1.0\include\rapidjson\allocators.h" />

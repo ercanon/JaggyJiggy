@@ -14,6 +14,7 @@
 #include <queue>
 #include "SDL/include/SDL_opengl.h"
 #include "Math/float2.h"
+#include "pcg-c/include/pcg_basic.h"
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -110,7 +111,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 					texturePath = path.C_Str();
 
 					/*---EXAMPLE---*/
-					//pcg32 rng(0);
+					uint random = pcg32_random();
 
 					std::string textureFile(texturePath);
 					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(texturePath.c_str(), ".fuk");
