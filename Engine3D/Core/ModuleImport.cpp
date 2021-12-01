@@ -14,6 +14,7 @@
 #include <queue>
 #include "SDL/include/SDL_opengl.h"
 #include "Math/float2.h"
+#include "pcg-c/include/pcg_basic.h"
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
@@ -146,7 +147,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 			// -- Store Normals info --//
 			if (assimpMesh->HasNormals()) 
-				StoreInBuffer(bytes, bytesPointer, sizeof(float3) * assimpMesh->mNumVertices, &assimpMesh->mNormals);
+				StoreInBuffer(bytes, bytesPointer, sizeof(float3) * assimpMesh->mNumVertices, &assimpMesh->mNormals[0]);
 
 			// -- Store UV info --//
 			if (assimpMesh->HasTextureCoords(0))
@@ -161,7 +162,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
+			std::string pathShort = "Library/Meshes/" + pcg32_random() + App->fileSystem->SetNameFile(path, ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -268,6 +269,45 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 	}
 
 	RELEASE(buffer);
+}
+
+void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::string name)
+{
+	std::vector<char> bytes;
+	unsigned bytesPointer = 0;
+
+	ComponentMesh* mesh = gameObject->GetComponent<ComponentMesh>();
+	ComponentMaterial* texture = gameObject->GetComponent<ComponentMaterial>();
+
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numVertices);
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numIndices);
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numVertices);	//Normals
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numVertices);	//Coords
+
+	char charName[1024];
+	strcpy(charName, gameObject->name.c_str());
+	StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charName);
+
+	char charTexturePath[1024];
+	strcpy(charName, texture->GetTextureName().c_str());
+	StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charTexturePath);
+
+	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->vertices[0]);
+	StoreInBuffer(bytes, bytesPointer, sizeof(uint) * mesh->numIndices, &mesh->indices[0]);
+	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->normals[0]);
+	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->texCoords[0]);
+
+	if (name.size() > 0)
+	{
+		std::string pathShort = path + App->fileSystem->SetNameFile(name.c_str(), ".fbx");
+		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
+	}
+	else
+	{
+		std::string pathShort = path + App->fileSystem->SetNameFile(gameObject->name.c_str(), ".fbx");
+		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
+	}
+
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)

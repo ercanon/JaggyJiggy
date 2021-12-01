@@ -185,6 +185,9 @@
     <ClCompile Include="Core\ModuleResources.cpp">
       <Filter>Engine\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
+      <Filter>ExternalLibraries\pcg-c</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ImGui\imconfig.h">
@@ -715,6 +718,9 @@
     <ClInclude Include="Core\ModuleResources.h">
       <Filter>Engine\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
+      <Filter>ExternalLibraries\pcg-c</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ExternalLibraries">
@@ -770,6 +776,9 @@
     </Filter>
     <Filter Include="Engine\Tools">
       <UniqueIdentifier>{3b33fd60-8311-4ddf-87d9-d36b91d2b082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExternalLibraries\pcg-c">
+      <UniqueIdentifier>{fa186cdd-16d0-4c6a-90e1-dc9806a8c0c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
