@@ -185,6 +185,10 @@ update_status ModuleInput::PreUpdate(float dt)
 						}
 					}
 				}
+				else if (fileName.substr(fileName.find_last_of(".")) == ".fuk")
+				{
+
+				}
 			};
 
 			SDL_free(&filePath);

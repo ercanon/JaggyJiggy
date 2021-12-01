@@ -152,6 +152,8 @@ const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std:
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			}
+			iluFlipImage();
+
 			Save(pathDestiny.c_str());
 
 			ilDeleteImages(1, &imageId);
