@@ -4,6 +4,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "ModuleImport.h"
+#include "ComponentCamera.h"
 
 #include "GameObject.h"
 class ModuleScene : public Module
@@ -21,4 +22,5 @@ public:
 public:
 	
 	GameObject* root;
+	GameObject* gameCamera;
 };

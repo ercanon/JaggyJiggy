@@ -9,6 +9,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
+#include "ModuleViewportFrameBuffer.h"
 #include "ModuleFileSystem.h"
 #include "ModuleTextures.h"
 #include "ModuleResources.h"
@@ -25,6 +26,7 @@ Application::Application()
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	editor = new ModuleEditor(this);
+	viewportBuffer = new ModuleViewportFrameBuffer(this);
 	import = new ModuleImport(this);
 	fileSystem = new ModuleFileSystem(this);
 	textures = new ModuleTextures(this);
@@ -44,6 +46,7 @@ Application::Application()
 	AddModule(resources);
 	
 	// Scenes
+	AddModule(viewportBuffer);
 	AddModule(scene);
 	AddModule(editor);
 

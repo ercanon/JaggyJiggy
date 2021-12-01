@@ -624,7 +624,7 @@ void ModuleEditor::UpdateWindowStatus()
         }
 
         lastViewportSize = viewportSize;
-        //ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         
         if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
         else App->camera->isMouseFocused = false;

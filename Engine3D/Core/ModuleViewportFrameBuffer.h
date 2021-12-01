@@ -1,18 +1,20 @@
 #pragma once
+#include "Module.h"
 #include "Globals.h"
 
 #include <string>
 
-class ModuleViewportFrameBuffer
+class ModuleViewportFrameBuffer : public Module
 {
 public:
-	ModuleViewportFrameBuffer();
+	ModuleViewportFrameBuffer(Application* app, bool start_enabled = true);
 	~ModuleViewportFrameBuffer();
 
-	void Start();
-	void PreUpdate();
-	void PostUpdate();
-	void CleanUp();
+	bool Init() override;
+	bool Start() override;
+	update_status PreUpdate(float dt) override;
+	update_status PostUpdate(float dt) override;
+	bool CleanUp();
 
 public:
 

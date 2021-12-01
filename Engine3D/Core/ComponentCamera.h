@@ -5,6 +5,7 @@
 #include "Math/float4x4.h"
 #include "Geometry/Frustum.h"
 #include "Globals.h"
+#include "ModuleViewportFrameBuffer.h"
 #include "ImGui/imgui.h"
 
 class ComponentCamera : public Component 
@@ -29,6 +30,9 @@ public:
 	float nearPlaneDistance = 1.f;
 	float farPlaneDistance = 5000.f;
 	bool projectionIsDirty = false;
+
+	ModuleViewportFrameBuffer* frambuffer;
+
 
 private:
 

@@ -7,6 +7,7 @@
 #include "ModuleTextures.h"
 #include "ModuleCamera3D.h"
 #include "Component.h"
+#include "GameObject.h"
 #include <stack>
 #include <queue>
 
@@ -24,6 +25,9 @@ bool ModuleScene::Start()
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
 	
+	gameCamera->CreateComponent<ComponentCamera>();
+	//gameCamera->components.at(0)->owner.
+
 	return ret;
 }
 

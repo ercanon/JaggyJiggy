@@ -15,6 +15,7 @@ class ModuleInput;
 class ModuleScene;
 class ModuleRenderer3D;
 class ModuleCamera3D;
+class ModuleViewportFrameBuffer;
 class ModuleEditor;
 class ModuleImport;
 class ModuleFileSystem;
@@ -31,6 +32,7 @@ public:
 	ModuleRenderer3D* renderer3D { nullptr };
 	ModuleCamera3D* camera { nullptr };
 	ModuleEditor* editor { nullptr };
+	ModuleViewportFrameBuffer* viewportBuffer{ nullptr };
 	ModuleImport* import { nullptr };
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };
