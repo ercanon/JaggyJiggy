@@ -109,6 +109,9 @@ bool ModuleImport::LoadGeometry(const char* path)
 					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &path);
 					texturePath = path.C_Str();
 
+					/*---EXAMPLE---*/
+					//pcg32 rng(0);
+
 					std::string textureFile(texturePath);
 					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(texturePath.c_str(), ".fuk");
 
