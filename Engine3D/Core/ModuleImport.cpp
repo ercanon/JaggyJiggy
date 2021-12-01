@@ -162,7 +162,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + pcg32_random() + App->fileSystem->SetNameFile(path, ".jgg");
+			std::string pathShort = "Library/Meshes/" + std::to_string(pcg32_random()) + App->fileSystem->SetNameFile(path, ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
