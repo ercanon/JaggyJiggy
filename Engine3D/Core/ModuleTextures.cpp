@@ -95,16 +95,16 @@ bool ModuleTextures::CleanUp() //can be called to reset stored textures
 }
 
 // Load new texture from file path
-const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMaps)
+const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std::string& pathDestiny, bool useMipMaps)
 {
-	LOG("Loading texture -> %s", path.c_str());
+	LOG("Loading texture -> %s", pathOrigin.c_str());
 
 	ILuint imageId;
 	ilGenImages(1, &imageId);
 	ilBindImage(imageId);
 
 	char* data;
-	uint bytes = App->fileSystem->Load(path.c_str(), &data);
+	uint bytes = App->fileSystem->Load(pathOrigin.c_str(), &data);
 
 	if (bytes != 0)
 	{
@@ -152,20 +152,92 @@ const TextureObject& ModuleTextures::Load(const std::string& path, bool useMipMa
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			}
+			Save(pathDestiny.c_str());
+
 			ilDeleteImages(1, &imageId);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			textures.insert(std::make_pair(path, TextureObject(path, static_cast<uint>(textureId), width, height)));
+		}
+	}
+
+	delete[] data;
+}
+
+// Load new texture from file path
+const TextureObject& ModuleTextures::Load(const std::string& pathOrigin, bool useMipMaps)
+{
+	LOG("Loading texture -> %s", pathOrigin.c_str());
+
+	ILuint imageId;
+	ilGenImages(1, &imageId);
+	ilBindImage(imageId);
+
+	char* data;
+	uint bytes = App->fileSystem->Load(pathOrigin.c_str(), &data);
+
+	if (bytes != 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, data, bytes))
+		{
+			GLuint textureId = 0;
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glGenTextures(1, &textureId);
+
+			glBindTexture(GL_TEXTURE_2D, textureId);
+
+			ILinfo ImageInfo;
+			iluGetImageInfo(&ImageInfo);
+			if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT)
+			{
+				iluFlipImage();
+			}
+
+			int channels = ilGetInteger(IL_IMAGE_CHANNELS);
+			if (channels == 3)
+			{
+				ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+			}
+			else if (channels == 4)
+			{
+				ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+			}
+
+			ILubyte* imageData = ilGetData();
+			int width = ilGetInteger(IL_IMAGE_WIDTH);
+			int height = ilGetInteger(IL_IMAGE_HEIGHT);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT), width, height, 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, imageData);
+
+			if (useMipMaps)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+				glGenerateMipmap(GL_TEXTURE_2D);
+			}
+			else
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			}
+
+			ilDeleteImages(1, &imageId);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			textures.insert(std::make_pair(pathOrigin, TextureObject(pathOrigin, static_cast<uint>(textureId), width, height)));
 
 			delete[] data;
-			return textures[path];
+			return textures[pathOrigin];
 		}
 		delete[] data;
 
 	}
 	return textures["BLACK_FALLBACK"];
 }
+
 
 const TextureObject& ModuleTextures::Get(const std::string& path)
 {
@@ -196,10 +268,7 @@ void ModuleTextures::Save(const char* path)
 	{
 		data = new ILubyte[size]; // allocate data buffer
 		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
-		{
-			std::string pathShort = "Library/Materials/" + App->fileSystem->SetNameFile(path, ".fuk");
-			App->fileSystem->Save(pathShort.c_str(), (char*)data, size);
-		}
+			App->fileSystem->Save(path, (char*)data, size);
 		RELEASE_ARRAY(data);
 	}
 }

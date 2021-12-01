@@ -155,27 +155,33 @@ update_status ModuleInput::PreUpdate(float dt)
 				else if (fileName.substr(fileName.find_last_of(".")) == ".jpg" || fileName.substr(fileName.find_last_of(".")) == ".png" || fileName.substr(fileName.find_last_of(".")) == ".PNG" || fileName.substr(fileName.find_last_of(".")) == ".JPG")
 				{
 					LOG("Path of file dropped will be %s", filePath);
-					std::string realFileName = fileName.substr(fileName.find_last_of("\\") + 1);
-					if (App->textures->Find(realFileName))
+					std::string texturePath(filePath);
+					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(filePath, ".fuk");
+
+					if (!App->fileSystem->Exists(texturePath))
+						App->textures->SaveTexture(filePath, texturePath.c_str());
+
+					if (App->textures->Find(texturePath))
 					{
-						TextureObject texture = App->textures->Get(realFileName);
+						TextureObject texture = App->textures->Get(texturePath);
 						if (App->editor->gameobjectSelected)
 						{
 							if (ComponentMaterial* material = App->editor->gameobjectSelected->GetComponent<ComponentMaterial>())
-							{
 								material->SetTexture(texture);
-							}
+							else
+								App->editor->gameobjectSelected->CreateComponent<ComponentMaterial>()->SetTexture(texture);
 						}
 					}
 					else
 					{
-						TextureObject texture = App->textures->Load(realFileName);
+						TextureObject texture = App->textures->Load(texturePath);
 						if (App->editor->gameobjectSelected)
 						{
 							if (ComponentMaterial* material = App->editor->gameobjectSelected->GetComponent<ComponentMaterial>())
-							{
 								material->SetTexture(texture);
-							}
+							else
+								App->editor->gameobjectSelected->CreateComponent<ComponentMaterial>()->SetTexture(texture);
+
 						}
 					}
 				}

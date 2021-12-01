@@ -24,7 +24,8 @@ public:
 	bool Start() override;
 	bool CleanUp() override;
 
-	const TextureObject& Load(const std::string& path, bool useMipMaps = false);
+	const void SaveTexture(const std::string& pathOrigin, const std::string& pathDestiny, bool useMipMaps = false);
+	const TextureObject& Load(const std::string& pathOrigin, bool useMipMaps = false);
 	void Save(const char* path);
 	const TextureObject& Get(const std::string& path);
 

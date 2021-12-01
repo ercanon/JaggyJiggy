@@ -93,7 +93,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			FindNodeName(scene, i, name);
 			strcpy(charName, name.c_str());
 
-			StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &name);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charName);
 
 			// -- Store material --//
 			if (scene->HasMaterials())
@@ -108,6 +108,12 @@ bool ModuleImport::LoadGeometry(const char* path)
 
 					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &path);
 					texturePath = path.C_Str();
+
+					std::string textureFile(texturePath);
+					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(texturePath.c_str(), ".fuk");
+
+					if (!App->fileSystem->Exists(texturePath))
+						App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
 				}
 				strcpy(charTexturePath, texturePath.c_str());
 
@@ -208,14 +214,25 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
 		ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
 
+
 		char charTexturePath[1024];
 		memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
 		std::string texturePath(charTexturePath);
 		newMesh->texturePath = texturePath;
 		
-		const TextureObject& textureObject = App->textures->Load(texturePath);
-		ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
-		materialComp->SetTexture(textureObject);
+		if (!App->textures->Find(texturePath))
+		{
+			const TextureObject& textureObject = App->textures->Load(texturePath);
+			ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+			materialComp->SetTexture(textureObject);
+		}
+		else
+		{
+			const TextureObject& textureObject = App->textures->Get(texturePath);
+			ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+			materialComp->SetTexture(textureObject);
+		}
+
 
 		newMesh->numVertices = numVertices;
 		newMesh->numIndices = numIndices;
