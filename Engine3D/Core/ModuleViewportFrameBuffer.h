@@ -8,6 +8,7 @@ class ModuleViewportFrameBuffer : public Module
 {
 public:
 	ModuleViewportFrameBuffer(Application* app, bool start_enabled = true);
+	ModuleViewportFrameBuffer();
 	~ModuleViewportFrameBuffer();
 
 	bool Init() override;

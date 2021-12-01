@@ -25,8 +25,9 @@ bool ModuleScene::Start()
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
 	
+	gameCamera = new GameObject; 
 	gameCamera->CreateComponent<ComponentCamera>();
-	//gameCamera->components.at(0)->owner.
+	gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
 
 	return ret;
 }
