@@ -12,7 +12,7 @@ ModuleViewportFrameBuffer::ModuleViewportFrameBuffer(Application* app, bool star
 	show_viewport_window = true;
 }
 
-ModuleViewportFrameBuffer::ModuleViewportFrameBuffer(){}
+//ModuleViewportFrameBuffer::ModuleViewportFrameBuffer(){}
 
 ModuleViewportFrameBuffer::~ModuleViewportFrameBuffer(){}
 

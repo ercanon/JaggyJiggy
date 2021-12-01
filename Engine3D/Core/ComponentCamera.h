@@ -31,7 +31,7 @@ public:
 	float farPlaneDistance = 5000.f;
 	bool projectionIsDirty = false;
 
-	ModuleViewportFrameBuffer frambuffer;
+	//ModuleViewportFrameBuffer frambuffer;
 
 
 private:

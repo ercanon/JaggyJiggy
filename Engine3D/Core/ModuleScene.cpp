@@ -27,7 +27,7 @@ bool ModuleScene::Start()
 	
 	gameCamera = new GameObject; 
 	gameCamera->CreateComponent<ComponentCamera>();
-	gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
+	//gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
 
 	return ret;
 }
