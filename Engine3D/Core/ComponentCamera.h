@@ -19,8 +19,7 @@ public:
 	void CalculateViewMatrix();
 	void RecalculateProjection();
 	void OnGui() override;
-	//void OnSave(JSONWriter& writer);
-	//void OnLoad(const JSONReader& reader);
+	void Draw();
 
 	float3 right, up, front, position, reference;
 	Frustum cameraFrustum;
@@ -30,9 +29,6 @@ public:
 	float nearPlaneDistance = 1.f;
 	float farPlaneDistance = 5000.f;
 	bool projectionIsDirty = false;
-
-	//ModuleViewportFrameBuffer frambuffer;
-
 
 private:
 

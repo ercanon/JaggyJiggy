@@ -81,6 +81,9 @@ bool ModuleEditor::Start()
     
     CreateGridBuffer();
 
+    GameObject* newGameObject = App->scene->CreateGameObject("Camera");
+    newCam = new ComponentCamera(newGameObject, true);
+
     return ret;
 }
 
@@ -388,12 +391,6 @@ void ModuleEditor::MenuBar()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::MenuItem("Camera") && newCam == nullptr)
-            {
-                GameObject* newGameObject = App->scene->CreateGameObject("Camera");
-                newCam = new ComponentCamera(newGameObject, true);
-            }
-
             ImGui::EndMenu();
         }
 
@@ -606,7 +603,7 @@ void ModuleEditor::UpdateWindowStatus()
             }
 
             lastViewportSize2 = viewportSize;
-            ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((ImTextureID)App->viewportBuffer2->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         }
 
         ImGui::End();

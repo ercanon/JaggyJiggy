@@ -6,6 +6,7 @@
 #include "ModuleImport.h"
 #include "ModuleTextures.h"
 #include "ModuleCamera3D.h"
+#include "ModuleEditor.h"
 #include "Component.h"
 #include "GameObject.h"
 #include <stack>
@@ -25,8 +26,8 @@ bool ModuleScene::Start()
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
 	
-	gameCamera = new GameObject; 
-	gameCamera->CreateComponent<ComponentCamera>();
+	//gameCamera = new GameObject; 
+	//gameCamera->CreateComponent<ComponentCamera>();
 	//gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
 
 	return ret;
@@ -75,6 +76,31 @@ update_status ModuleScene::Update(float dt)
 		{
 			S.push(child);
 		}
+	}
+	App->editor->DrawGrid();
+	App->viewportBuffer->PostUpdate(dt);
+
+	if (App->editor->newCam != nullptr)
+	{
+		App->editor->newCam->Draw();
+		std::queue<GameObject*> S;
+		for (GameObject* child : root->children)
+		{
+			S.push(child);
+		}
+
+		while (!S.empty())
+		{
+			GameObject* go = S.front();
+			go->Update(dt);
+			S.pop();
+			for (GameObject* child : go->children)
+			{
+				S.push(child);
+			}
+		}
+		//App->editor->DrawGrid();
+		App->viewportBuffer2->PostUpdate(dt);
 	}
 
 	return UPDATE_CONTINUE;

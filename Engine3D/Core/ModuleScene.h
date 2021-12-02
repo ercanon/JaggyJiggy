@@ -22,5 +22,5 @@ public:
 public:
 	
 	GameObject* root;
-	GameObject* gameCamera;
+	//GameObject* gameCamera;
 };

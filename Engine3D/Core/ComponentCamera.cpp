@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "ModuleCamera3D.h"
+#include "ComponentTransform.h"
+#include "SDL/include/SDL_opengl.h"
 
 ComponentCamera::ComponentCamera(GameObject* parent) : Component(parent) {}	
 
@@ -11,7 +13,8 @@ ComponentCamera::ComponentCamera(GameObject* parent, bool CanCam) : Component(pa
 	up = float3(0.0f, 1.0f, 0.0f);
 	front = float3(0.0f, 0.0f, 1.0f);
 
-	position = float3(20.0f, 10.0f, -30.0f);
+	position = float3(0.0f, 5.0f, -30.0f);
+	owner->transform->SetPosition(position);
 	reference = float3(0.0f, 0.0f, 0.0f);
 
 	CalculateViewMatrix();
@@ -53,15 +56,35 @@ void ComponentCamera::RecalculateProjection() {
 
 void ComponentCamera::OnGui() {
 
-	if (ImGui::CollapsingHeader("TestCam"))
+	if (ImGui::CollapsingHeader("Camera Settings"))
 	{
+		ImGui::DragFloat("Near Distance", &cameraFrustum.nearPlaneDistance);
+		ImGui::DragFloat("Far Distance", &cameraFrustum.farPlaneDistance);
+		if (ImGui::DragFloat("Vertical FOV", &verticalFOV)) RecalculateProjection();
 	}
+
+	if (cameraFrustum.nearPlaneDistance < 1) cameraFrustum.nearPlaneDistance = 1;
+	else if (cameraFrustum.nearPlaneDistance >= cameraFrustum.farPlaneDistance) 
+		cameraFrustum.nearPlaneDistance = cameraFrustum.farPlaneDistance - 30;
+
+	if (cameraFrustum.farPlaneDistance < 30) cameraFrustum.farPlaneDistance = 30;
+	else if (cameraFrustum.farPlaneDistance <= cameraFrustum.nearPlaneDistance)
+		cameraFrustum.farPlaneDistance = cameraFrustum.nearPlaneDistance + 30;
+
+	if (verticalFOV <= 1) verticalFOV = 1;
+	else if (verticalFOV >= 359) verticalFOV = 359;
 }
 
-/*void OnSave(JSONWriter& writer) { //Needed?
+void ComponentCamera::Draw() {
+	position = owner->transform->GetPosition();
+	up = owner->transform->GetUp();
+	front = owner->transform->GetFront();
 
+	CalculateViewMatrix();
+
+	App->viewportBuffer2->PreUpdate(App->dt);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(cameraFrustum.ProjectionMatrix().Transposed().ptr());
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(viewMatrix.Transposed().ptr());
 }
-
-void OnLoad(const JSONReader& reader) { //Needed?
-
-}*/
