@@ -188,6 +188,9 @@
     <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
       <Filter>ExternalLibraries\pcg-c</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ImGui\ImGuiFileDialog.cpp">
+      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ImGui\imconfig.h">
@@ -720,6 +723,9 @@
     </ClInclude>
     <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
       <Filter>ExternalLibraries\pcg-c</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImGui\ImGuiFileDialog.h">
+      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

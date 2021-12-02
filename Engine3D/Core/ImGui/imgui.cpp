@@ -3513,7 +3513,9 @@ void ImGui::UpdateMouseMovingWindowNewFrame()
         KeepAliveID(g.ActiveId);
         IM_ASSERT(g.MovingWindow && g.MovingWindow->RootWindow);
         ImGuiWindow* moving_window = g.MovingWindow->RootWindow;
-        if (g.IO.MouseDown[0] && IsMousePosValid(&g.IO.MousePos))
+        // When a window stop being submitted while being dragged, it may will its viewport until next Begin()
+        const bool window_disappared = (!moving_window->WasActive || moving_window->Viewport == NULL);
+        if (g.IO.MouseDown[0] && IsMousePosValid(&g.IO.MousePos) && !window_disappared)
         {
             ImVec2 pos = g.IO.MousePos - g.ActiveIdClickOffset;
             if (moving_window->Pos.x != pos.x || moving_window->Pos.y != pos.y)
@@ -3527,20 +3529,23 @@ void ImGui::UpdateMouseMovingWindowNewFrame()
         }
         else
         {
-            // Try to merge the window back into the main viewport.
-            // This works because MouseViewport should be != MovingWindow->Viewport on release (as per code in UpdateViewports)
-            if (g.ConfigFlagsCurrFrame & ImGuiConfigFlags_ViewportsEnable)
-                UpdateTryMergeWindowIntoHostViewport(moving_window, g.MouseViewport);
+            if (!window_disappared)
+            {
+                // Try to merge the window back into the main viewport.
+                // This works because MouseViewport should be != MovingWindow->Viewport on release (as per code in UpdateViewports)
+                if (g.ConfigFlagsCurrFrame & ImGuiConfigFlags_ViewportsEnable)
+                    UpdateTryMergeWindowIntoHostViewport(moving_window, g.MouseViewport);
 
-            // Restore the mouse viewport so that we don't hover the viewport _under_ the moved window during the frame we released the mouse button.
-            if (!IsDragDropPayloadBeingAccepted())
-                g.MouseViewport = moving_window->Viewport;
+                // Restore the mouse viewport so that we don't hover the viewport _under_ the moved window during the frame we released the mouse button.
+                if (!IsDragDropPayloadBeingAccepted())
+                    g.MouseViewport = moving_window->Viewport;
 
-            // Clear the NoInput window flag set by the Viewport system
-            moving_window->Viewport->Flags &= ~ImGuiViewportFlags_NoInputs; // FIXME-VIEWPORT: Test engine managed to crash here because Viewport was NULL.
+                // Clear the NoInput window flag set by the Viewport system
+                moving_window->Viewport->Flags &= ~ImGuiViewportFlags_NoInputs; // FIXME-VIEWPORT: Test engine managed to crash here because Viewport was NULL.
+            }
 
-            ClearActiveID();
             g.MovingWindow = NULL;
+            ClearActiveID();
         }
     }
     else
@@ -5217,7 +5222,7 @@ ImGuiWindow* ImGui::FindWindowByName(const char* name)
 
 static void ApplyWindowSettings(ImGuiWindow* window, ImGuiWindowSettings* settings)
 {
-    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     window->ViewportPos = main_viewport->Pos;
     if (settings->ViewportId)
     {
@@ -5243,7 +5248,7 @@ static ImGuiWindow* CreateNewWindow(const char* name, ImGuiWindowFlags flags)
     g.WindowsById.SetVoidPtr(window->ID, window);
 
     // Default/arbitrary window position. Use SetNextWindowPos() with the appropriate condition flag to change the initial position of a window.
-    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     window->Pos = main_viewport->Pos + ImVec2(60, 60);
     window->ViewportPos = main_viewport->Pos;
 

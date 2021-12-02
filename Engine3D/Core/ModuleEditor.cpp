@@ -22,7 +22,7 @@
 #include "ImGui/imgui_internal.h"
 #include "glew.h"
 #include <gl/GL.h>
-//#include "ImGui/ImGuiFileDialogConfig.h"
+#include "ImGui/ImGuiFileDialog.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -635,7 +635,7 @@ void ModuleEditor::UpdateWindowStatus()
 
     if (showFileExplorer)
     {
-        //ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, ".");
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, ".");
     }
 }
 
