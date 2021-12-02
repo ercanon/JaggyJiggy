@@ -62,6 +62,7 @@ public:
 	bool showGameWindow;
 	bool showTextures;
 	bool showConsoleWindow;
+	bool showFileExplorer;
 
 	ImGuiTextBuffer consoleText;
 

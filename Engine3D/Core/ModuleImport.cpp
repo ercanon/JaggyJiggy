@@ -277,7 +277,6 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 	unsigned bytesPointer = 0;
 
 	ComponentMesh* mesh = gameObject->GetComponent<ComponentMesh>();
-	ComponentMaterial* texture = gameObject->GetComponent<ComponentMaterial>();
 
 	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numVertices);
 	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &mesh->numIndices);
@@ -289,7 +288,7 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 	StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charName);
 
 	char charTexturePath[1024];
-	strcpy(charName, texture->GetTextureName().c_str());
+	strcpy(charName, gameObject->GetComponent<ComponentMaterial>()->GetTextureName().c_str());
 	StoreInBuffer(bytes, bytesPointer, sizeof(char) * 1024, &charTexturePath);
 
 	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->vertices[0]);

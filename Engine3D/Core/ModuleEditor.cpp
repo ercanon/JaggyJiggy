@@ -15,7 +15,6 @@
 #include "ComponentMesh.h"
 
 //Tools
-
 #include <string>
 #include <stack>
 #include "ImGui/imgui_impl_opengl3.h"
@@ -23,6 +22,7 @@
 #include "ImGui/imgui_internal.h"
 #include "glew.h"
 #include <gl/GL.h>
+//#include "ImGui/ImGuiFileDialogConfig.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -205,6 +205,11 @@ void ModuleEditor::CreateGridBuffer()
     grid.length = (GLuint)indices.size() * 4;
 }
 
+ModuleEditor::Grid::~Grid()
+{
+    glDeleteBuffers(1, &VAO);
+}
+
 void ModuleEditor::DrawGrid()
 {
     GLboolean isLightingOn, isDepthTestOn;
@@ -349,11 +354,11 @@ void ModuleEditor::MenuBar()
         {
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
-            
+                showFileExplorer = true;
             }
             if (ImGui::MenuItem("Load", "Ctrl + L"))
             {
-
+                showFileExplorer = true;
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "(Alt+F4)")) App->closeEngine = true;
@@ -449,7 +454,6 @@ void ModuleEditor::MenuBar()
 
 void ModuleEditor::UpdateWindowStatus() 
 {
-
     //Demo
     if (showDemoWindow) 
         ImGui::ShowDemoWindow(&showDemoWindow);
@@ -628,6 +632,11 @@ void ModuleEditor::UpdateWindowStatus()
         
         ImGui::End();
     } 
+
+    if (showFileExplorer)
+    {
+        //ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, ".");
+    }
 }
 
 void ModuleEditor::InspectorGameObject() 
@@ -636,7 +645,3 @@ void ModuleEditor::InspectorGameObject()
         gameobjectSelected->OnGui();
 }
 
-ModuleEditor::Grid::~Grid()
-{
-    glDeleteBuffers(1, &VAO);
-}
