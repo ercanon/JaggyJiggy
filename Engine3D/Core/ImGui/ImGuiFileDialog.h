@@ -1231,7 +1231,7 @@ namespace IGFD
 			ImGuiWindowFlags vFlags = ImGuiWindowFlags_NoCollapse,	// ImGuiWindowFlags
 			ImVec2 vMinSize = ImVec2(0, 0),							// mininmal size contraint for the ImGuiWindow
 			ImVec2 vMaxSize = ImVec2(FLT_MAX, FLT_MAX));			// maximal size contraint for the ImGuiWindow
-		void Close();												// close dialog
+		bool Close();												// close dialog
 
 		// queries
 		bool WasOpenedThisFrame(const std::string& vKey) const;		// say if the dialog key was already opened this frame

@@ -37,6 +37,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showGameWindow = true;
     showSceneWindow = true;
     showTextures = true;
+    showFileExplorer = false;
 
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
@@ -635,7 +636,23 @@ void ModuleEditor::UpdateWindowStatus()
 
     if (showFileExplorer)
     {
+        // open Dialog with Pane
         ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, ".");
+
+        // display and action if ok
+        if (ImGuiFileDialog::Instance()->Display("ChooseDirDlgKey"))
+        {
+            // action if OK
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                // action
+            }
+            // close
+            if (ImGuiFileDialog::Instance()->Close())
+                showFileExplorer = false;
+        }
     }
 }
 

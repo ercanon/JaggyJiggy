@@ -4277,10 +4277,12 @@ namespace IGFD
 		ImGui::EndChild();
 	}
 
-	void IGFD::FileDialog::Close()
+	bool IGFD::FileDialog::Close()
 	{
 		prFileDialogInternal.puDLGkey.clear();
 		prFileDialogInternal.puShowDialog = false;
+
+		return true;
 	}
 
 	bool IGFD::FileDialog::WasOpenedThisFrame(const std::string& vKey) const
