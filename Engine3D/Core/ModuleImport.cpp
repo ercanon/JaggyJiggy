@@ -264,7 +264,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		}
 
 		newMesh->GenerateBuffers();
-		newMesh->GenerateBounds();
+		newMesh->GenerateBounds(true);
 		newMesh->ComputeNormals();
 	}
 

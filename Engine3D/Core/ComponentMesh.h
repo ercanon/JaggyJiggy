@@ -28,7 +28,7 @@ public:
 
 	void GenerateBuffers();
 	void ComputeNormals();
-	void GenerateBounds();
+	void GenerateBounds(bool dontupdate);
 	void DrawNormals() const;
 	void DrawAABBOBB(float3* points, float3 color) const;
 	float3 GetCenterPointInWorldCoords() const;
