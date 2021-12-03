@@ -162,7 +162,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + std::to_string(pcg32_random()) + App->fileSystem->SetNameFile(path, ".jgg");
+			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -306,7 +306,75 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 		std::string pathShort = path + App->fileSystem->SetNameFile(gameObject->name.c_str(), ".fbx");
 		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 	}
+}
 
+void ModuleImport::SaveScene(const char* path)
+{
+	std::vector<char> bytes;
+	uint bytesPointer = 0;
+
+	std::queue<GameObject*> T;
+	for (GameObject* child : App->scene->root->children)
+	{
+		std::queue<GameObject*> C;
+		C.push(child);
+		while (!C.empty())
+		{
+			GameObject* go = C.front();
+			T.push(go);
+			C.pop();
+			for (GameObject* child : go->children)
+			{
+				C.push(child);
+			}
+		}
+	}
+
+	unsigned int objectSize = T.size();
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &objectSize);
+	unsigned int textureSize = App->textures->textures.size();
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &textureSize);
+
+
+	while (!T.empty())
+	{
+		GameObject* object = T.front();
+		T.pop();
+		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(object->name.c_str(), ".jgg");
+		if (object->GetComponent<ComponentMaterial>())
+		{
+			if (App->fileSystem->Exists(pathShort))
+			{
+				char* buffer;
+				App->fileSystem->Load(pathShort.c_str(), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			}
+			else
+			{
+				char* buffer;
+				SaveMeshFile(object, pathShort.c_str());
+				App->fileSystem->Load(pathShort.c_str(), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			}
+		}
+	}
+
+	for (auto& t : App->textures->textures)
+	{
+		std::string pathShort = t.first.c_str();
+		if (App->fileSystem->Exists(pathShort))
+		{
+			char* buffer;
+			App->fileSystem->Load(pathShort.c_str(), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+		}
+		else
+		{
+			char* buffer;
+			//App->fileSystem->Load(pathShort.c_str(), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+		}
+	}
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)

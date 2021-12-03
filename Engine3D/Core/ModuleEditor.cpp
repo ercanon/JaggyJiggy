@@ -355,7 +355,7 @@ void ModuleEditor::MenuBar()
         {
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
-                showFileExplorer = true;
+                App->import->SaveScene("Library/Meshes/");
             }
             if (ImGui::MenuItem("Load", "Ctrl + L"))
             {
