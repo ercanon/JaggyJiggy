@@ -14,7 +14,6 @@
 #include <queue>
 #include "SDL/include/SDL_opengl.h"
 #include "Math/float2.h"
-#include "pcg-c/include/pcg_basic.h"
 
 #include "Assimp/include/cimport.h"
 #include "Assimp/include/scene.h"
