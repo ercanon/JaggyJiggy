@@ -185,19 +185,100 @@ void ModuleImport::StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, u
 	pointer += bytes;
 }
 
-void ModuleImport::LoadMeshFile(const char* pathfile)
+void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferScene)
 {
-	char* buffer;
-	uint bytes = App->fileSystem->Load(pathfile, &buffer);
+	if (!scene)
+	{
+		char* buffer;
+		uint bytes = App->fileSystem->Load(pathfile, &buffer);
 
-	if (bytes > 0)
+		if (bytes > 0)
+		{
+			// -- Header --//
+			unsigned int numVertices, numIndices, numNormals, numCoords;
+			memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
+			memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
+			memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
+			memcpy(&numCoords, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
+
+			// -- Byte pointer --//
+			unsigned nameOffset = 4 * sizeof(unsigned);
+			unsigned textureOffset = nameOffset + (sizeof(char) * 1024);
+			unsigned verticesOffset = textureOffset + (sizeof(char) * 1024);
+			unsigned indicesOffset = verticesOffset + (sizeof(float3) * numVertices);
+			unsigned normalsOffset = indicesOffset + (sizeof(uint) * numIndices);
+			unsigned coordsOffset = normalsOffset + (sizeof(float3) * numNormals);
+
+			// -- Create mesh --//
+			char charName[1024];
+			memcpy(&charName[0], &buffer[nameOffset], sizeof(char) * 1024);
+			std::string name(charName);
+
+			GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
+			ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
+
+
+			char charTexturePath[1024];
+			memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
+			std::string texturePath(charTexturePath);
+			newMesh->texturePath = texturePath;
+
+			if (texturePath.size() > 0)
+			{
+				if (!App->textures->Find(texturePath))
+				{
+					const TextureObject& textureObject = App->textures->Load(texturePath);
+					ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+					materialComp->SetTexture(textureObject);
+				}
+				else
+				{
+					const TextureObject& textureObject = App->textures->Get(texturePath);
+					ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
+					materialComp->SetTexture(textureObject);
+				}
+			}
+
+
+			newMesh->numVertices = numVertices;
+			newMesh->numIndices = numIndices;
+
+			newMesh->vertices.resize(numVertices);
+			memcpy(&newMesh->vertices[0], &buffer[verticesOffset], sizeof(float3) * numVertices);
+
+			if (numIndices > 0)
+			{
+				newMesh->indices.resize(numIndices);
+				memcpy(&newMesh->indices[0], &buffer[indicesOffset], sizeof(uint) * numIndices);
+			}
+
+			if (numNormals > 0)
+			{
+				newMesh->normals.resize(numNormals);
+				memcpy(&newMesh->normals[0], &buffer[normalsOffset], sizeof(float3) * numNormals);
+			}
+
+			if (numCoords > 0)
+			{
+				newMesh->texCoords.resize(numCoords);
+				memcpy(&newMesh->texCoords[0], &buffer[coordsOffset], sizeof(float2) * numCoords);
+			}
+
+			newMesh->GenerateBuffers();
+			newMesh->GenerateBounds(true);
+			newMesh->ComputeNormals();
+		}
+
+		RELEASE(buffer);
+	}
+	else
 	{
 		// -- Header --//
 		unsigned int numVertices, numIndices, numNormals, numCoords;
-		memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
-		memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
-		memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
-		memcpy(&numCoords, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
+		memcpy(&numVertices, &bufferScene[0], sizeof(unsigned int));
+		memcpy(&numIndices, &bufferScene[sizeof(unsigned int)], sizeof(unsigned int));
+		memcpy(&numNormals, &bufferScene[sizeof(unsigned int) * 2], sizeof(unsigned int));
+		memcpy(&numCoords, &bufferScene[sizeof(unsigned int) * 3], sizeof(unsigned int));
 
 		// -- Byte pointer --//
 		unsigned nameOffset = 4 * sizeof(unsigned);
@@ -209,7 +290,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 
 		// -- Create mesh --//
 		char charName[1024];
-		memcpy(&charName[0], &buffer[nameOffset], sizeof(char) * 1024);
+		memcpy(&charName[0], &bufferScene[nameOffset], sizeof(char) * 1024);
 		std::string name(charName);
 
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
@@ -217,10 +298,10 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 
 
 		char charTexturePath[1024];
-		memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
+		memcpy(&charTexturePath[0], &bufferScene[textureOffset], sizeof(char) * 1024);
 		std::string texturePath(charTexturePath);
 		newMesh->texturePath = texturePath;
-		
+
 		if (texturePath.size() > 0)
 		{
 			if (!App->textures->Find(texturePath))
@@ -242,32 +323,30 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		newMesh->numIndices = numIndices;
 
 		newMesh->vertices.resize(numVertices);
-		memcpy(&newMesh->vertices[0], &buffer[verticesOffset], sizeof(float3) * numVertices);
+		memcpy(&newMesh->vertices[0], &bufferScene[verticesOffset], sizeof(float3) * numVertices);
 
 		if (numIndices > 0)
 		{
 			newMesh->indices.resize(numIndices);
-			memcpy(&newMesh->indices[0], &buffer[indicesOffset], sizeof(uint) * numIndices);
+			memcpy(&newMesh->indices[0], &bufferScene[indicesOffset], sizeof(uint) * numIndices);
 		}
 
 		if (numNormals > 0)
 		{
 			newMesh->normals.resize(numNormals);
-			memcpy(&newMesh->normals[0], &buffer[normalsOffset], sizeof(float3) * numNormals);
+			memcpy(&newMesh->normals[0], &bufferScene[normalsOffset], sizeof(float3) * numNormals);
 		}
 
 		if (numCoords > 0)
 		{
 			newMesh->texCoords.resize(numCoords);
-			memcpy(&newMesh->texCoords[0], &buffer[coordsOffset], sizeof(float2) * numCoords);
+			memcpy(&newMesh->texCoords[0], &bufferScene[coordsOffset], sizeof(float2) * numCoords);
 		}
 
 		newMesh->GenerateBuffers();
 		newMesh->GenerateBounds(true);
 		newMesh->ComputeNormals();
 	}
-
-	RELEASE(buffer);
 }
 
 void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::string name)
@@ -345,7 +424,7 @@ void ModuleImport::SaveScene(const char* path)
 			char* buffer;
 			unsigned int bytesText = App->fileSystem->Load(pathShort.c_str(), &buffer);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesText, &buffer);
 		}
 		else
 		{
@@ -354,7 +433,7 @@ void ModuleImport::SaveScene(const char* path)
 			App->textures->SaveTexture(pathShort, pathDestiny);
 			unsigned int bytesText = App->fileSystem->Load(pathDestiny.c_str(), &buffer);
 			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesText, &buffer);
 		}
 	}
 
@@ -364,6 +443,8 @@ void ModuleImport::SaveScene(const char* path)
 		GameObject* object = T.front();
 		T.pop();
 		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(object->name.c_str(), ".jgg");
+		StoreInBuffer(bytes, bytesPointer, sizeof(GameObject*), &object);
+
 		if (object->GetComponent<ComponentMaterial>())
 		{
 			if (App->fileSystem->Exists(pathShort))
@@ -371,7 +452,7 @@ void ModuleImport::SaveScene(const char* path)
 				char* buffer;
 				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
 				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
-				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesMesh, &buffer);
 			}
 			else
 			{
@@ -379,7 +460,7 @@ void ModuleImport::SaveScene(const char* path)
 				SaveMeshFile(object, pathShort.c_str());
 				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
 				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
-				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesMesh, &buffer);
 			}
 		}
 	}
@@ -406,12 +487,12 @@ void ModuleImport::LoadScene(const char* path)
 		{
 			unsigned int numBytes;
 			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
-
+		
 			unsigned materialOffset = prevOffset + sizeof(unsigned int);
 			memcpy(&numBytes, &buffer[materialOffset], sizeof(char*) * numBytes);
-
+		
 			//Code
-
+		
 			prevOffset = materialOffset + (sizeof(char*) * numBytes);
 		}
 
@@ -420,11 +501,11 @@ void ModuleImport::LoadScene(const char* path)
 			unsigned int numBytes;
 			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
 
-			GameObject* newGameObject;
+			char* newGameObject;
 			unsigned meshOffset = prevOffset + sizeof(unsigned int);
 			memcpy(&newGameObject, &buffer[meshOffset], sizeof(char*) * numBytes);
 
-			//Code
+			LoadMeshFile(path, true, newGameObject);
 
 			prevOffset = meshOffset + (sizeof(char*) * numBytes);
 		}
