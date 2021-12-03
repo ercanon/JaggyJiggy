@@ -25,6 +25,7 @@ public:
 	void SaveMeshFile(GameObject* gameObject, const char* path, std::string name = nullptr);
 
 	void SaveScene(const char* path);
+	void LoadScene(const char* path);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
 };

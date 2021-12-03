@@ -359,7 +359,7 @@ void ModuleEditor::MenuBar()
             }
             if (ImGui::MenuItem("Load", "Ctrl + L"))
             {
-                showFileExplorer = true;
+                App->import->LoadScene("Library/scene.jiy");
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "(Alt+F4)")) App->closeEngine = true;

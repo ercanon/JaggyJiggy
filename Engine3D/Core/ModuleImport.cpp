@@ -194,7 +194,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 	if (bytes > 0)
 	{
 		// -- Header --//
-		unsigned numVertices, numIndices, numNormals, numCoords;
+		unsigned int numVertices, numIndices, numNormals, numCoords;
 		memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
 		memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
 		memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
@@ -295,6 +295,7 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 	StoreInBuffer(bytes, bytesPointer, sizeof(uint) * mesh->numIndices, &mesh->indices[0]);
 	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->normals[0]);
 	StoreInBuffer(bytes, bytesPointer, sizeof(float3) * mesh->numVertices, &mesh->texCoords[0]);
+	
 
 	if (name.size() > 0)
 	{
@@ -330,12 +331,35 @@ void ModuleImport::SaveScene(const char* path)
 		}
 	}
 
-	unsigned int objectSize = T.size();
-	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &objectSize);
 	unsigned int textureSize = App->textures->textures.size();
 	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &textureSize);
+	unsigned int objectSize = T.size();
+	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &objectSize);
 
 
+	//Textures
+	for (auto& t : App->textures->textures)
+	{
+		std::string pathShort = t.first.c_str();
+		if (App->fileSystem->Exists(pathShort))
+		{
+			char* buffer;
+			unsigned int bytesText = App->fileSystem->Load(pathShort.c_str(), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+		}
+		else
+		{
+			char* buffer;
+			std::string pathDestiny = "Library/Materials/" + App->fileSystem->SetNameFile(pathShort.c_str(), ".jay");
+			App->textures->SaveTexture(pathShort, pathDestiny);
+			unsigned int bytesText = App->fileSystem->Load(pathDestiny.c_str(), &buffer);
+			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
+			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+		}
+	}
+
+	//Meshes
 	while (!T.empty())
 	{
 		GameObject* object = T.front();
@@ -346,35 +370,68 @@ void ModuleImport::SaveScene(const char* path)
 			if (App->fileSystem->Exists(pathShort))
 			{
 				char* buffer;
-				App->fileSystem->Load(pathShort.c_str(), &buffer);
+				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
 				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
 			}
 			else
 			{
 				char* buffer;
 				SaveMeshFile(object, pathShort.c_str());
-				App->fileSystem->Load(pathShort.c_str(), &buffer);
+				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
+				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
 				StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
 			}
 		}
 	}
 
-	for (auto& t : App->textures->textures)
+
+	std::string pathScene = "Library/" + App->fileSystem->SetNameFile("scene", ".jiy");
+	App->fileSystem->Save(pathScene.c_str(), &bytes[0], bytesPointer);
+	LOG("Scene saved at %s", pathScene.c_str());
+}
+
+void ModuleImport::LoadScene(const char* path)
+{
+	char* buffer;
+	uint bytes = App->fileSystem->Load(path, &buffer);
+
+	if (bytes > 0)
 	{
-		std::string pathShort = t.first.c_str();
-		if (App->fileSystem->Exists(pathShort))
+		unsigned int numMaterials, numMeshes;
+		memcpy(&numMaterials, &buffer[0], sizeof(unsigned int));
+		memcpy(&numMeshes, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
+
+		unsigned prevOffset = 2 * sizeof(unsigned);
+		for (int mat = 0; mat < numMaterials; mat++)
 		{
-			char* buffer;
-			App->fileSystem->Load(pathShort.c_str(), &buffer);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			unsigned int numBytes;
+			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
+
+			unsigned materialOffset = prevOffset + sizeof(unsigned int);
+			memcpy(&numBytes, &buffer[materialOffset], sizeof(char*) * numBytes);
+
+			//Code
+
+			prevOffset = materialOffset + (sizeof(char*) * numBytes);
 		}
-		else
+
+		for (int mes = 0; mes < numMeshes; mes++)
 		{
-			char* buffer;
-			//App->fileSystem->Load(pathShort.c_str(), &buffer);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*), &buffer);
+			unsigned int numBytes;
+			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
+
+			GameObject* newGameObject;
+			unsigned meshOffset = prevOffset + sizeof(unsigned int);
+			memcpy(&newGameObject, &buffer[meshOffset], sizeof(char*) * numBytes);
+
+			//Code
+
+			prevOffset = meshOffset + (sizeof(char*) * numBytes);
 		}
+
 	}
+	RELEASE(buffer);
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)

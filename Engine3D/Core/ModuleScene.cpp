@@ -106,8 +106,8 @@ update_status ModuleScene::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-GameObject* ModuleScene::CreateGameObject(GameObject* parent) {
-
+GameObject* ModuleScene::CreateGameObject(GameObject* parent) 
+{
 	GameObject* temp = new GameObject();
 	if (parent)
 		parent->AttachChild(temp);

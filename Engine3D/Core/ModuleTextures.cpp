@@ -116,44 +116,6 @@ const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std:
 
 			glBindTexture(GL_TEXTURE_2D, textureId);
 
-			ILinfo ImageInfo;
-			iluGetImageInfo(&ImageInfo);
-			if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT)
-			{
-				iluFlipImage();
-			}
-
-			int channels = ilGetInteger(IL_IMAGE_CHANNELS);
-			if (channels == 3)
-			{
-				ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-			}
-			else if (channels == 4)
-			{
-				ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-			}
-
-			ILubyte* imageData = ilGetData();
-			int width = ilGetInteger(IL_IMAGE_WIDTH);
-			int height = ilGetInteger(IL_IMAGE_HEIGHT);
-
-			glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT), width, height, 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, imageData);
-
-			if (useMipMaps)
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-				glGenerateMipmap(GL_TEXTURE_2D);
-			}
-			else
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			}
-			iluFlipImage();
-
 			Save(pathDestiny.c_str());
 
 			ilDeleteImages(1, &imageId);
