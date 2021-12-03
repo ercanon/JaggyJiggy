@@ -185,9 +185,6 @@
     <ClCompile Include="Core\ModuleResources.cpp">
       <Filter>Engine\Modules</Filter>
     </ClCompile>
-    <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
-      <Filter>ExternalLibraries\pcg-c</Filter>
-    </ClCompile>
     <ClCompile Include="Core\ImGui\ImGuizmo.cpp">
       <Filter>ExternalLibraries\Gizmos</Filter>
     </ClCompile>
@@ -721,9 +718,6 @@
     <ClInclude Include="Core\ModuleResources.h">
       <Filter>Engine\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
-      <Filter>ExternalLibraries\pcg-c</Filter>
-    </ClInclude>
     <ClInclude Include="Core\ImGui\ImGuizmo.h">
       <Filter>ExternalLibraries\Gizmos</Filter>
     </ClInclude>
@@ -782,9 +776,6 @@
     </Filter>
     <Filter Include="Engine\Tools">
       <UniqueIdentifier>{3b33fd60-8311-4ddf-87d9-d36b91d2b082}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ExternalLibraries\pcg-c">
-      <UniqueIdentifier>{fa186cdd-16d0-4c6a-90e1-dc9806a8c0c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="ExternalLibraries\Gizmos">
       <UniqueIdentifier>{907e8ae3-6955-40c0-9c2f-d6f7486e797a}</UniqueIdentifier>
