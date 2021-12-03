@@ -82,7 +82,7 @@ void ComponentCamera::Draw() {
 
 	CalculateViewMatrix();
 
-	App->viewportBuffer2->PreUpdate(App->dt);
+	App->viewportBufferGame->PreUpdate(App->dt);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(cameraFrustum.ProjectionMatrix().Transposed().ptr());
 	glMatrixMode(GL_MODELVIEW);

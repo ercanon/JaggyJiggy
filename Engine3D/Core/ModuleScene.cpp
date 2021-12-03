@@ -78,7 +78,7 @@ update_status ModuleScene::Update(float dt)
 		}
 	}
 	App->editor->DrawGrid();
-	App->viewportBuffer->PostUpdate(dt);
+	App->viewportBufferScene->PostUpdate(dt);
 
 	if (App->editor->newCam != nullptr)
 	{
@@ -100,7 +100,7 @@ update_status ModuleScene::Update(float dt)
 			}
 		}
 		//App->editor->DrawGrid();
-		App->viewportBuffer2->PostUpdate(dt);
+		App->viewportBufferGame->PostUpdate(dt);
 	}
 
 	return UPDATE_CONTINUE;

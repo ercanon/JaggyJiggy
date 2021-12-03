@@ -9,7 +9,6 @@
 #include "ComponentTransform.h"
 #include "GameObject.h"
 #include "ImGui/imgui.h"
-#include "Geometry/Sphere.h"
 #include "MathGeoLib/include/Geometry/Plane.h"
 #include "par_shapes.h"
 
@@ -66,7 +65,7 @@ void ComponentMesh::CopyParMesh(par_shapes_mesh* parMesh)
 
 	GenerateBuffers();
 	ComputeNormals();
-	GenerateBounds();
+	GenerateBounds(false);
 }
 
 
@@ -116,23 +115,18 @@ void ComponentMesh::ComputeNormals()
 	int kk = 0;
 }
 
-void ComponentMesh::GenerateBounds()
+void ComponentMesh::GenerateBounds(bool dontupdate)
 {
-	// Generate local AABB
-	localAABB.SetNegativeInfinity();
-	localAABB.Enclose(&vertices[0], vertices.size());
-		
-	Sphere sphere;	
-	sphere.r = 0.f;
-	sphere.pos = localAABB.CenterPoint();
-	sphere.Enclose(localAABB);
-
-	radius = sphere.r;
-	centerPoint = sphere.pos;
+	if (dontupdate)
+	{
+		// Generate local AABB
+		localAABB.SetNegativeInfinity();
+		localAABB.Enclose(&vertices[0], vertices.size());
+	}
 
 	// Generate global OBB
 	owner->globalOBB = localAABB;
-	owner->globalOBB.Transform(owner->transform->transformMatrix);
+	owner->globalOBB.Transform(owner->transform->transformMatrixLocal);
 
 	// Generate global AABB
 	owner->globalAABB.SetNegativeInfinity();
@@ -231,10 +225,6 @@ bool ComponentMesh::InGameCamView(Frustum* cam)
 
 bool ComponentMesh::Update(float dt)
 {
-	// Update AABB/OBB
-	owner->globalOBB.Transform(owner->transform->transformMatrix);
-	owner->globalAABB.Transform(owner->transform->transformMatrix);
-
 	 if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
 		drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

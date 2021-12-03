@@ -1,4 +1,5 @@
 #include "ComponentTransform.h"
+#include "ComponentMesh.h"
 #include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
@@ -99,4 +100,8 @@ void ComponentTransform::RecomputeGlobalMatrix()
 	{
 		transformMatrix = transformMatrixLocal;
 	}
+
+	//Update Globals Bounding Boxes
+	if (owner->GetComponent<ComponentMesh>() != nullptr)
+		owner->GetComponent<ComponentMesh>()->GenerateBounds(false);
 }

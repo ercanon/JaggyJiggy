@@ -4,6 +4,9 @@
 #include "Math/float3.h"
 #include "Math/float4x4.h"
 #include "Geometry/Frustum.h"
+#include "Geometry/LineSegment.h"
+#include "Geometry/Triangle.h"
+#include "ImGui/imgui.h"
 
 class ModuleCamera3D : public Module
 {
@@ -18,6 +21,9 @@ public:
 	void LookAt(const float3&point);
 	void CalculateViewMatrix();
 	void RecalculateProjection();
+	void IsMouseClicked();
+	ImVec2 NormalizeWindow(ImVec2 pos, float x, float y, float w, float h);
+	void RayToMeshIntersection(LineSegment ray);
 	void OnGui() override;
 	void OnSave(JSONWriter& writer) const override;
 	void OnLoad(const JSONReader& reader) override;

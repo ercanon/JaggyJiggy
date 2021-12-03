@@ -188,8 +188,8 @@
     <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
       <Filter>ExternalLibraries\pcg-c</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ImGui\ImGuiFileDialog.cpp">
-      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
+    <ClCompile Include="Core\ImGui\ImGuizmo.cpp">
+      <Filter>ExternalLibraries\Gizmos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -724,8 +724,8 @@
     <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
       <Filter>ExternalLibraries\pcg-c</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ImGui\ImGuiFileDialog.h">
-      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
+    <ClInclude Include="Core\ImGui\ImGuizmo.h">
+      <Filter>ExternalLibraries\Gizmos</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -786,8 +786,8 @@
     <Filter Include="ExternalLibraries\pcg-c">
       <UniqueIdentifier>{fa186cdd-16d0-4c6a-90e1-dc9806a8c0c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ExternalLibraries\ImGuiFileDialog">
-      <UniqueIdentifier>{1db08f3b-a5a5-4e70-9920-d512902fb83b}</UniqueIdentifier>
+    <Filter Include="ExternalLibraries\Gizmos">
+      <UniqueIdentifier>{907e8ae3-6955-40c0-9c2f-d6f7486e797a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
