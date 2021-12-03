@@ -3,9 +3,11 @@
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleRenderer3D.h"
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "GameObject.h"
+#include <map>
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -172,6 +174,91 @@ update_status ModuleCamera3D::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
+// -----------------------------------------------------------------
+void ModuleCamera3D::IsMouseClicked()
+{
+	ImVec2 position = ImGui::GetMousePos();
+	ImVec2 normal = NormalizeWindow(position, 
+		ImGui::GetWindowPos().x,
+		ImGui::GetWindowPos().y + ImGui::GetFrameHeight(), 
+		ImGui::GetWindowSize().x, 
+		ImGui::GetWindowSize().y - ImGui::GetFrameHeight());
+
+	normal.x = (normal.x - 0.5f) / 0.5f;
+	normal.y = -((normal.y - 0.5f) / 0.5f);
+
+	if ((normal.x >= -1 && normal.x <= 1) && (normal.y >= -1 && normal.y <= 1))
+	{
+		LineSegment picking = cameraFrustum.UnProjectLineSegment(normal.x, normal.y);
+		RayToMeshIntersection(picking);
+
+	}
+}
+
+// -----------------------------------------------------------------
+ImVec2 ModuleCamera3D::NormalizeWindow(ImVec2 pos, float x, float y, float w, float h)
+{
+	ImVec2 nPos;
+
+	nPos.x = (pos.x - x) / ((x + w) - x);
+	nPos.y = (pos.y - y) / ((y + h) - y);
+
+	return nPos;
+}
+
+// -----------------------------------------------------------------
+void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
+{
+	std::map<float, GameObject*> canSelect; // not map?
+	float nHit = 0;
+	float fHit = 0;
+
+	// Raycast hits everything and see if it has AABB and can be selected. 
+	/*for (std::vector<GameObject*>::iterator i = App->editor->S.begin(); i != App->editor->S.end(); ++i) // not vector
+	{
+		if (ray.Intersects((*i)->globalAABB, nHit, fHit))
+			canSelect[nHit] = (*i);
+	}*/
+
+	// Add all meshes with a triangle hit and store the distance from the ray to the triangle, then pick the closest one
+	std::map<float, GameObject*> distMap; //not map?
+	for (auto i = canSelect.begin(); i != canSelect.end(); ++i) // If it dosen't detect any object with AABB, it will skip this.
+	{
+		LOG("Im inside");
+		const ComponentMesh* _mesh = (*i).second->GetComponent<ComponentMesh>();
+		if (_mesh)
+		{
+			LineSegment local = ray;
+			local.Transform((*i).second->transform->transformMatrix.Inverted());
+
+			if (_mesh->numVertices >= 9)
+			{
+				for (uint index = 0; index < _mesh->numIndices; index += 3)
+				{
+					float3 pA(_mesh->vertices[_mesh->indices[index] * 3]);
+					float3 pB(_mesh->vertices[_mesh->indices[index + 1] * 3]);
+					float3 pC(_mesh->vertices[_mesh->indices[index + 2] * 3]);
+
+					Triangle trian(pA, pB, pC);
+
+					float dist = 0;
+					if (local.Intersects(trian, &dist, nullptr))
+					{
+						distMap[dist] = (*i).second;
+					}
+				}
+			}
+		}
+	}
+	canSelect.clear();
+
+	// Select object in editor.
+	if (distMap.begin() != distMap.end())
+	{
+		App->editor->SelectItem((*distMap.begin()).second);
+	}
+	distMap.clear();
+}
 
 // -----------------------------------------------------------------
 void ModuleCamera3D::LookAt(const float3& point)
@@ -213,18 +300,20 @@ void ModuleCamera3D::OnGui()
 {
 	if (ImGui::CollapsingHeader("Editor Camera"))
 	{
-		if (ImGui::DragFloat("Vertical fov", &verticalFOV))
-		{
-			projectionIsDirty = true;
-		}
-		if (ImGui::DragFloat("Near plane distance", &nearPlaneDistance))
-		{
-			projectionIsDirty = true;
-		}
-		if (ImGui::DragFloat("Far plane distance", &farPlaneDistance))
-		{
-			projectionIsDirty = true;
-		}
+		ImGui::DragFloat("Near Distance", &cameraFrustum.nearPlaneDistance);
+		ImGui::DragFloat("Far Distance", &cameraFrustum.farPlaneDistance);
+		if (ImGui::DragFloat("Vertical FOV", &verticalFOV)) RecalculateProjection();
+
+		if (cameraFrustum.nearPlaneDistance < 1) cameraFrustum.nearPlaneDistance = 1;
+		else if (cameraFrustum.nearPlaneDistance >= cameraFrustum.farPlaneDistance)
+			cameraFrustum.nearPlaneDistance = cameraFrustum.farPlaneDistance - 30;
+
+		if (cameraFrustum.farPlaneDistance < 30) cameraFrustum.farPlaneDistance = 30;
+		else if (cameraFrustum.farPlaneDistance <= cameraFrustum.nearPlaneDistance)
+			cameraFrustum.farPlaneDistance = cameraFrustum.nearPlaneDistance + 30;
+
+		if (verticalFOV <= 1) verticalFOV = 1;
+		else if (verticalFOV >= 359) verticalFOV = 359;
 	}
 }
 

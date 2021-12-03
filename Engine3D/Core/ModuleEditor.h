@@ -5,6 +5,7 @@
 #include "ImGui/imgui.h"
 #include "ComponentCamera.h"
 #include <string>
+#include <stack>
 
 //Forward declaration
 class GameObject;
@@ -49,6 +50,9 @@ public:
 	void UpdateText(const char* consoleText);
 
 	void About_Window();	//Can be done better
+
+	void SelectItem(GameObject* Selected);
+
 	void InspectorGameObject();
 
 	//Window status control
@@ -63,6 +67,9 @@ public:
 	bool showTextures;
 	bool showConsoleWindow;
 
+	std::stack<GameObject*> S;
+	std::stack<uint> indents;
+
 	ImGuiTextBuffer consoleText;
 
 	ImVec4 currentColor;
@@ -70,6 +77,8 @@ public:
 	ImGuiWindowFlags sceneWindow = 0;
 
 	GameObject* gameobjectSelected;
+	GameObject* go;
+
 	ComponentCamera* newCam;
 
 	ImVec2 lastViewportSize;

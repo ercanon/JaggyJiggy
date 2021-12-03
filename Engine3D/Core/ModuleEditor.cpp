@@ -17,7 +17,6 @@
 //Tools
 
 #include <string>
-#include <stack>
 #include "ImGui/imgui_impl_opengl3.h"
 #include "ImGui/imgui_impl_sdl.h"
 #include "ImGui/imgui_internal.h"
@@ -513,13 +512,12 @@ void ModuleEditor::UpdateWindowStatus()
         {
             App->scene->CreateGameObject();
         }*/
-        std::stack<GameObject*> S;
-        std::stack<uint> indents;
+        
         S.push(App->scene->root);
         indents.push(0);
         while (!S.empty())
         {
-            GameObject* go = S.top();
+            go = S.top();
             uint indentsAmount = indents.top();
             S.pop();
             indents.pop();
@@ -560,17 +558,7 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked()) 
                 {
-                    gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
-                    gameobjectSelected = go;
-                    gameobjectSelected->isSelected = !gameobjectSelected->isSelected;
-                    if (gameobjectSelected->isSelected)
-                    {
-                        LOG("GameObject selected name: %s", gameobjectSelected->name.c_str());
-                    }
-                    else
-                    {
-                        LOG("GameObject unselected name: %s", gameobjectSelected->name.c_str());
-                    }
+                    SelectItem(gameobjectSelected);
                 }
                 for (GameObject* child : go->children)
                 {
@@ -626,8 +614,30 @@ void ModuleEditor::UpdateWindowStatus()
         if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
         else App->camera->isMouseFocused = false;
         
+        // Mouse clicking ----------------
+        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT) {
+            App->camera->IsMouseClicked();
+        }
+
         ImGui::End();
     } 
+}
+
+void ModuleEditor::SelectItem(GameObject* Selected)
+{
+    Selected ? Selected->isSelected = !Selected->isSelected : 0;
+    Selected = go;
+    Selected->isSelected = !Selected->isSelected;
+    if (Selected->isSelected)
+    {
+        LOG("GameObject selected name: %s", Selected->name.c_str());
+    }
+    else
+    {
+        LOG("GameObject unselected name: %s", Selected->name.c_str());
+    }
+
+    gameobjectSelected = Selected;
 }
 
 void ModuleEditor::InspectorGameObject() 
