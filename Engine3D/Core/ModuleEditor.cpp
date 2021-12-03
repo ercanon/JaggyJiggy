@@ -514,6 +514,7 @@ void ModuleEditor::UpdateWindowStatus()
         }*/
         
         S.push(App->scene->root);
+        V.push_back(App->scene->root);
         indents.push(0);
         while (!S.empty())
         {
@@ -563,6 +564,7 @@ void ModuleEditor::UpdateWindowStatus()
                 for (GameObject* child : go->children)
                 {
                     S.push(child);
+                    V.push_back(child);
                     indents.push(indentsAmount + 1);
                 }
 

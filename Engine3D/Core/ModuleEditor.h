@@ -68,6 +68,7 @@ public:
 	bool showConsoleWindow;
 
 	std::stack<GameObject*> S;
+	std::vector<GameObject*> V;
 	std::stack<uint> indents;
 
 	ImGuiTextBuffer consoleText;

@@ -7,7 +7,8 @@
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "GameObject.h"
-#include <map>
+#include "Geometry/AABB.h"
+#include <vector>
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -209,27 +210,28 @@ ImVec2 ModuleCamera3D::NormalizeWindow(ImVec2 pos, float x, float y, float w, fl
 // -----------------------------------------------------------------
 void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 {
-	std::map<float, GameObject*> canSelect; // not map?
+	std::vector<GameObject*> canSelect; // not map?
 	float nHit = 0;
 	float fHit = 0;
 
 	// Raycast hits everything and see if it has AABB and can be selected. 
-	/*for (std::vector<GameObject*>::iterator i = App->editor->S.begin(); i != App->editor->S.end(); ++i) // not vector
-	{
-		if (ray.Intersects((*i)->globalAABB, nHit, fHit))
-			canSelect[nHit] = (*i);
-	}*/
+	for (int i = 0; i < App->editor->V.size(); ++i)
+	{ 
+		if (ray.Intersects(App->editor->V.at(i)->globalAABB, nHit, fHit))
+			canSelect.push_back(App->editor->V.at(i));
+	}
+
 
 	// Add all meshes with a triangle hit and store the distance from the ray to the triangle, then pick the closest one
-	std::map<float, GameObject*> distMap; //not map?
-	for (auto i = canSelect.begin(); i != canSelect.end(); ++i) // If it dosen't detect any object with AABB, it will skip this.
+	std::vector<GameObject*> distMap;
+	for (int i = 0; i < canSelect.size(); ++i) // If it dosen't detect any object with AABB, it will skip this.
 	{
 		LOG("Im inside");
-		const ComponentMesh* _mesh = (*i).second->GetComponent<ComponentMesh>();
+		const ComponentMesh* _mesh = canSelect.at(i)->GetComponent<ComponentMesh>();
 		if (_mesh)
 		{
 			LineSegment local = ray;
-			local.Transform((*i).second->transform->transformMatrix.Inverted());
+			local.Transform(canSelect.at(i)->transform->transformMatrix.Inverted());
 
 			if (_mesh->numVertices >= 9)
 			{
@@ -244,7 +246,7 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 					float dist = 0;
 					if (local.Intersects(trian, &dist, nullptr))
 					{
-						distMap[dist] = (*i).second;
+						distMap.push_back(canSelect.at(i));
 					}
 				}
 			}
@@ -255,7 +257,7 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 	// Select object in editor.
 	if (distMap.begin() != distMap.end())
 	{
-		App->editor->SelectItem((*distMap.begin()).second);
+		App->editor->SelectItem(distMap.at(0));
 	}
 	distMap.clear();
 }
