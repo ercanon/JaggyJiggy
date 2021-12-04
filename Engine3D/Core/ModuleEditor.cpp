@@ -37,6 +37,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showSceneWindow = true;
     showTextures = true;
     showFileExplorer = false;
+    showLoadScene = false;
 
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
@@ -354,12 +355,10 @@ void ModuleEditor::MenuBar()
         {
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
-                App->import->SaveScene("Library/Meshes/");
+                App->import->SaveScene("Library/Scenes/");
             }
             if (ImGui::MenuItem("Load", "Ctrl + L"))
-            {
-                App->import->LoadScene("Library/scene.jiy");
-            }
+                showLoadScene = true;
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "(Alt+F4)")) App->closeEngine = true;
             ImGui::EndMenu();
@@ -645,6 +644,27 @@ void ModuleEditor::UpdateWindowStatus()
             // close
             if (ImGuiFileDialog::Instance()->Close())
                 showFileExplorer = false;
+        }
+    }
+
+    if (showLoadScene)
+    {
+        ImGui::OpenPopup("Load File");
+        if (ImGui::BeginPopupModal("Load File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Are you sure you want to open a new scene?\n\nWARNING:\nYou will delete the actual scene!");
+
+            if (ImGui::Button("Ok", ImVec2(50, 20)))
+            {
+                //App->import->LoadScene("Library/scene.jiy");
+                showLoadScene = false;
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel", ImVec2(50, 20)))
+                showLoadScene = false;
+
+            ImGui::EndPopup();
         }
     }
 }

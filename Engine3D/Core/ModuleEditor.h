@@ -66,6 +66,7 @@ public:
 	bool showGameWindow;
 	bool showTextures;
 	bool showConsoleWindow;
+	bool showLoadScene;
 	bool showFileExplorer;
 
 	std::stack<GameObject*> S;
