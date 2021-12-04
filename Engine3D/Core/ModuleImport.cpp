@@ -20,6 +20,9 @@
 #include "Assimp/include/postprocess.h"
 #include "Assimp/include/mesh.h"
 
+#include "rapidjson-1.1.0/include/rapidjson/document.h"
+using namespace rapidjson;
+
 
 ModuleImport::ModuleImport(Application* app, bool start_enabled) : Module(app, start_enabled) {}
 
@@ -389,8 +392,7 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 
 void ModuleImport::SaveScene(const char* path)
 {
-	std::vector<char> bytes;
-	uint bytesPointer = 0;
+	Document sceneFile;
 
 	std::queue<GameObject*> T;
 	for (GameObject* child : App->scene->root->children)
@@ -409,65 +411,59 @@ void ModuleImport::SaveScene(const char* path)
 		}
 	}
 
-	unsigned int textureSize = App->textures->textures.size();
-	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &textureSize);
-	unsigned int objectSize = T.size();
-	StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &objectSize);
-
-
-	//Textures
+	// -- Textures --//
+	Value textures(kObjectType);
 	for (auto& t : App->textures->textures)
 	{
+		Value currentTexture(kArrayType);
 		std::string pathShort = t.first.c_str();
-		if (App->fileSystem->Exists(pathShort))
-		{
-			char* buffer;
-			unsigned int bytesText = App->fileSystem->Load(pathShort.c_str(), &buffer);
-			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesText, &buffer);
-		}
-		else
-		{
-			char* buffer;
-			std::string pathDestiny = "Library/Materials/" + App->fileSystem->SetNameFile(pathShort.c_str(), ".jay");
-			App->textures->SaveTexture(pathShort, pathDestiny);
-			unsigned int bytesText = App->fileSystem->Load(pathDestiny.c_str(), &buffer);
-			StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesText);
-			StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesText, &buffer);
-		}
-	}
+		
+		Value mat;
+		currentTexture.AddMember("Material", mat, sceneFile.GetAllocator());
 
-	//Meshes
+		textures.AddMember(StringRef(pathShort.c_str()), currentTexture, sceneFile.GetAllocator());
+	}
+	sceneFile.AddMember("Textures", textures, sceneFile.GetAllocator());	//¿?
+
+	// -- GameObjects --//
+	Value objects(kObjectType);
 	while (!T.empty())
 	{
 		GameObject* object = T.front();
 		T.pop();
-		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(object->name.c_str(), ".jgg");
-		StoreInBuffer(bytes, bytesPointer, sizeof(GameObject*), &object);
 
+		Value currentObject(kArrayType);
+		std::string pathShort = App->fileSystem->SetNameFile(object->name.c_str(), ".");
+
+		currentObject.AddMember("Parent", StringRef(object->parent->name.c_str()), sceneFile.GetAllocator());
 		if (object->GetComponent<ComponentMaterial>())
 		{
-			if (App->fileSystem->Exists(pathShort))
-			{
-				char* buffer;
-				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
-				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
-				StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesMesh, &buffer);
-			}
-			else
-			{
-				char* buffer;
-				SaveMeshFile(object, pathShort.c_str());
-				unsigned int bytesMesh = App->fileSystem->Load(pathShort.c_str(), &buffer);
-				StoreInBuffer(bytes, bytesPointer, sizeof(unsigned int), &bytesMesh);
-				StoreInBuffer(bytes, bytesPointer, sizeof(char*) * bytesMesh, &buffer);
-			}
+			Value mat;
+			currentObject.AddMember("Material", mat, sceneFile.GetAllocator());
 		}
+		if (object->GetComponent<ComponentMesh>())
+		{
+			Value mesh;
+			currentObject.AddMember("Mesh", mesh, sceneFile.GetAllocator());
+		}
+		//if (object->GetComponent<ComponentTransform>())	//Crash¿?
+		{
+			Value t;
+			currentObject.AddMember("Transform", t, sceneFile.GetAllocator());
+		}
+		if (object->GetComponent<ComponentCamera>())
+		{
+			Value c;
+			currentObject.AddMember("Camera", c, sceneFile.GetAllocator());
+		}
+
+		objects.AddMember(StringRef(pathShort.c_str()), currentObject, sceneFile.GetAllocator());
 	}
+	sceneFile.AddMember("GameObjects", objects, sceneFile.GetAllocator());	//¿?
 
 
-	std::string pathScene = "Library/" + App->fileSystem->SetNameFile("scene", ".jiy");
-	App->fileSystem->Save(pathScene.c_str(), &bytes[0], bytesPointer);
+	std::string pathScene = "Library/Scenes/" + App->fileSystem->SetNameFile("scene", ".jiy");
+	//App->fileSystem->Save(pathScene.c_str(), &bytes[0], bytesPointer);
 	LOG("Scene saved at %s", pathScene.c_str());
 }
 

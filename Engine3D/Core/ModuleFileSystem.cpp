@@ -29,6 +29,7 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	AddPath("./Library/Meshes");
 	AddPath("./Library/Materials");
 	AddPath("./Library/Animation");
+	AddPath("./Library/Scenes");
 	AddPath("./Settings");
 }
 
@@ -140,6 +141,7 @@ void ModuleFileSystem::CreateLibraryDirectories()
 	CreateDir("Library/Meshes/");
 	CreateDir("Library/Materials/");
 	CreateDir("Library/Animation/");
+	CreateDir("/Library/Scenes");
 }
 
 // Add a new zip file or folder
