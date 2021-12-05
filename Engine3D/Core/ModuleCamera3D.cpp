@@ -3,6 +3,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "ModuleRenderer3D.h"
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
@@ -179,78 +180,54 @@ update_status ModuleCamera3D::Update(float dt)
 // -----------------------------------------------------------------
 void ModuleCamera3D::IsMouseClicked()
 {
-	ImVec2 position = ImGui::GetMousePos();
-	ImVec2 normal = NormalizeWindow(position, 
-		ImGui::GetWindowPos().x,
-		ImGui::GetWindowPos().y + ImGui::GetFrameHeight(), 
-		ImGui::GetWindowSize().x, 
-		ImGui::GetWindowSize().y - ImGui::GetFrameHeight());
+	float positionX, positionY, normalX, normalY;
+	
+	positionX = ImGui::GetMousePos().x;
+	positionY = ImGui::GetMousePos().y;
 
-	normal.x = (normal.x - 0.5f) / 0.5f;
-	normal.y = -((normal.y - 0.5f) / 0.5f);
+	normalX = (((positionX - ImGui::GetWindowPos().x) / 
+		((ImGui::GetWindowPos().x + ImGui::GetWindowSize().x) - ImGui::GetWindowPos().x)) - 0.5f) / 0.5f;
+	normalY = -((((positionY - (ImGui::GetWindowPos().y + ImGui::GetFrameHeight())) / 
+		(((ImGui::GetWindowPos().y + ImGui::GetFrameHeight()) + (ImGui::GetWindowSize().y - ImGui::GetFrameHeight())) - (ImGui::GetWindowPos().y + ImGui::GetFrameHeight()))) - 0.5f) / 0.5f);
 
-	if ((normal.x >= -1 && normal.x <= 1) && (normal.y >= -1 && normal.y <= 1))
+	if ((normalX >= -1 && normalX <= 1) && (normalY >= -1 && normalY <= 1))
 	{
-		LineSegment picking = cameraFrustum.UnProjectLineSegment(normal.x, normal.y);
+		LineSegment picking = cameraFrustum.UnProjectLineSegment(normalX, normalY);
 		RayToMeshIntersection(picking);
-		LOG("x %f", normal.x);
-		LOG("y %f", normal.y);
 	}
-}
-
-// -----------------------------------------------------------------
-ImVec2 ModuleCamera3D::NormalizeWindow(ImVec2 pos, float x, float y, float w, float h)
-{
-	ImVec2 nPos;
-
-	nPos.x = (pos.x - x) / ((x + w) - x);
-	nPos.y = (pos.y - y) / ((y + h) - y);
-
-	return nPos;
 }
 
 // -----------------------------------------------------------------
 void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 {
-	std::map<float, GameObject*> canSelect; 
-	float nHit = 0;
-	float fHit = 0;
+	std::map<float, GameObject*> canSelect, distMap;
+	float nHit, fHit;
 	bool selected = false;
 
 	// Raycast hits everything and see if it has AABB and can be selected. 
-	for (std::vector<GameObject*>::iterator i = App->editor->V.begin(); i != App->editor->V.end(); ++i)
-	{ 
-		if (ray.Intersects((*i)->globalAABB, nHit, fHit))
-			canSelect[nHit] = (*i);
-	}
+	for (std::vector<GameObject*>::iterator i = App->scene->root->children.begin(); i != App->scene->root->children.end(); ++i)
+		if ((*i)->name != "Camera") if (ray.Intersects((*i)->globalAABB, nHit, fHit)) canSelect[nHit] = (*i);
 	
 
 	// Add all meshes with a triangle hit and store the distance from the ray to the triangle, then pick the closest one
-	std::map<float, GameObject*> distMap;
 	for (auto i = canSelect.begin(); i != canSelect.end(); ++i) // If it dosen't detect any object with AABB, it will skip this.
 	{
-		const ComponentMesh* _mesh = (*i).second->GetComponent<ComponentMesh>();
-		if (_mesh)
+		ComponentMesh* mesh = (*i).second->GetComponent<ComponentMesh>();
+		if (mesh)
 		{
-			LineSegment local = ray;
-			local.Transform((*i).second->transform->transformMatrix.Inverted());
+			ray.Transform((*i).second->transform->transformMatrix.Inverted());
 
-			if (_mesh->numVertices >= 9)
+			if (mesh->numVertices >= 9)
 			{
-				for (uint index = 0; index < _mesh->numIndices; index += 3)
+				for (int index = 0; index < mesh->numIndices; index += 3)
 				{
-					float3 pA(_mesh->vertices[_mesh->indices[index] * 3]);
-					float3 pB(_mesh->vertices[_mesh->indices[index + 1] * 3]);
-					float3 pC(_mesh->vertices[_mesh->indices[index + 2] * 3]);
-
-					Triangle trian(pA, pB, pC);
+					Triangle trian(mesh->vertices[mesh->indices[index]], 
+						mesh->vertices[mesh->indices[index + 1]], 
+						mesh->vertices[mesh->indices[index + 2]]);
 
 					float dist = 0;
-					if (local.Intersects(trian, &dist, nullptr))
-					{
+					if (ray.Intersects(trian, &dist, nullptr))
 						distMap[dist] = (*i).second;
-						LOG("Im inside");
-					}
 				}
 			}
 		}
@@ -260,13 +237,15 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 	// Select object in editor.
 	if (distMap.begin() != distMap.end())
 	{
-		App->editor->SelectItem((*distMap.begin()).second);
+		App->editor->gameobjectSelected = (*distMap.begin()).second;
+		LOG("GameObject selected name: %s", (*distMap.begin()).second->name.c_str());
+		selected = true;
 	}
 	distMap.clear();
 
 	//If nothing is selected, set selected GO to null
 	if (!selected)
-		App->editor->SelectItem(nullptr);
+		App->editor->gameobjectSelected = nullptr;
 }
 
 // -----------------------------------------------------------------

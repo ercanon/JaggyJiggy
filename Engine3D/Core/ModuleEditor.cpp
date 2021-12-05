@@ -514,7 +514,6 @@ void ModuleEditor::UpdateWindowStatus()
         }*/
         
         S.push(App->scene->root);
-        V.push_back(App->scene->root);
         indents.push(0);
         while (!S.empty())
         {
@@ -559,12 +558,21 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked()) 
                 {
-                    SelectItem(gameobjectSelected);
+                    gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
+                    gameobjectSelected = go;
+                    gameobjectSelected->isSelected = !gameobjectSelected->isSelected;
+                    if (gameobjectSelected->isSelected)
+                    {
+                        LOG("GameObject selected name: %s", gameobjectSelected->name.c_str());
+                    }
+                    else
+                    {
+                        LOG("GameObject unselected name: %s", gameobjectSelected->name.c_str());
+                    }
                 }
                 for (GameObject* child : go->children)
                 {
                     S.push(child);
-                    V.push_back(child);
                     indents.push(indentsAmount + 1);
                 }
 
@@ -617,29 +625,12 @@ void ModuleEditor::UpdateWindowStatus()
         else App->camera->isMouseFocused = false;
         
         // Mouse clicking ----------------
-        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT) {
+        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) {
             App->camera->IsMouseClicked();
         }
 
         ImGui::End();
     } 
-}
-
-void ModuleEditor::SelectItem(GameObject* Selected)
-{
-    Selected ? Selected->isSelected = !Selected->isSelected : 0;
-    Selected = go;
-    Selected->isSelected = !Selected->isSelected;
-    if (Selected->isSelected)
-    {
-        LOG("GameObject selected name: %s", Selected->name.c_str());
-    }
-    else
-    {
-        LOG("GameObject unselected name: %s", Selected->name.c_str());
-    }
-
-    gameobjectSelected = Selected;
 }
 
 void ModuleEditor::InspectorGameObject() 

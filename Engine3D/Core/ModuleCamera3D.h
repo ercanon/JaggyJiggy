@@ -22,7 +22,6 @@ public:
 	void CalculateViewMatrix();
 	void RecalculateProjection();
 	void IsMouseClicked();
-	ImVec2 NormalizeWindow(ImVec2 pos, float x, float y, float w, float h);
 	void RayToMeshIntersection(LineSegment ray);
 	void OnGui() override;
 	void OnSave(JSONWriter& writer) const override;
