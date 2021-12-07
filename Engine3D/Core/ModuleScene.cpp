@@ -25,38 +25,8 @@ bool ModuleScene::Start()
 
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
-	
-	//gameCamera = new GameObject; 
-	//gameCamera->CreateComponent<ComponentCamera>();
-	//gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
 
 	return ret;
-}
-
-bool ModuleScene::CleanUp()
-{
-	std::stack<GameObject*> S;
-	for (GameObject* child : root->children)	
-	{
-		S.push(child);
-	}
-	root->children.clear();
-
-	while (!S.empty())
-	{
-		GameObject* go = S.top();
-		S.pop();
-		for (GameObject* child : go->children)
-		{
-			S.push(child);
-		}
-		go->children.clear();
-		delete go;
-	}
-
-	delete root;
-
-	return true;
 }
 
 update_status ModuleScene::Update(float dt)

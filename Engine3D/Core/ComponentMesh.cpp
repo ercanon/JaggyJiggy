@@ -65,7 +65,7 @@ void ComponentMesh::CopyParMesh(par_shapes_mesh* parMesh)
 
 	GenerateBuffers();
 	ComputeNormals();
-	GenerateBounds(false);
+	GenerateBounds(true);
 }
 
 

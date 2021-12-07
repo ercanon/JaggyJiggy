@@ -145,7 +145,6 @@ update_status ModuleEditor::PostUpdate(float dt)
 // Called before quitting
 bool ModuleEditor::CleanUp()
 {
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -582,7 +581,7 @@ void ModuleEditor::UpdateWindowStatus()
                 }
 
                 ImGui::TreePop();
-            }
+            }       
         }
         ImGui::End();
     }

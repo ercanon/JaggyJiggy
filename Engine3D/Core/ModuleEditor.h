@@ -51,8 +51,6 @@ public:
 
 	void About_Window();	//Can be done better
 
-	void SelectItem(GameObject* Selected);
-
 	void InspectorGameObject();
 
 	//Window status control
@@ -83,5 +81,4 @@ public:
 
 	ImVec2 lastViewportSize;
 	ImVec2 lastViewportSize2;
-
 };
