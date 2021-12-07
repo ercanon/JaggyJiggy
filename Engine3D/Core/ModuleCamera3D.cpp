@@ -22,8 +22,10 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	position = float3(0.0f, 5.0f, -15.0f);
 	reference = float3(0.0f, 0.0f, 0.0f);
 	
-	CalculateViewMatrix();
+	operation = ImGuizmo::OPERATION::TRANSLATE;
+	mode = ImGuizmo::MODE::WORLD;
 
+	CalculateViewMatrix();	
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -54,57 +56,61 @@ update_status ModuleCamera3D::Update(float dt)
 {
 	if (isMouseFocused)
 	{
-		float3 newPos(0, 0, 0);
-		float speed = cameraSpeed * dt;
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
-			speed *= 4.f;
-
-		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
-			newPos.y += speed;
-		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
-			newPos.y -= speed;
-
-		//Focus
-		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+		if (!ImGuizmo::IsUsing())
 		{
-			if (App->editor->gameobjectSelected != nullptr)
+			float3 newPos(0, 0, 0);
+			float speed = cameraSpeed * dt;
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+				speed *= 4.f;
+
+			if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+				newPos.y += speed;
+			if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+				newPos.y -= speed;
+
+			//Focus
+			//Don't work. Use and screen goes gray/black. -> made by teacher
+			/*if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
 			{
-				if (ComponentMesh* mesh = App->editor->gameobjectSelected->GetComponent<ComponentMesh>())
+				if (App->editor->gameobjectSelected != nullptr)
 				{
-					const float3 meshCenter = mesh->GetCenterPointInWorldCoords();
-					LookAt(meshCenter);
-					const float meshRadius = mesh->GetSphereRadius();
-					const float currentDistance = meshCenter.Distance(position);
-					const float desiredDistance = (meshRadius * 2) / atan(cameraFrustum.horizontalFov);
-					position = position + front * (currentDistance - desiredDistance);
+					if (ComponentMesh* mesh = App->editor->gameobjectSelected->GetComponent<ComponentMesh>())
+					{
+						const float3 meshCenter = mesh->GetCenterPointInWorldCoords();
+						LookAt(meshCenter);
+						const float meshRadius = mesh->GetSphereRadius();
+						const float currentDistance = meshCenter.Distance(position);
+						const float desiredDistance = (meshRadius * 2) / atan(cameraFrustum.horizontalFov);
+						position = position + front * (currentDistance - desiredDistance);
+					}
+					else
+					{
+						LookAt(App->editor->gameobjectSelected->transform->GetPosition());
+					}
 				}
-				else
-				{
-					LookAt(App->editor->gameobjectSelected->transform->GetPosition());
-				}
-			}
+			}*/
+
+			if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+				newPos += front * speed;
+			if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+				newPos -= front * speed;
+
+
+			if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+				newPos += right * speed;
+			if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+				newPos -= right * speed;
+
+			if (App->input->GetMouseZ() > 0)
+				newPos += front * speed * 2;
+			if (App->input->GetMouseZ() < 0)
+				newPos -= front * speed * 2;
+
+			position += newPos;
+
+			// Recalculate matrix -------------
+			if (!newPos.Equals(float3::zero)) CalculateViewMatrix();
 		}
-
-		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
-			newPos += front * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
-			newPos -= front * speed;
-
-
-		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
-			newPos += right * speed;
-		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
-			newPos -= right * speed;
-
-		if (App->input->GetMouseZ() > 0)
-			newPos += front * speed * 2;
-		if (App->input->GetMouseZ() < 0)
-			newPos -= front * speed * 2;
-
-		position += newPos;
-
-		// Recalculate matrix -------------
-		if (!newPos.Equals(float3::zero)) CalculateViewMatrix();
 
 		// Mouse motion ----------------
 
@@ -232,7 +238,6 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 			}
 		}
 	}
-	canSelect.clear();
 
 	// Select object in editor.
 	if (distMap.begin() != distMap.end())
@@ -241,11 +246,14 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 		LOG("GameObject selected name: %s", (*distMap.begin()).second->name.c_str());
 		selected = true;
 	}
-	distMap.clear();
-
-	//If nothing is selected, set selected GO to null
+	
+	// If nothing is selected, set selected GO to null
 	if (!selected)
 		App->editor->gameobjectSelected = nullptr;
+
+	// Cleaning
+	canSelect.clear();
+	distMap.clear();
 }
 
 // -----------------------------------------------------------------
@@ -259,8 +267,6 @@ void ModuleCamera3D::LookAt(const float3& point)
 
 	CalculateViewMatrix();
 }
-
-
 
 // -----------------------------------------------------------------
 void ModuleCamera3D::CalculateViewMatrix()
@@ -282,6 +288,35 @@ void ModuleCamera3D::RecalculateProjection()
 	cameraFrustum.farPlaneDistance = farPlaneDistance;
 	cameraFrustum.verticalFov = (verticalFOV * 3.141592 / 2) / 180.f;
 	cameraFrustum.horizontalFov = 2.f * atanf(tanf(cameraFrustum.verticalFov * 0.5f) * aspectRatio);
+}
+
+void ModuleCamera3D::EditTransform()
+{
+	// Guizmo Operation Changer
+	if (!ImGuizmo::IsUsing()) {
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_DOWN)
+			operation = ImGuizmo::OPERATION::TRANSLATE;
+		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_DOWN)
+			operation = ImGuizmo::OPERATION::ROTATE;
+		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
+			operation = ImGuizmo::OPERATION::SCALE;
+
+		if (operation == ImGuizmo::OPERATION::SCALE && mode != ImGuizmo::MODE::LOCAL)
+			mode = ImGuizmo::MODE::LOCAL;
+		else mode = ImGuizmo::MODE::WORLD;
+	}
+
+	// Rect Creation
+	ImVec2 cornerPos = ImGui::GetWindowPos();
+	ImVec2 size = ImGui::GetContentRegionMax();
+	ImGuizmo::SetRect(cornerPos.x, cornerPos.y, size.x, size.y);
+
+	// Guizmo Creation/Draw
+	ComponentTransform* trans = App->editor->gameobjectSelected->transform;
+	float4x4 matrix = trans->transformMatrix.Transposed();
+	float4x4 camView = cameraFrustum.ViewMatrix();
+
+	ImGuizmo::Manipulate(camView.Transposed().ptr(), cameraFrustum.ProjectionMatrix().Transposed().ptr(), operation, mode, matrix.ptr());
 }
 
 void ModuleCamera3D::OnGui()

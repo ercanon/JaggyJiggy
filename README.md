@@ -7,7 +7,7 @@ Has a family friendly interface and you use your knowloadge in C and C++ to prog
 
 # Github
 
-3D-Motor-2021 engine: https://github.com/ercanon/3D-Motor-2021
+3D-Motor-2021 engine: https://github.com/ercanon/JaggyJiggy
 
 # Developers
 

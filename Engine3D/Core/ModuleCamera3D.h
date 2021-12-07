@@ -6,6 +6,7 @@
 #include "Geometry/Frustum.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
+#include "ImGui/ImGuizmo.h"
 #include "ImGui/imgui.h"
 
 class ModuleCamera3D : public Module
@@ -23,6 +24,7 @@ public:
 	void RecalculateProjection();
 	void IsMouseClicked();
 	void RayToMeshIntersection(LineSegment ray);
+	void EditTransform();
 	void OnGui() override;
 	void OnSave(JSONWriter& writer) const override;
 	void OnLoad(const JSONReader& reader) override;
@@ -38,6 +40,8 @@ public:
 	float cameraSpeed = 60.f;
 	bool projectionIsDirty = false;
 	bool isMouseFocused = false;
+	ImGuizmo::OPERATION operation;
+	ImGuizmo::MODE mode;
 
 private:
 

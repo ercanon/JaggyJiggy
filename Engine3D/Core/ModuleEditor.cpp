@@ -94,6 +94,8 @@ update_status ModuleEditor::PreUpdate(float dt)
     ImGui_ImplSDL2_NewFrame(App->window->window);
     ImGui::NewFrame();
 
+    ImGuizmo::BeginFrame();
+
     return UPDATE_CONTINUE;
 
 }
@@ -366,11 +368,11 @@ void ModuleEditor::MenuBar()
 
             if (ImGui::BeginMenu("3D Objects")) 
             {
-                if (ImGui::MenuItem("Cube")) 
+                /*if (ImGui::MenuItem("Cube")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cube");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CUBE);
-                }
+                }*/
                 if (ImGui::MenuItem("Sphere")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
@@ -381,11 +383,11 @@ void ModuleEditor::MenuBar()
                     GameObject* newGameObject = App->scene->CreateGameObject("Plane");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PLANE);
                 }
-                if (ImGui::MenuItem("Pyramid")) 
+                /*if (ImGui::MenuItem("Pyramid")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Pyramid");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PYRAMID);
-                }
+                }*/
                 ImGui::EndMenu();
             }
 
@@ -627,6 +629,9 @@ void ModuleEditor::UpdateWindowStatus()
         if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) {
             App->camera->IsMouseClicked();
         }
+
+        // Gizmo -------------------------
+        if (gameobjectSelected != nullptr) App->camera->EditTransform();
 
         ImGui::End();
     } 
