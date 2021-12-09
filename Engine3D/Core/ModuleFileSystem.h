@@ -14,6 +14,25 @@ struct aiFileIO;
 class Config;
 struct PathNode;
 
+class File
+{
+public:
+	File(std::string _name) { name = _name; }
+	~File() {}
+
+	void Read();
+
+	File* owner = nullptr;
+
+	std::string name;
+	std::string path;
+
+	std::vector<File*> child;
+	std::vector<std::string> files;
+
+	bool selected = false;
+};
+
 class ModuleFileSystem : public Module
 {
 public:
@@ -35,6 +54,7 @@ public:
 	bool AddPath(const char* path_or_zip);
 	bool Exists(const char* file) const;
 	bool CreateDir(const char* dir);
+	void DeleteDir(const char* dir);
 	bool IsDirectory(const char* file) const;
 	const char* GetWriteDir() const;
 	void DiscoverFiles(const char* directory, std::vector<std::string>& file_list, std::vector<std::string>& dir_list) const;
@@ -69,6 +89,8 @@ public:
 	std::string SetNameFile(const char* path, const char* type = nullptr);
 
 	std::string systemBasePath;
+
+	File* file = nullptr;
 };
 
 #endif // __MODULEFILESYSTEM_H__

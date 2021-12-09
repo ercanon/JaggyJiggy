@@ -172,6 +172,11 @@ bool ModuleFileSystem::CreateDir(const char* dir)
 	return false;
 }
 
+void ModuleFileSystem::DeleteDir(const char* dir) 
+{ 
+	PHYSFS_delete(dir); 
+}
+
 // Check if a file is a directory
 bool ModuleFileSystem::IsDirectory(const char* file) const
 {
@@ -582,4 +587,32 @@ std::string ModuleFileSystem::SetNameFile(const char* path, const char* type)
 	}
 
 	return new_name;
+}
+
+void File::Read() 
+{
+	std::vector<std::string> direction;
+
+	App->fileSystem->DiscoverFiles(this->path.c_str(), this->files, direction);
+
+	if (direction.size() > 0)
+	{
+		for (uint i = 0; i < direction.size(); i++)
+		{
+			std::string _path = this->path + std::string("/") + direction.at(i) + std::string("/");
+			App->fileSystem->file = new File(direction.at(i).c_str());
+			App->fileSystem->file->path = _path;
+			this->child.push_back(App->fileSystem->file);
+			App->fileSystem->file->owner = this;
+			App->fileSystem->file->Read();
+		}
+	}
+	for (uint i = 0; i < this->files.size(); i++)
+	{
+		File* b = new File(this->files.at(i));
+		b->owner = this;
+		this->child.push_back(b);
+	}
+
+	direction.clear();
 }

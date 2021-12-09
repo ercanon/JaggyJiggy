@@ -9,6 +9,7 @@
 #include "ModuleImport.h"
 #include "ModuleScene.h"
 #include "ModuleViewportFrameBuffer.h"
+#include "ModuleFileSystem.h"
 #include "ModuleCamera3D.h"
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
@@ -29,6 +30,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showAnotherWindow = false;
     showAboutWindow = false;
     showConfWindow = true;
+    showAssetsListWindow = true;
 
     showConsoleWindow = true;
     showHierarchyWindow = true;
@@ -40,6 +42,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
     gameobjectSelected = nullptr;
+    assetselect = nullptr;
     newCam = nullptr;
 }
 
@@ -83,6 +86,10 @@ bool ModuleEditor::Start()
     GameObject* newGameObject = App->scene->CreateGameObject("Camera");
     newCam = new ComponentCamera(newGameObject, true);
 
+    assetFile = new File("Assets");
+    assetFile->path = assetFile->name;
+    assetFile->Read();
+
     return ret;
 }
 
@@ -110,6 +117,13 @@ update_status ModuleEditor::Update(float dt)
         MenuBar();
         ImGui::End();
     }
+    if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+    {
+        gameobjectSelected->parent->RemoveChild(gameobjectSelected);
+    }
+
+    assetFile->child.clear();
+    assetFile->Read();
 
     //Update status of each window and shows ImGui elements
     UpdateWindowStatus();
@@ -486,6 +500,78 @@ void ModuleEditor::UpdateWindowStatus()
         ImGui::End();
     }
 
+    //Assets List
+    if (showAssetsListWindow)
+    {
+        ImGui::Begin("Assets List", &showAssetsListWindow);
+
+        static char buf[32] = " "; ImGui::InputText(" ", buf, 32);
+        if (ImGui::Button("Create folder", ImVec2(120, 0)))
+        {
+            std::string newPath;
+            if (assetselect != nullptr)
+            {
+                newPath = assetselect->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(newPath.c_str());
+            }
+            else
+            {
+                newPath = assetFile->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(newPath.c_str());
+            }
+        }
+        ImGui::Separator();
+
+        std::stack<File*> F;
+        std::stack<uint> indents;
+
+        F.push(assetFile);
+        indents.push(0);
+
+        File* file;
+
+        while (!F.empty())
+        {
+            file = F.top();
+            uint max = indents.top();
+            F.pop();
+            indents.pop();
+
+            ImGuiTreeNodeFlags nodeFlags = 0;
+            if (file->child.size() == 0)   nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+            if (file->selected)  nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+            for (uint i = 0; i < max; ++i)
+            {
+                ImGui::Indent();
+            }
+
+            if (ImGui::TreeNodeEx(file->name.c_str(), nodeFlags))
+            {
+                if (ImGui::IsItemClicked())
+                {
+                    assetselect ? assetselect->selected = !assetselect->selected : 0;
+                    assetselect = file;
+                    assetselect->selected = !assetselect->selected;
+                }
+
+                if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+                    if (assetselect != nullptr) CleanUpObject();
+
+                for (File* child : file->child)
+                {
+                    F.push(child);
+                    indents.push(max + 1);
+                }
+
+                for (uint i = 0; i < max; ++i) ImGui::Unindent();
+
+                ImGui::TreePop();
+            }
+        }
+        ImGui::End();
+    }
+
     //Inspector
     if (showInspectorWindow) 
     {
@@ -629,6 +715,20 @@ void ModuleEditor::UpdateWindowStatus()
 
         ImGui::End();
     } 
+}
+
+void ModuleEditor::CleanUpObject()
+{
+   if (assetselect->child.size() > 0)
+    {
+        for (int i = 0; i < assetselect->files.size(); i++)
+        {
+            std::string file = assetselect->path + std::string(assetselect->files.at(i));
+            App->fileSystem->DeleteDir(file.c_str());
+        }
+    }
+    App->fileSystem->DeleteDir(assetselect->path.c_str());
+    assetselect = nullptr;
 }
 
 void ModuleEditor::InspectorGameObject() 

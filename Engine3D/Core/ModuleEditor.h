@@ -10,6 +10,7 @@
 //Forward declaration
 class GameObject;
 class ComponentTransform;
+class File;
 
 class ModuleEditor : public Module
 {
@@ -51,6 +52,8 @@ public:
 
 	void About_Window();	//Can be done better
 
+	void CleanUpObject();
+
 	void InspectorGameObject();
 
 	//Window status control
@@ -64,6 +67,7 @@ public:
 	bool showGameWindow;
 	bool showTextures;
 	bool showConsoleWindow;
+	bool showAssetsListWindow;
 
 	std::stack<GameObject*> S;
 	std::stack<uint> indents;
@@ -81,4 +85,7 @@ public:
 
 	ImVec2 lastViewportSize;
 	ImVec2 lastViewportSize2;
+
+	File* assetFile;
+	File* assetselect;
 };
