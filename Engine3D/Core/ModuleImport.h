@@ -22,7 +22,7 @@ public:
 	void StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, unsigned bytes, void* data);
 
 	void LoadMeshFile(const char* pathfile, bool scene = false, char* bufferScene = nullptr);
-	void SaveMeshFile(GameObject* gameObject, const char* path, std::string name = nullptr);
+	void SaveMeshFile(GameObject* gameObject, std::string name = nullptr);
 
 	void SaveScene(const char* path);
 	void LoadScene(const char* path);

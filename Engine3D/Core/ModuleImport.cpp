@@ -352,7 +352,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferSc
 	}
 }
 
-void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::string name)
+void ModuleImport::SaveMeshFile(GameObject* gameObject, std::string name)
 {
 	std::vector<char> bytes;
 	unsigned bytesPointer = 0;
@@ -380,12 +380,12 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 
 	if (name.size() > 0)
 	{
-		std::string pathShort = path + App->fileSystem->SetNameFile(name.c_str(), ".fbx");
+		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
 		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 	}
 	else
 	{
-		std::string pathShort = path + App->fileSystem->SetNameFile(gameObject->name.c_str(), ".fbx");
+		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(gameObject->name.c_str(), ".jgg");
 		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 	}
 }
@@ -393,6 +393,10 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, const char* path, std::s
 void ModuleImport::SaveScene(const char* path)
 {
 	Document sceneFile;
+	sceneFile.SetObject();
+	StringBuffer bufferScene;
+	Writer<StringBuffer> writer(bufferScene);
+	Document::AllocatorType& allocator = sceneFile.GetAllocator();
 
 	std::queue<GameObject*> T;
 	for (GameObject* child : App->scene->root->children)
@@ -412,58 +416,93 @@ void ModuleImport::SaveScene(const char* path)
 	}
 
 	// -- Textures --//
-	Value textures(kObjectType);
+	Value textures(kArrayType);
 	for (auto& t : App->textures->textures)
 	{
-		Value currentTexture(kArrayType);
-		std::string pathShort = t.first.c_str();
+		std::string pathShort = t.first;
 		
-		Value mat;
-		currentTexture.AddMember("Material", mat, sceneFile.GetAllocator());
-
-		textures.AddMember(StringRef(pathShort.c_str()), currentTexture, sceneFile.GetAllocator());
+		if (App->fileSystem->Exists(pathShort))
+		{
+			textures.PushBack(
+				StringRef(pathShort.c_str()),
+				allocator);
+		}
+		else LOG("Error! Texture %s not found!", pathShort.c_str());
 	}
-	sceneFile.AddMember("Textures", textures, sceneFile.GetAllocator());	//¿?
+	sceneFile.AddMember("Textures", textures, allocator);
 
 	// -- GameObjects --//
-	Value objects(kObjectType);
+	Value objectList(kObjectType);
 	while (!T.empty())
 	{
 		GameObject* object = T.front();
 		T.pop();
 
-		Value currentObject(kArrayType);
-		std::string pathShort = App->fileSystem->SetNameFile(object->name.c_str(), ".");
+		Value currentObject(kObjectType);
+		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(object->name.c_str(), ".jgg");
 
-		currentObject.AddMember("Parent", StringRef(object->parent->name.c_str()), sceneFile.GetAllocator());
+		currentObject.AddMember("Parent", 
+			StringRef(object->parent->name.c_str()), 
+			allocator);
 		if (object->GetComponent<ComponentMaterial>())
 		{
-			Value mat;
-			currentObject.AddMember("Material", mat, sceneFile.GetAllocator());
+			currentObject.AddMember("Material", 
+				StringRef(object->GetComponent<ComponentMaterial>()->GetTextureName().c_str()), 
+				allocator);
 		}
-		if (object->GetComponent<ComponentMesh>())
+		if (ComponentMesh* compMesh = object->GetComponent<ComponentMesh>())
 		{
-			Value mesh;
-			currentObject.AddMember("Mesh", mesh, sceneFile.GetAllocator());
+			Value mesh(kObjectType);
+			Value vertices(kArrayType);
+			Value normals(kArrayType);
+			Value texCoords(kArrayType);
+			for (size_t f = 0; f < compMesh->numVertices / 3; f++)
+			{
+				vertices.PushBack(compMesh->vertices[f].x, allocator);
+				vertices.PushBack(compMesh->vertices[f].y, allocator);
+				vertices.PushBack(compMesh->vertices[f].z, allocator);
+
+				normals.PushBack(compMesh->normals[f].x, allocator);
+				normals.PushBack(compMesh->normals[f].y, allocator);
+				normals.PushBack(compMesh->normals[f].z, allocator);
+			}
+			for (size_t f = 0; f < compMesh->numVertices / 2; f++)
+			{
+				texCoords.PushBack(compMesh->texCoords[f].x, allocator);
+				texCoords.PushBack(compMesh->texCoords[f].y, allocator);
+			}
+
+			mesh.AddMember("NumVertices", compMesh->numVertices, allocator);
+			mesh.AddMember("NumIndices", compMesh->numIndices, allocator);
+
+			mesh.AddMember("Vertices", vertices, allocator);
+			mesh.AddMember("Indices", compMesh->indices[0], allocator);
+			mesh.AddMember("Normals", normals, allocator);
+			mesh.AddMember("TexCoords", texCoords, allocator);
+
+			currentObject.AddMember("Mesh", mesh, allocator);
 		}
 		//if (object->GetComponent<ComponentTransform>())	//Crash¿?
-		{
-			Value t;
-			currentObject.AddMember("Transform", t, sceneFile.GetAllocator());
-		}
+		//{
+		//	Value t;
+		//	currentObject.AddMember("Transform", t, allocator);
+		//}
 		if (object->GetComponent<ComponentCamera>())
 		{
-			Value c;
-			currentObject.AddMember("Camera", c, sceneFile.GetAllocator());
+			//Value c;
+			//currentObject.AddMember("Camera", c, allocator);
 		}
 
-		objects.AddMember(StringRef(pathShort.c_str()), currentObject, sceneFile.GetAllocator());
+		objectList.AddMember(
+			StringRef(App->fileSystem->SetNameFile(pathShort.c_str(), ".").c_str()),
+			currentObject, allocator);
 	}
-	sceneFile.AddMember("GameObjects", objects, sceneFile.GetAllocator());	//¿?
+	sceneFile.AddMember("GameObjects", objectList, allocator);
 
-
+	sceneFile.Accept(writer);
+	const char* buffer = bufferScene.GetString();
 	std::string pathScene = "Library/Scenes/" + App->fileSystem->SetNameFile("scene", ".jiy");
-	//App->fileSystem->Save(pathScene.c_str(), &bytes[0], bytesPointer);
+	App->fileSystem->Save(pathScene.c_str(), &buffer[0], strlen(buffer));
 	LOG("Scene saved at %s", pathScene.c_str());
 }
 
