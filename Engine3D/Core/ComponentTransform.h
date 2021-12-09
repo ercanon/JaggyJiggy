@@ -5,8 +5,8 @@
 #include "Math/float4x4.h"
 #include "Math/Quat.h"
 
-class ComponentTransform : public Component {
-
+class ComponentTransform : public Component 
+{
 public:
 
 	ComponentTransform(GameObject* parent);

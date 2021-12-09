@@ -94,6 +94,7 @@ StyleCopReport.xml
 *.scc
 *.jgg
 *.jay
+*.jiy
 *.ini
 
 # Chutzpah Test files
