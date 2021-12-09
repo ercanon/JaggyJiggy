@@ -117,10 +117,9 @@ update_status ModuleEditor::Update(float dt)
         MenuBar();
         ImGui::End();
     }
+
     if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
-    {
         gameobjectSelected->parent->RemoveChild(gameobjectSelected);
-    }
 
     assetFile->child.clear();
     assetFile->Read();

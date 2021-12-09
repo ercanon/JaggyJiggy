@@ -230,13 +230,16 @@ bool ComponentMesh::Update(float dt)
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		//--Enable States--//
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//--Enable States--//
+	glEnableClientState(GL_VERTEX_ARRAY);
 
-		//-- Buffers--//
+	//-- Buffers--//
+	if (this->textureBufferId)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glBindBuffer(GL_ARRAY_BUFFER, this->textureBufferId);
 		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+	}
 
 		glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
 		glVertexPointer(3, GL_FLOAT, 0, NULL);
@@ -248,17 +251,23 @@ bool ComponentMesh::Update(float dt)
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
 
-		//-- Draw --//
-		glPushMatrix();
-		glMultMatrixf(owner->transform->transformMatrix.Transposed().ptr());
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
-		glPopMatrix();
-		//-- UnBind Buffers--//
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//-- Draw --//
+	glPushMatrix();
+	glMultMatrixf(owner->transform->transformMatrix.Transposed().ptr());
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
+	glPopMatrix();
+	//-- UnBind Buffers--//
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	if (this->textureBufferId)
+	{
 		glBindBuffer(GL_TEXTURE_COORD_ARRAY, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 		//--Disables States--//
 		glDisableClientState(GL_VERTEX_ARRAY);
