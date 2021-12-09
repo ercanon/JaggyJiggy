@@ -136,11 +136,15 @@ bool ModuleImport::LoadGeometry(const char* path)
 				for (size_t f = 0; f < assimpMesh->mNumFaces; f++)
 				{
 					if (assimpMesh->mFaces[f].mNumIndices != 3)
+					{
 						LOG("WARNING, geometry face with != 3 indices!");
-
-					indices[(f * 3)] = assimpMesh->mFaces[f].mIndices[0];
-					indices[(f * 3) + 1] = assimpMesh->mFaces[f].mIndices[1];
-					indices[(f * 3) + 2] = assimpMesh->mFaces[f].mIndices[2];
+					}
+					else
+					{
+						indices[(f * 3)] = assimpMesh->mFaces[f].mIndices[0];
+						indices[(f * 3) + 1] = assimpMesh->mFaces[f].mIndices[1];
+						indices[(f * 3) + 2] = assimpMesh->mFaces[f].mIndices[2];
+					}
 				}
 				StoreInBuffer(bytes, bytesPointer, sizeof(uint) * NumIndices, &indices[0]);
 			}
