@@ -42,6 +42,8 @@ public:
 	bool isMouseFocused = false;
 	ImGuizmo::OPERATION operation;
 	ImGuizmo::MODE mode;
+	ImVec2 cornerPos;
+	ImVec2 size;
 
 private:
 

@@ -182,9 +182,6 @@
     <ClCompile Include="Core\ComponentCamera.cpp">
       <Filter>Engine\GameObjects - Components</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ModuleResources.cpp">
-      <Filter>Engine\Modules</Filter>
-    </ClCompile>
     <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
       <Filter>ExternalLibraries\pcg-c</Filter>
     </ClCompile>
@@ -717,9 +714,6 @@
     </ClInclude>
     <ClInclude Include="Core\ComponentCamera.h">
       <Filter>Engine\GameObjects - Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ModuleResources.h">
-      <Filter>Engine\Modules</Filter>
     </ClInclude>
     <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
       <Filter>ExternalLibraries\pcg-c</Filter>

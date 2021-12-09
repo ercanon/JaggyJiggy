@@ -12,7 +12,6 @@
 #include "ModuleViewportFrameBuffer.h"
 #include "ModuleFileSystem.h"
 #include "ModuleTextures.h"
-#include "ModuleResources.h"
 #include "Globals.h"
 
 
@@ -31,7 +30,6 @@ Application::Application()
 	import = new ModuleImport(this);
 	fileSystem = new ModuleFileSystem(this);
 	textures = new ModuleTextures(this);
-	resources = new ModuleResources(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -44,7 +42,6 @@ Application::Application()
 	AddModule(input);
 	AddModule(textures);
 	AddModule(import);
-	AddModule(resources);
 	
 	// Scenes
 	AddModule(viewportBufferGame);

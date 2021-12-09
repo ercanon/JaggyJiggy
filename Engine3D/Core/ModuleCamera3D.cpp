@@ -307,8 +307,6 @@ void ModuleCamera3D::EditTransform()
 	}
 
 	// Rect Creation
-	ImVec2 cornerPos = ImGui::GetWindowPos();
-	ImVec2 size = ImGui::GetContentRegionMax();
 	ImGuizmo::SetRect(cornerPos.x, cornerPos.y, size.x, size.y);
 
 	// Guizmo Creation/Draw

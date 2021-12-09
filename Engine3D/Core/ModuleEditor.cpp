@@ -501,18 +501,6 @@ void ModuleEditor::UpdateWindowStatus()
     if (showHierarchyWindow) 
     {
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
-
-        //Just cleaning gameObjects(not textures,buffers...)
-        /*if (ImGui::Button("Clear", {60,20}))
-        {
-            App->editor->gameobjectSelected = nullptr;
-            App->scene->CleanUp(); //Clean GameObjects 
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("New", { 60,20 }))
-        {
-            App->scene->CreateGameObject();
-        }*/
         
         S.push(App->scene->root);
         indents.push(0);
@@ -612,6 +600,12 @@ void ModuleEditor::UpdateWindowStatus()
     {
         ImGui::Begin("Scene", &showSceneWindow, ImGuiWindowFlags_NoScrollbar);
 
+        if (App->editor->gameobjectSelected != nullptr)
+        {
+            App->camera->cornerPos = ImGui::GetWindowPos();
+            App->camera->size = ImGui::GetContentRegionMax();
+        }
+
         ImVec2 viewportSize = ImGui::GetCurrentWindow()->Size;
         if (viewportSize.x != lastViewportSize.x || viewportSize.y != lastViewportSize.y)
         {
@@ -621,7 +615,7 @@ void ModuleEditor::UpdateWindowStatus()
 
         lastViewportSize = viewportSize;
         ImGui::Image((ImTextureID)App->viewportBufferScene->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-        
+
         if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
         else App->camera->isMouseFocused = false;
         
