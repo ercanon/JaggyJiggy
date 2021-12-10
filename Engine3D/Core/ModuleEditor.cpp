@@ -92,10 +92,19 @@ bool ModuleEditor::Start()
     assets->Read();
 
     folderImage = App->textures->Load("Assets/Format/folder.png");
+    App->import->SaveTexture(folderImage);
+
     pngImage = App->textures->Load("Assets/Format/png.png");
+    App->import->SaveTexture(pngImage);
+
     jpgImage = App->textures->Load("Assets/Format/jpg.png");
+    App->import->SaveTexture(jpgImage);
+
     tgaImage = App->textures->Load("Assets/Format/tga.png");
+    App->import->SaveTexture(tgaImage);
+
     fbxImage = App->textures->Load("Assets/Format/fbx.png");
+    App->import->SaveTexture(fbxImage);
 
     folderID = folderImage.id;
     pngID = pngImage.id;
@@ -333,6 +342,7 @@ void ModuleEditor::About_Window()
 void ModuleEditor::UpdateText(const char* text) 
 {
     consoleText.appendf(text);
+    scroll = true;
 }
 
 bool ModuleEditor::DockingRootItem(char* id, ImGuiWindowFlags winFlags)
@@ -475,6 +485,35 @@ void ModuleEditor::MenuBar()
                 showAboutWindow = !showAboutWindow;
             ImGui::EndMenu();
         }
+
+        /* ---- TIME MANAGMENT ----*/
+        ImGui::Separator();
+        if (ImGui::MenuItem("Play"))
+        {
+            play = !play;
+            // Save
+            if (play == false)
+            {
+
+            }
+            // Load
+            if (play == true)
+            {
+
+            }
+        }
+        if (ImGui::MenuItem("Pause")) if (play == false) pause = !pause;
+        if (ImGui::MenuItem("Stop"))
+        {
+            if (play == false)
+            {
+                // Load
+
+
+                play = true;
+                pause = true;
+            }
+        }
     }
 
     ImGui::EndMainMenuBar();
@@ -514,8 +553,10 @@ void ModuleEditor::UpdateWindowStatus()
     if (showConsoleWindow) 
     {
         ImGui::Begin("Console", &showConsoleWindow);
-        ImGui::TextUnformatted(consoleText.begin(), consoleText.end());
-        ImGui::SetScrollHere(1.0f);
+        if (pause == true) ImGui::TextUnformatted(consoleText.begin(), consoleText.end());
+        else ImGui::Text("---- Game Paused ----");
+        if (scroll) ImGui::SetScrollHere(1.0f);
+        scroll = false;
         ImGui::End();
     }
 
@@ -693,6 +734,7 @@ void ModuleEditor::UpdateWindowStatus()
         
         S.push(App->scene->root);
         indents.push(0);
+
         while (!S.empty())
         {
             go = S.top();
@@ -879,7 +921,11 @@ void ModuleEditor::DrawID(uint id, const char* text, int numID)
             if (App->fileSystem->HasExtension(str.c_str(), "fbx")) App->import->LoadGeometry(str.c_str());
             if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
                 App->fileSystem->HasExtension(str.c_str(), "png") ||
-                App->fileSystem->HasExtension(str.c_str(), "tga")) App->textures->Load(str.c_str());
+                App->fileSystem->HasExtension(str.c_str(), "tga"))
+            {
+                TextureObject texture = App->textures->Load(str.c_str());
+                App->import->SaveTexture(texture);
+            }
         }
     }
     ImGui::Text(text);

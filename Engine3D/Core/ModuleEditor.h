@@ -78,6 +78,7 @@ public:
 	std::stack<uint> indents;
 
 	ImGuiTextBuffer consoleText;
+	bool scroll = false;
 
 	ImVec4 currentColor;
 
@@ -104,4 +105,7 @@ public:
 	TextureObject folderImage, pngImage, jpgImage, tgaImage, fbxImage;
 
 	std::vector<std::string> assetsString;
+
+	// Time Managment
+	bool play = true, pause = true;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "Module.h"
+#include "ModuleTextures.h"
 
 #include <string>
 
@@ -25,4 +26,6 @@ public:
 	void SaveMeshFile(GameObject* gameObject, const char* path, std::string name = nullptr);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
+
+	void SaveTexture(const TextureObject texture);
 };

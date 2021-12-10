@@ -226,7 +226,9 @@ bool ComponentMesh::InGameCamView(Frustum* cam)
 bool ComponentMesh::Update(float dt)
 {
 	 if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
-		drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		 if ((drawWireframe || App->renderer3D->wireframeMode) && owner->isSelected)
+			 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+		 else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -246,7 +248,7 @@ bool ComponentMesh::Update(float dt)
 
 		if (ComponentMaterial* material = owner->GetComponent<ComponentMaterial>())
 		{
-			drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
+			(drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode) && owner->isSelected ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
@@ -275,17 +277,17 @@ bool ComponentMesh::Update(float dt)
 
 		App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		if (drawFaceNormals || drawVertexNormals)
+		if ((drawFaceNormals || drawVertexNormals) && owner->isSelected)
 			DrawNormals();
 
-		if (baabb)
+		if (baabb && owner->isSelected)
 		{
 			float3 points[8];
 			owner->globalAABB.GetCornerPoints(points);
 			DrawAABBOBB(points, float3(0.2f, 1.f, 0.1f));
 		}
 
-		if (bobb)
+		if (bobb && owner->isSelected)
 		{
 			float3 points[8];
 			owner->globalOBB.GetCornerPoints(points);

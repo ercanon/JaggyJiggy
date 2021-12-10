@@ -150,8 +150,10 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Store Normals info --//
-			if (assimpMesh->HasNormals()) 
+			if (assimpMesh->HasNormals())
+			{
 				StoreInBuffer(bytes, bytesPointer, sizeof(float3) * assimpMesh->mNumVertices, &assimpMesh->mNormals[0]);
+			}
 
 			// -- Store UV info --//
 			if (assimpMesh->HasTextureCoords(0))
@@ -339,6 +341,18 @@ void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::strin
 			}
 		}
 	}
+}
+
+void ModuleImport::SaveTexture(const TextureObject texture)
+{
+	std::string texturePath;
+	texturePath = App->fileSystem->SetNameFile(texturePath.c_str());
+
+	std::string textureFile = texture.name;
+
+	texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
+
+	App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
 }
 
 // Called before quitting
