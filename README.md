@@ -20,22 +20,19 @@ Pau Motta: https://github.com/paumotta
 # How to use
 
 - Open "JaggyJiggy.exe" to start.
-- Then choose to drag and drop a FBX or choose any of our geometry.
-- With that "object" created, select him and move, rotate or scale.
+- Then choose any geometry or texture inside the folders to load it inside the game.
+- With that "object" created, select him and move, rotate or scale, change materials, look his wireframe or normals, etc.
 
 ## Controls
 
 - Left click in Object: Select object.
-- WASD + Right: Movement.
-- Movement + SHIFT: speed x2.
-- F: focus the camera around the selected object.
-- Mouse wheel + Alt: Zoom.
+- WASD: Movement.
+- Q/E: Move Up/Down.
+- Movement + Shift: speed x2.
+- Mouse wheel: Zoom.
 - Left: Rotate.
-- Esc: Close the engine.
-
-## Additional funcionality
-
-- If a windows gui is dropped out of the screen it goes back.
-- If the engine windows is changed, the windows gui will change to the size of the engine windows.
+- Left + Alt: Rotate around GameObject selected.
+- Delete: Delete selection.
+- Escape: Close the engine.
 
 ### Fork from: https://github.com/solidajenjo/Engine3D

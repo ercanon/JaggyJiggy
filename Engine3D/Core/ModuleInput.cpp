@@ -159,7 +159,7 @@ update_status ModuleInput::PreUpdate(float dt)
 					LOG("Path of file dropped will be %s", filePath);
 					std::string texturePath = App->fileSystem->SetNameFile(filePath);
 					filePath = texturePath.c_str();
-					texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(filePath, ".jay");
+					texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile(filePath, ".jay");
 
 					if (!App->fileSystem->Exists(texturePath))
 						App->textures->SaveTexture(filePath, texturePath.c_str());

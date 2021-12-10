@@ -115,7 +115,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 						texturePath = App->fileSystem->SetNameFile(texturePath.c_str());
 						std::string textureFile(texturePath);
 
-						texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
+						texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
 
 						if (!App->fileSystem->Exists(texturePath))
 							App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
@@ -169,7 +169,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + std::to_string(pcg32_random()) + App->fileSystem->SetNameFile(path, ".jgg");
+			std::string pathShort = "Library/Resources/Meshes/" + std::to_string(pcg32_random()) + App->fileSystem->SetNameFile(path, ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -364,7 +364,7 @@ void ModuleImport::SaveTexture(const TextureObject texture)
 
 	std::string textureFile = texture.name;
 
-	texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
+	texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
 
 	App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
 }

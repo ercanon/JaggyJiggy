@@ -91,19 +91,19 @@ bool ModuleEditor::Start()
     assets->path = assets->name;
     assets->Read();
 
-    folderImage = App->textures->Load("Assets/Format/folder.png");
+    folderImage = App->textures->Load("Assets/Resources/Format/folder.png");
     App->import->SaveTexture(folderImage);
 
-    pngImage = App->textures->Load("Assets/Format/png.png");
+    pngImage = App->textures->Load("Assets/Resources/Format/png.png");
     App->import->SaveTexture(pngImage);
 
-    jpgImage = App->textures->Load("Assets/Format/jpg.png");
+    jpgImage = App->textures->Load("Assets/Resources/Format/jpg.png");
     App->import->SaveTexture(jpgImage);
 
-    tgaImage = App->textures->Load("Assets/Format/tga.png");
+    tgaImage = App->textures->Load("Assets/Resources/Format/tga.png");
     App->import->SaveTexture(tgaImage);
 
-    fbxImage = App->textures->Load("Assets/Format/fbx.png");
+    fbxImage = App->textures->Load("Assets/Resources/Format/fbx.png");
     App->import->SaveTexture(fbxImage);
 
     folderID = folderImage.id;
@@ -637,6 +637,9 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked())
                 {
+                    if (gameobjectSelected != nullptr) gameobjectSelected = false;
+                    gameobjectSelected = nullptr;
+
                     assetselect ? assetselect->selected = !assetselect->selected : 0;
                     assetselect = file;
                     assetselect->selected = !assetselect->selected;
@@ -778,6 +781,9 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked()) 
                 {
+                    if (assetselect != nullptr) assetselect->selected = false;
+                    assetselect = nullptr;
+
                     gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
                     gameobjectSelected = go;
                     gameobjectSelected->isSelected = !gameobjectSelected->isSelected;
@@ -854,7 +860,7 @@ void ModuleEditor::UpdateWindowStatus()
         if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) App->camera->IsMouseClicked();
 
         // Gizmo -------------------------
-        if (gameobjectSelected != nullptr) App->camera->EditTransform();
+        //if (gameobjectSelected != nullptr) App->camera->EditTransform();
 
         ImGui::End();
     } 
