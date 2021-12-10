@@ -396,33 +396,47 @@ void ModuleImport::SaveScene(const char* path)
 			for (size_t v = 0; v < compMesh->numVertices; v++)
 			{
 				Value vec(kArrayType);
-				vec.PushBack(compMesh->vertices[v].x, allocator);
-				vec.PushBack(compMesh->vertices[v].y, allocator);
-				vec.PushBack(compMesh->vertices[v].z, allocator);
+				if (!compMesh->vertices.empty())
+				{
+					vec.PushBack(compMesh->vertices[v].x, allocator);
+					vec.PushBack(compMesh->vertices[v].y, allocator);
+					vec.PushBack(compMesh->vertices[v].z, allocator);
+				}
 
 				Value norm(kArrayType);
-				norm.PushBack(compMesh->normals[v].x, allocator);
-				norm.PushBack(compMesh->normals[v].y, allocator);
-				norm.PushBack(compMesh->normals[v].z, allocator);
+				if (!compMesh->normals.empty())
+				{
+					norm.PushBack(compMesh->normals[v].x, allocator);
+					norm.PushBack(compMesh->normals[v].y, allocator);
+					norm.PushBack(compMesh->normals[v].z, allocator);
+				}
 
 				Value coord(kArrayType);
-				coord.PushBack(compMesh->texCoords[v].x, allocator);
-				coord.PushBack(compMesh->texCoords[v].y, allocator);
+				if (!compMesh->texCoords.empty())
+				{
+					coord.PushBack(compMesh->texCoords[v].x, allocator);
+					coord.PushBack(compMesh->texCoords[v].y, allocator);
+				}
 
 				vertices.PushBack(vec, allocator);
 				normals.PushBack(norm, allocator);
 				texCoords.PushBack(coord, allocator);
 			}
 			for (size_t i = 0; i < compMesh->numIndices; i++)
-				indices.PushBack(compMesh->indices[i], allocator);
+				if (!compMesh->indices.empty())
+					indices.PushBack(compMesh->indices[i], allocator);
 
 			mesh.AddMember("NumVertices", compMesh->numVertices, allocator);
 			mesh.AddMember("NumIndices", compMesh->numIndices, allocator);
 
-			mesh.AddMember("Vertices", vertices, allocator);
-			mesh.AddMember("Indices", indices, allocator);
-			mesh.AddMember("Normals", normals, allocator);
-			mesh.AddMember("TexCoords", texCoords, allocator);
+			if (!compMesh->vertices.empty())
+				mesh.AddMember("Vertices", vertices, allocator);
+			if (!compMesh->indices.empty())
+				mesh.AddMember("Indices", indices, allocator);
+			if (!compMesh->normals.empty())
+				mesh.AddMember("Normals", normals, allocator);
+			if (!compMesh->texCoords.empty())
+				mesh.AddMember("TexCoords", texCoords, allocator);
 
 			currentObject.AddMember("Mesh", mesh, allocator);
 		}
@@ -538,19 +552,29 @@ void ModuleImport::LoadScene(const char* path)
 				newMesh->texCoords.resize(newMesh->numVertices);
 				for (size_t v = 0; v < newMesh->numVertices; v++)
 				{
-					newMesh->vertices[v].x = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][0].GetFloat();
-					newMesh->vertices[v].y = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][1].GetFloat();
-					newMesh->vertices[v].z = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][2].GetFloat();
+					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Vertices"))
+					{
+						newMesh->vertices[v].x = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][0].GetFloat();
+						newMesh->vertices[v].y = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][1].GetFloat();
+						newMesh->vertices[v].z = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][2].GetFloat();
+					}
 
-					newMesh->normals[v].x = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][0].GetFloat();
-					newMesh->normals[v].y = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][1].GetFloat();
-					newMesh->normals[v].z = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][2].GetFloat();
+					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Normals"))
+					{
+						newMesh->normals[v].x = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][0].GetFloat();
+						newMesh->normals[v].y = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][1].GetFloat();
+						newMesh->normals[v].z = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][2].GetFloat();
+					}
 
-					newMesh->texCoords[v].x = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][0].GetFloat();
-					newMesh->texCoords[v].y = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][1].GetFloat();
+					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("TexCoords"))
+					{
+						newMesh->texCoords[v].x = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][0].GetFloat();
+						newMesh->texCoords[v].y = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][1].GetFloat();
+					}
 				}
 				for (size_t i = 0; i < newMesh->numIndices; i++)
-					newMesh->indices[i] = sceneFile["GameObjects"][go]["Mesh"]["Indices"][i].GetInt();
+					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Indices"))
+						newMesh->indices[i] = sceneFile["GameObjects"][go]["Mesh"]["Indices"][i].GetInt();
 			}
 			if (sceneFile["GameObjects"][go].HasMember("Transform"))
 			{
