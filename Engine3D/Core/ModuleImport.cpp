@@ -6,6 +6,7 @@
 #include "ModuleTextures.h"
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
+#include "ModuleEditor.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "GameObject.h"
@@ -188,100 +189,19 @@ void ModuleImport::StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, u
 	pointer += bytes;
 }
 
-void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferScene)
+void ModuleImport::LoadMeshFile(const char* pathfile)
 {
-	if (!scene)
-	{
-		char* buffer;
-		uint bytes = App->fileSystem->Load(pathfile, &buffer);
+	char* buffer;
+	uint bytes = App->fileSystem->Load(pathfile, &buffer);
 
-		if (bytes > 0)
-		{
-			// -- Header --//
-			unsigned int numVertices, numIndices, numNormals, numCoords;
-			memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
-			memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
-			memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
-			memcpy(&numCoords, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
-
-			// -- Byte pointer --//
-			unsigned nameOffset = 4 * sizeof(unsigned);
-			unsigned textureOffset = nameOffset + (sizeof(char) * 1024);
-			unsigned verticesOffset = textureOffset + (sizeof(char) * 1024);
-			unsigned indicesOffset = verticesOffset + (sizeof(float3) * numVertices);
-			unsigned normalsOffset = indicesOffset + (sizeof(uint) * numIndices);
-			unsigned coordsOffset = normalsOffset + (sizeof(float3) * numNormals);
-
-			// -- Create mesh --//
-			char charName[1024];
-			memcpy(&charName[0], &buffer[nameOffset], sizeof(char) * 1024);
-			std::string name(charName);
-
-			GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
-			ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
-
-
-			char charTexturePath[1024];
-			memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
-			std::string texturePath(charTexturePath);
-			newMesh->texturePath = texturePath;
-
-			if (texturePath.size() > 0)
-			{
-				if (!App->textures->Find(texturePath))
-				{
-					const TextureObject& textureObject = App->textures->Load(texturePath);
-					ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
-					materialComp->SetTexture(textureObject);
-				}
-				else
-				{
-					const TextureObject& textureObject = App->textures->Get(texturePath);
-					ComponentMaterial* materialComp = newGameObject->CreateComponent<ComponentMaterial>();
-					materialComp->SetTexture(textureObject);
-				}
-			}
-
-
-			newMesh->numVertices = numVertices;
-			newMesh->numIndices = numIndices;
-
-			newMesh->vertices.resize(numVertices);
-			memcpy(&newMesh->vertices[0], &buffer[verticesOffset], sizeof(float3) * numVertices);
-
-			if (numIndices > 0)
-			{
-				newMesh->indices.resize(numIndices);
-				memcpy(&newMesh->indices[0], &buffer[indicesOffset], sizeof(uint) * numIndices);
-			}
-
-			if (numNormals > 0)
-			{
-				newMesh->normals.resize(numNormals);
-				memcpy(&newMesh->normals[0], &buffer[normalsOffset], sizeof(float3) * numNormals);
-			}
-
-			if (numCoords > 0)
-			{
-				newMesh->texCoords.resize(numCoords);
-				memcpy(&newMesh->texCoords[0], &buffer[coordsOffset], sizeof(float2) * numCoords);
-			}
-
-			newMesh->GenerateBuffers();
-			newMesh->GenerateBounds(true);
-			newMesh->ComputeNormals();
-		}
-
-		RELEASE(buffer);
-	}
-	else
+	if (bytes > 0)
 	{
 		// -- Header --//
 		unsigned int numVertices, numIndices, numNormals, numCoords;
-		memcpy(&numVertices, &bufferScene[0], sizeof(unsigned int));
-		memcpy(&numIndices, &bufferScene[sizeof(unsigned int)], sizeof(unsigned int));
-		memcpy(&numNormals, &bufferScene[sizeof(unsigned int) * 2], sizeof(unsigned int));
-		memcpy(&numCoords, &bufferScene[sizeof(unsigned int) * 3], sizeof(unsigned int));
+		memcpy(&numVertices, &buffer[0], sizeof(unsigned int));
+		memcpy(&numIndices, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
+		memcpy(&numNormals, &buffer[sizeof(unsigned int) * 2], sizeof(unsigned int));
+		memcpy(&numCoords, &buffer[sizeof(unsigned int) * 3], sizeof(unsigned int));
 
 		// -- Byte pointer --//
 		unsigned nameOffset = 4 * sizeof(unsigned);
@@ -293,7 +213,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferSc
 
 		// -- Create mesh --//
 		char charName[1024];
-		memcpy(&charName[0], &bufferScene[nameOffset], sizeof(char) * 1024);
+		memcpy(&charName[0], &buffer[nameOffset], sizeof(char) * 1024);
 		std::string name(charName);
 
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
@@ -301,7 +221,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferSc
 
 
 		char charTexturePath[1024];
-		memcpy(&charTexturePath[0], &bufferScene[textureOffset], sizeof(char) * 1024);
+		memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
 		std::string texturePath(charTexturePath);
 		newMesh->texturePath = texturePath;
 
@@ -326,32 +246,35 @@ void ModuleImport::LoadMeshFile(const char* pathfile, bool scene, char* bufferSc
 		newMesh->numIndices = numIndices;
 
 		newMesh->vertices.resize(numVertices);
-		memcpy(&newMesh->vertices[0], &bufferScene[verticesOffset], sizeof(float3) * numVertices);
+		memcpy(&newMesh->vertices[0], &buffer[verticesOffset], sizeof(float3) * numVertices);
 
 		if (numIndices > 0)
 		{
 			newMesh->indices.resize(numIndices);
-			memcpy(&newMesh->indices[0], &bufferScene[indicesOffset], sizeof(uint) * numIndices);
+			memcpy(&newMesh->indices[0], &buffer[indicesOffset], sizeof(uint) * numIndices);
 		}
 
 		if (numNormals > 0)
 		{
 			newMesh->normals.resize(numNormals);
-			memcpy(&newMesh->normals[0], &bufferScene[normalsOffset], sizeof(float3) * numNormals);
+			memcpy(&newMesh->normals[0], &buffer[normalsOffset], sizeof(float3) * numNormals);
 		}
 
 		if (numCoords > 0)
 		{
 			newMesh->texCoords.resize(numCoords);
-			memcpy(&newMesh->texCoords[0], &bufferScene[coordsOffset], sizeof(float2) * numCoords);
+			memcpy(&newMesh->texCoords[0], &buffer[coordsOffset], sizeof(float2) * numCoords);
 		}
 
 		newMesh->GenerateBuffers();
 		newMesh->GenerateBounds(true);
 		newMesh->ComputeNormals();
 	}
+
+	RELEASE(buffer);
 }
 
+/*
 void ModuleImport::SaveMeshFile(GameObject* gameObject, std::string name)
 {
 	std::vector<char> bytes;
@@ -389,6 +312,7 @@ void ModuleImport::SaveMeshFile(GameObject* gameObject, std::string name)
 		App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 	}
 }
+*/
 
 void ModuleImport::SaveScene(const char* path)
 {
@@ -418,65 +342,68 @@ void ModuleImport::SaveScene(const char* path)
 	// -- Textures --//
 	Value textures(kArrayType);
 	for (auto& t : App->textures->textures)
-	{
-		std::string pathShort = t.first;
-		
-		if (App->fileSystem->Exists(pathShort))
-		{
-			textures.PushBack(
-				StringRef(pathShort.c_str()),
-				allocator);
-		}
-		else LOG("Error! Texture %s not found!", pathShort.c_str());
+	{	
+		textures.PushBack(StringRef(t.first.c_str()), allocator);
 	}
 	sceneFile.AddMember("Textures", textures, allocator);
 
 	// -- GameObjects --//
-	Value objectList(kObjectType);
+	Value objectList(kArrayType);
 	while (!T.empty())
 	{
 		GameObject* object = T.front();
 		T.pop();
-
 		Value currentObject(kObjectType);
-		std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(object->name.c_str(), ".jgg");
 
+		currentObject.AddMember("Name",
+			StringRef(object->name.c_str()),
+			allocator);
 		currentObject.AddMember("Parent", 
 			StringRef(object->parent->name.c_str()), 
 			allocator);
 		if (object->GetComponent<ComponentMaterial>())
 		{
-			currentObject.AddMember("Material", 
-				StringRef(object->GetComponent<ComponentMaterial>()->GetTextureName().c_str()), 
-				allocator);
+			Value texture;
+			std::string stringTexture = object->GetComponent<ComponentMaterial>()->GetTextureName();
+			texture.SetString(stringTexture.c_str(), stringTexture.length(), allocator);
+			currentObject.AddMember("Material", texture, allocator);
 		}
 		if (ComponentMesh* compMesh = object->GetComponent<ComponentMesh>())
 		{
 			Value mesh(kObjectType);
 			Value vertices(kArrayType);
+			Value indices(kArrayType);
 			Value normals(kArrayType);
 			Value texCoords(kArrayType);
-			for (size_t f = 0; f < compMesh->numVertices / 3; f++)
-			{
-				vertices.PushBack(compMesh->vertices[f].x, allocator);
-				vertices.PushBack(compMesh->vertices[f].y, allocator);
-				vertices.PushBack(compMesh->vertices[f].z, allocator);
 
-				normals.PushBack(compMesh->normals[f].x, allocator);
-				normals.PushBack(compMesh->normals[f].y, allocator);
-				normals.PushBack(compMesh->normals[f].z, allocator);
-			}
-			for (size_t f = 0; f < compMesh->numVertices / 2; f++)
+			for (size_t v = 0; v < compMesh->numVertices; v++)
 			{
-				texCoords.PushBack(compMesh->texCoords[f].x, allocator);
-				texCoords.PushBack(compMesh->texCoords[f].y, allocator);
+				Value vec(kArrayType);
+				vec.PushBack(compMesh->vertices[v].x, allocator);
+				vec.PushBack(compMesh->vertices[v].y, allocator);
+				vec.PushBack(compMesh->vertices[v].z, allocator);
+
+				Value norm(kArrayType);
+				norm.PushBack(compMesh->normals[v].x, allocator);
+				norm.PushBack(compMesh->normals[v].y, allocator);
+				norm.PushBack(compMesh->normals[v].z, allocator);
+
+				Value coord(kArrayType);
+				coord.PushBack(compMesh->texCoords[v].x, allocator);
+				coord.PushBack(compMesh->texCoords[v].y, allocator);
+
+				vertices.PushBack(vec, allocator);
+				normals.PushBack(norm, allocator);
+				texCoords.PushBack(coord, allocator);
 			}
+			for (size_t i = 0; i < compMesh->numIndices; i++)
+				indices.PushBack(compMesh->indices[i], allocator);
 
 			mesh.AddMember("NumVertices", compMesh->numVertices, allocator);
 			mesh.AddMember("NumIndices", compMesh->numIndices, allocator);
 
 			mesh.AddMember("Vertices", vertices, allocator);
-			mesh.AddMember("Indices", compMesh->indices[0], allocator);
+			mesh.AddMember("Indices", indices, allocator);
 			mesh.AddMember("Normals", normals, allocator);
 			mesh.AddMember("TexCoords", texCoords, allocator);
 
@@ -487,15 +414,44 @@ void ModuleImport::SaveScene(const char* path)
 		//	Value t;
 		//	currentObject.AddMember("Transform", t, allocator);
 		//}
-		if (object->GetComponent<ComponentCamera>())
+		if (ComponentCamera* compCamera = object->GetComponent<ComponentCamera>())
 		{
-			//Value c;
-			//currentObject.AddMember("Camera", c, allocator);
+			Value camera(kObjectType);
+			Value right(kArrayType);
+			Value up(kArrayType);
+			Value front(kArrayType);
+			Value position(kArrayType);
+			Value reference(kArrayType);
+
+			right.PushBack(compCamera->right.x, allocator);
+			right.PushBack(compCamera->right.y, allocator);
+			right.PushBack(compCamera->right.z, allocator);
+
+			up.PushBack(compCamera->up.x, allocator);
+			up.PushBack(compCamera->up.y, allocator);
+			up.PushBack(compCamera->up.z, allocator);
+
+			front.PushBack(compCamera->front.x, allocator);
+			front.PushBack(compCamera->front.y, allocator);
+			front.PushBack(compCamera->front.z, allocator);
+
+			position.PushBack(compCamera->position.x, allocator);
+			position.PushBack(compCamera->position.y, allocator);
+			position.PushBack(compCamera->position.z, allocator);
+
+			reference.PushBack(compCamera->reference.x, allocator);
+			reference.PushBack(compCamera->reference.y, allocator);
+			reference.PushBack(compCamera->reference.z, allocator);
+
+			camera.AddMember("Right", right, allocator);
+			camera.AddMember("Up", up, allocator);
+			camera.AddMember("Front", front, allocator);
+			camera.AddMember("Position", position, allocator);
+			camera.AddMember("Reference", reference, allocator);
+			currentObject.AddMember("Camera", camera, allocator);
 		}
 
-		objectList.AddMember(
-			StringRef(App->fileSystem->SetNameFile(pathShort.c_str(), ".").c_str()),
-			currentObject, allocator);
+		objectList.PushBack(currentObject, allocator);
 	}
 	sceneFile.AddMember("GameObjects", objectList, allocator);
 
@@ -508,45 +464,95 @@ void ModuleImport::SaveScene(const char* path)
 
 void ModuleImport::LoadScene(const char* path)
 {
-	char* buffer;
-	uint bytes = App->fileSystem->Load(path, &buffer);
+	char* json;
+	uint bytes = App->fileSystem->Load(path, &json);
 
 	if (bytes > 0)
 	{
-		unsigned int numMaterials, numMeshes;
-		memcpy(&numMaterials, &buffer[0], sizeof(unsigned int));
-		memcpy(&numMeshes, &buffer[sizeof(unsigned int)], sizeof(unsigned int));
+		Document sceneFile;
+		sceneFile.Parse(json);
 
-		unsigned prevOffset = 2 * sizeof(unsigned);
-		for (int mat = 0; mat < numMaterials; mat++)
+		for (int t = 0; t < sceneFile["Textures"].Size(); t++)
 		{
-			unsigned int numBytes;
-			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
-		
-			unsigned materialOffset = prevOffset + sizeof(unsigned int);
-			memcpy(&numBytes, &buffer[materialOffset], sizeof(char*) * numBytes);
-		
-			//Code
-		
-			prevOffset = materialOffset + (sizeof(char*) * numBytes);
-		}
 
-		for (int mes = 0; mes < numMeshes; mes++)
+		}
+		for (int go = 0; go < sceneFile["GameObjects"].Size(); go++)
 		{
-			unsigned int numBytes;
-			memcpy(&numBytes, &buffer[prevOffset], sizeof(unsigned int));
+			std::string name = sceneFile["GameObjects"][go]["Name"].GetString();
+			std::string parentName = sceneFile["GameObjects"][go]["Parent"].GetString();
 
-			char* newGameObject;
-			unsigned meshOffset = prevOffset + sizeof(unsigned int);
-			memcpy(&newGameObject, &buffer[meshOffset], sizeof(char*) * numBytes);
+			GameObject* newGameObject = App->scene->CreateGameObject(name.c_str(), App->scene->SearchGameObject(parentName));
 
-			LoadMeshFile(path, true, newGameObject);
+			if (sceneFile["GameObjects"][go].HasMember("Material"))
+			{
+				ComponentMaterial* newMaterial = newGameObject->CreateComponent<ComponentMaterial>();
+				std::string texturePath = sceneFile["GameObjects"][go]["Material"].GetString();
+				
+				TextureObject texture;
+				if (App->textures->Find(texturePath))
+					texture = App->textures->Get(texturePath);
+				else texture = App->textures->Load(texturePath);
+				
+				newMaterial->SetTexture(texture);
+			}
+			if (sceneFile["GameObjects"][go].HasMember("Mesh"))
+			{
+				ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
 
-			prevOffset = meshOffset + (sizeof(char*) * numBytes);
+				newMesh->numVertices = sceneFile["GameObjects"][go]["Mesh"]["NumVertices"].GetInt();
+				newMesh->numIndices = sceneFile["GameObjects"][go]["Mesh"]["NumIndices"].GetInt();
+
+				newMesh->vertices.resize(newMesh->numVertices);
+				newMesh->indices.resize(newMesh->numIndices);
+				newMesh->normals.resize(newMesh->numVertices);
+				newMesh->texCoords.resize(newMesh->numVertices);
+				for (size_t v = 0; v < newMesh->numVertices; v++)
+				{
+					newMesh->vertices[v].x = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][0].GetFloat();
+					newMesh->vertices[v].y = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][1].GetFloat();
+					newMesh->vertices[v].z = sceneFile["GameObjects"][go]["Mesh"]["Vertices"][v][2].GetFloat();
+
+					newMesh->normals[v].x = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][0].GetFloat();
+					newMesh->normals[v].y = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][1].GetFloat();
+					newMesh->normals[v].z = sceneFile["GameObjects"][go]["Mesh"]["Normals"][v][2].GetFloat();
+
+					newMesh->texCoords[v].x = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][0].GetFloat();
+					newMesh->texCoords[v].y = sceneFile["GameObjects"][go]["Mesh"]["TexCoords"][v][1].GetFloat();
+				}
+				for (size_t i = 0; i < newMesh->numIndices; i++)
+					newMesh->indices[i] = sceneFile["GameObjects"][go]["Mesh"]["Indices"][i].GetInt();
+			}
+			if (sceneFile["GameObjects"][go].HasMember("Transform"))
+			{
+				//ComponentTransform* newMesh = newGameObject->CreateComponent<ComponentTransform>();	//Crash¿?
+			}
+			if (sceneFile["GameObjects"][go].HasMember("Camera"))
+			{
+				App->editor->newCam = new ComponentCamera(newGameObject, true);
+
+				App->editor->newCam->right.x = sceneFile["GameObjects"][go]["Camera"]["Right"][0].GetFloat();
+				App->editor->newCam->right.y = sceneFile["GameObjects"][go]["Camera"]["Right"][1].GetFloat();
+				App->editor->newCam->right.z = sceneFile["GameObjects"][go]["Camera"]["Right"][2].GetFloat();
+
+				App->editor->newCam->up.x = sceneFile["GameObjects"][go]["Camera"]["Up"][0].GetFloat();
+				App->editor->newCam->up.y = sceneFile["GameObjects"][go]["Camera"]["Up"][1].GetFloat();
+				App->editor->newCam->up.z = sceneFile["GameObjects"][go]["Camera"]["Up"][2].GetFloat();
+
+				App->editor->newCam->front.x = sceneFile["GameObjects"][go]["Camera"]["Front"][0].GetFloat();
+				App->editor->newCam->front.y = sceneFile["GameObjects"][go]["Camera"]["Front"][1].GetFloat();
+				App->editor->newCam->front.z = sceneFile["GameObjects"][go]["Camera"]["Front"][2].GetFloat();
+
+				App->editor->newCam->position.x = sceneFile["GameObjects"][go]["Camera"]["Position"][0].GetFloat();
+				App->editor->newCam->position.y = sceneFile["GameObjects"][go]["Camera"]["Position"][1].GetFloat();
+				App->editor->newCam->position.z = sceneFile["GameObjects"][go]["Camera"]["Position"][2].GetFloat();
+
+				App->editor->newCam->reference.x = sceneFile["GameObjects"][go]["Camera"]["Reference"][0].GetFloat();
+				App->editor->newCam->reference.y = sceneFile["GameObjects"][go]["Camera"]["Reference"][1].GetFloat();
+				App->editor->newCam->reference.z = sceneFile["GameObjects"][go]["Camera"]["Reference"][2].GetFloat();
+			}
 		}
-
 	}
-	RELEASE(buffer);
+	RELEASE(json);
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)

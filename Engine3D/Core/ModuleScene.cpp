@@ -54,7 +54,7 @@ bool ModuleScene::CleanUp()
 		delete go;
 	}
 
-	delete root;
+	//delete root;
 
 	return true;
 }
@@ -123,4 +123,25 @@ GameObject* ModuleScene::CreateGameObject(const std::string name, GameObject* pa
 	else
 		root->AttachChild(temp);
 	return temp;
+}
+
+GameObject* ModuleScene::SearchGameObject(const std::string name)
+{
+	for (GameObject* child : App->scene->root->children)
+	{
+		std::queue<GameObject*> C;
+		C.push(child);
+		while (!C.empty())
+		{
+			GameObject* go = C.front();
+			if (go->name == name) return go;
+			C.pop();
+			for (GameObject* child : go->children)
+			{
+				C.push(child);
+			}
+		}
+	}
+
+	return root;
 }

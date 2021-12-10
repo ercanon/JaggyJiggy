@@ -194,6 +194,10 @@ update_status ModuleInput::PreUpdate(float dt)
 				{
 
 				}
+				else if (fileName.substr(fileName.find_last_of(".")) == ".jiy")
+				{
+
+				}
 				else LOG("File %s could not be readed. This engine do not support this kind of files.", filePath)
 			};
 

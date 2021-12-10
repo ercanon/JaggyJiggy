@@ -18,6 +18,7 @@ public:
 
 	GameObject* CreateGameObject(GameObject* parent = nullptr);	
 	GameObject* CreateGameObject(const std::string name, GameObject* parent = nullptr);	
+	GameObject* SearchGameObject(const std::string name);
 	
 public:
 	

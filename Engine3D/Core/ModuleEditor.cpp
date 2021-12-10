@@ -656,7 +656,9 @@ void ModuleEditor::UpdateWindowStatus()
 
             if (ImGui::Button("Ok", ImVec2(50, 20)))
             {
-                //App->import->LoadScene("Library/scene.jiy");
+                App->textures->CleanUp();
+                App->scene->CleanUp();
+                App->import->LoadScene("Library/Scenes/scene.jiy");
                 showLoadScene = false;
             }
             ImGui::SameLine();
