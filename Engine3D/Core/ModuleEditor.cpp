@@ -91,11 +91,20 @@ bool ModuleEditor::Start()
     assets->path = assets->name;
     assets->Read();
 
-    folderImage = App->textures->Load("Assets/Format/folder.png");
-    pngImage = App->textures->Load("Assets/Format/png.png");
-    jpgImage = App->textures->Load("Assets/Format/jpg.png");
-    tgaImage = App->textures->Load("Assets/Format/tga.png");
-    fbxImage = App->textures->Load("Assets/Format/fbx.png");
+    folderImage = App->textures->Load("Assets/Resources/Format/folder.png");
+    App->import->SaveTexture(folderImage);
+
+    pngImage = App->textures->Load("Assets/Resources/Format/png.png");
+    App->import->SaveTexture(pngImage);
+
+    jpgImage = App->textures->Load("Assets/Resources/Format/jpg.png");
+    App->import->SaveTexture(jpgImage);
+
+    tgaImage = App->textures->Load("Assets/Resources/Format/tga.png");
+    App->import->SaveTexture(tgaImage);
+
+    fbxImage = App->textures->Load("Assets/Resources/Format/fbx.png");
+    App->import->SaveTexture(fbxImage);
 
     folderID = folderImage.id;
     pngID = pngImage.id;
@@ -338,6 +347,7 @@ void ModuleEditor::About_Window()
 void ModuleEditor::UpdateText(const char* text) 
 {
     consoleText.appendf(text);
+    scroll = true;
 }
 
 bool ModuleEditor::DockingRootItem(char* id, ImGuiWindowFlags winFlags)
@@ -478,6 +488,35 @@ void ModuleEditor::MenuBar()
                 showAboutWindow = !showAboutWindow;
             ImGui::EndMenu();
         }
+
+        /* ---- TIME MANAGMENT ----*/
+        ImGui::Separator();
+        if (ImGui::MenuItem("Play"))
+        {
+            play = !play;
+            // Save
+            if (play == false)
+            {
+
+            }
+            // Load
+            if (play == true)
+            {
+
+            }
+        }
+        if (ImGui::MenuItem("Pause")) if (play == false) pause = !pause;
+        if (ImGui::MenuItem("Stop"))
+        {
+            if (play == false)
+            {
+                // Load
+
+
+                play = true;
+                pause = true;
+            }
+        }
     }
 
     ImGui::EndMainMenuBar();
@@ -516,8 +555,10 @@ void ModuleEditor::UpdateWindowStatus()
     if (showConsoleWindow) 
     {
         ImGui::Begin("Console", &showConsoleWindow);
-        ImGui::TextUnformatted(consoleText.begin(), consoleText.end());
-        ImGui::SetScrollHere(1.0f);
+        if (pause == true) ImGui::TextUnformatted(consoleText.begin(), consoleText.end());
+        else ImGui::Text("---- Game Paused ----");
+        if (scroll) ImGui::SetScrollHere(1.0f);
+        scroll = false;
         ImGui::End();
     }
 
@@ -598,6 +639,9 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked())
                 {
+                    if (gameobjectSelected != nullptr) gameobjectSelected = false;
+                    gameobjectSelected = nullptr;
+
                     assetselect ? assetselect->selected = !assetselect->selected : 0;
                     assetselect = file;
                     assetselect->selected = !assetselect->selected;
@@ -695,6 +739,7 @@ void ModuleEditor::UpdateWindowStatus()
         
         S.push(App->scene->root);
         indents.push(0);
+
         while (!S.empty())
         {
             go = S.top();
@@ -738,6 +783,9 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked()) 
                 {
+                    if (assetselect != nullptr) assetselect->selected = false;
+                    assetselect = nullptr;
+
                     gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
                     gameobjectSelected = go;
                     gameobjectSelected->isSelected = !gameobjectSelected->isSelected;
@@ -814,7 +862,7 @@ void ModuleEditor::UpdateWindowStatus()
         if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) App->camera->IsMouseClicked();
 
         // Gizmo -------------------------
-        if (gameobjectSelected != nullptr) App->camera->EditTransform();
+        //if (gameobjectSelected != nullptr) App->camera->EditTransform();
 
         ImGui::End();
     }
@@ -904,7 +952,11 @@ void ModuleEditor::DrawID(uint id, const char* text, int numID)
             if (App->fileSystem->HasExtension(str.c_str(), "fbx")) App->import->LoadGeometry(str.c_str());
             if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
                 App->fileSystem->HasExtension(str.c_str(), "png") ||
-                App->fileSystem->HasExtension(str.c_str(), "tga")) App->textures->Load(str.c_str());
+                App->fileSystem->HasExtension(str.c_str(), "tga"))
+            {
+                TextureObject texture = App->textures->Load(str.c_str());
+                App->import->SaveTexture(texture);
+            }
         }
     }
     ImGui::Text(text);

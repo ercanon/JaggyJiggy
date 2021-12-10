@@ -242,14 +242,19 @@ void ModuleCamera3D::RayToMeshIntersection(LineSegment ray)
 	// Select object in editor.
 	if (distMap.begin() != distMap.end())
 	{
+		if (App->editor->gameobjectSelected != nullptr) App->editor->gameobjectSelected->isSelected = false;
 		App->editor->gameobjectSelected = (*distMap.begin()).second;
 		LOG("GameObject selected name: %s", (*distMap.begin()).second->name.c_str());
+		App->editor->gameobjectSelected->isSelected = true;
 		selected = true;
 	}
 	
 	// If nothing is selected, set selected GO to null
-	if (!selected)
+	if (!selected && App->editor->gameobjectSelected != nullptr)
+	{
+		App->editor->gameobjectSelected->isSelected = false;
 		App->editor->gameobjectSelected = nullptr;
+	}
 
 	// Cleaning
 	canSelect.clear();

@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
+#include "ModuleEditor.h"
 #include "glew.h"
 #include "ImGui/imgui.h"
 
@@ -35,7 +36,8 @@ void ComponentTransform::OnGui()
 		float3 newPosition = position;
 		if (ImGui::DragFloat3("Location", &newPosition[0]))
 		{
-			SetPosition(newPosition);
+			if (App->editor->pause == true)
+				SetPosition(newPosition);
 		}
 		float3 newRotationEuler;
 		newRotationEuler.x = RADTODEG * rotationEuler.x;
@@ -43,14 +45,18 @@ void ComponentTransform::OnGui()
 		newRotationEuler.z = RADTODEG * rotationEuler.z;
 		if (ImGui::DragFloat3("Rotation", &(newRotationEuler[0])))
 		{
-			newRotationEuler.x = DEGTORAD * newRotationEuler.x;
-			newRotationEuler.y = DEGTORAD * newRotationEuler.y;
-			newRotationEuler.z = DEGTORAD * newRotationEuler.z;
-			SetRotation(newRotationEuler);
+			if (App->editor->pause == true)
+			{
+				newRotationEuler.x = DEGTORAD * newRotationEuler.x;
+				newRotationEuler.y = DEGTORAD * newRotationEuler.y;
+				newRotationEuler.z = DEGTORAD * newRotationEuler.z;
+				SetRotation(newRotationEuler);
+			}
 		}
 		float3 newScale = scale;
 		if (ImGui::DragFloat3("Scale", &(newScale[0])))
 		{
+			if (App->editor->pause == true)
 			SetScale(newScale);
 		}
 	}
