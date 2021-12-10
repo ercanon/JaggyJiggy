@@ -127,18 +127,6 @@ bool ModuleEditor::Start()
     jpgID = jpg.id;
 
 
-    TextureObject tga;
-    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("tga", ".jay");
-
-    if (!App->fileSystem->Exists(texturePath))
-        App->textures->SaveTexture("Assets/Format/tga.png", texturePath.c_str());
-
-    if (!App->textures->Find(texturePath))
-        tga = App->textures->Load(texturePath);
-
-    tgaID = tga.id;
-
-
     TextureObject fbx;
     texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("fbx", ".jay");
 
@@ -539,6 +527,7 @@ void ModuleEditor::MenuBar()
             }
             if (play == true)
             {
+                App->scene->CleanUp();
                 App->import->LoadScene("Library/Scenes/scene.jiy");
             }
         }
@@ -547,6 +536,7 @@ void ModuleEditor::MenuBar()
         {
             if (play == false)
             {
+                App->scene->CleanUp();
                 App->import->LoadScene("Library/Scenes/scene.jiy");
                 play = true;
                 pause = true;
@@ -743,7 +733,6 @@ void ModuleEditor::UpdateWindowStatus()
 
                                 if (App->fileSystem->HasExtension(str.c_str(), "png")) DrawID(pngID, assetsString.at(i).c_str(), i);
                                 if (App->fileSystem->HasExtension(str.c_str(), "jpg")) DrawID(jpgID, assetsString.at(i).c_str(), i);
-                                if (App->fileSystem->HasExtension(str.c_str(), "tga")) DrawID(tgaID, assetsString.at(i).c_str(), i);
                                 if (App->fileSystem->HasExtension(str.c_str(), "fbx")) DrawID(fbxID, assetsString.at(i).c_str(), i);
                             }
                             ImGui::NextColumn();
@@ -911,7 +900,6 @@ void ModuleEditor::UpdateWindowStatus()
 
             if (ImGui::Button("Ok", ImVec2(50, 20)))
             {
-                App->textures->CleanUp();
                 App->scene->CleanUp();
                 App->import->LoadScene("Library/Scenes/scene.jiy");
                 showLoadScene = false;
@@ -986,8 +974,7 @@ void ModuleEditor::DrawID(uint id, const char* text, int numID)
 
             if (App->fileSystem->HasExtension(str.c_str(), "fbx")) App->import->LoadGeometry(str.c_str());
             if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
-                App->fileSystem->HasExtension(str.c_str(), "png") ||
-                App->fileSystem->HasExtension(str.c_str(), "tga"))
+                App->fileSystem->HasExtension(str.c_str(), "png"))
             {
                 std::string texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(str.c_str(), ".jay");
 

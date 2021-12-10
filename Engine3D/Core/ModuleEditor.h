@@ -100,7 +100,7 @@ public:
 	File* assetselect;
 
 	// Assets ID
-	uint folderID, pngID, jpgID, tgaID, fbxID;
+	uint folderID, pngID, jpgID, fbxID;
 
 	std::vector<std::string> assetsString;
 

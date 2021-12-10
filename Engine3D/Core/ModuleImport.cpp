@@ -355,7 +355,7 @@ void ModuleImport::SaveScene(const char* path)
 			}
 		}
 	}
-
+	/*
 	// -- Textures --//
 	Value textures(kArrayType);
 	for (auto& t : App->textures->textures)
@@ -363,6 +363,7 @@ void ModuleImport::SaveScene(const char* path)
 		textures.PushBack(StringRef(t.first.c_str()), allocator);
 	}
 	sceneFile.AddMember("Textures", textures, allocator);
+	*/
 
 	// -- GameObjects --//
 	Value objectList(kArrayType);
@@ -503,13 +504,14 @@ void ModuleImport::LoadScene(const char* path)
 		Document sceneFile;
 		sceneFile.Parse(json);
 
+		/*
 		for (int t = 0; t < sceneFile["Textures"].Size(); t++)
 		{
 			std::string texturePath = sceneFile["Textures"][t].GetString();
 
 			if (texturePath.size() > 0)
 			{
-				std::string name = App->fileSystem->SetNameFile(texturePath.c_str(), ".png");
+				std::string name = "Assets/Textures/" + App->fileSystem->SetNameFile(texturePath.c_str(), ".png");
 				if (!App->textures->SaveTexture(name, texturePath))
 				{
 					name = App->fileSystem->SetNameFile(texturePath.c_str(), ".jpg");
@@ -520,6 +522,7 @@ void ModuleImport::LoadScene(const char* path)
 			if (!App->textures->Find(texturePath))
 				App->textures->Load(texturePath);
 		}
+		*/
 		for (int go = 0; go < sceneFile["GameObjects"].Size(); go++)
 		{
 			std::string name = sceneFile["GameObjects"][go]["Name"].GetString();
