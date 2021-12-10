@@ -660,24 +660,10 @@ void ModuleEditor::UpdateWindowStatus()
                             {
                                 std::string str = assetselect->path + assetsString.at(i);
 
-                                //Change
-                                if (App->fileSystem->HasExtension(str.c_str(), "png"))
-                                {
-                                    DrawID(pngID, assetsString.at(i).c_str(), i);
-                                }
-                                if (App->fileSystem->HasExtension(str.c_str(), "jpg"))
-                                {
-                                    DrawID(jpgID, assetsString.at(i).c_str(), i);
-                                }
-                                if (App->fileSystem->HasExtension(str.c_str(), "tga"))
-                                {
-                                    DrawID(tgaID, assetsString.at(i).c_str(), i);
-                                }
-                                if (App->fileSystem->HasExtension(str.c_str(), "fbx"))
-                                {
-                                    DrawID(fbxID, assetsString.at(i).c_str(), i);
-                                }
-                                //End
+                                if (App->fileSystem->HasExtension(str.c_str(), "png")) DrawID(pngID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "jpg")) DrawID(jpgID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "tga")) DrawID(tgaID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "fbx")) DrawID(fbxID, assetsString.at(i).c_str(), i);
                             }
                             ImGui::NextColumn();
                         }
