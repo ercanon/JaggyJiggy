@@ -92,10 +92,10 @@ bool ModuleEditor::Start()
     assets->Read();
 
     TextureObject folder;
-    std::string texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("folder", ".jay");
+    std::string texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile("folder", ".jay");
 
     if (!App->fileSystem->Exists(texturePath))
-        App->textures->SaveTexture("Assets/Format/folder.png", texturePath.c_str());
+        App->textures->SaveTexture("Assets/Resources/Format/folder.png", texturePath.c_str());
 
     if (!App->textures->Find(texturePath))
         folder = App->textures->Load(texturePath);
@@ -104,10 +104,10 @@ bool ModuleEditor::Start()
 
 
     TextureObject png;
-    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("png", ".jay");
+    texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile("png", ".jay");
 
     if (!App->fileSystem->Exists(texturePath))
-        App->textures->SaveTexture("Assets/Format/png.png", texturePath.c_str());
+        App->textures->SaveTexture("Assets/Resources/Format/png.png", texturePath.c_str());
 
     if (!App->textures->Find(texturePath))
         png = App->textures->Load(texturePath);
@@ -116,10 +116,10 @@ bool ModuleEditor::Start()
 
 
     TextureObject jpg;
-    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("jpg", ".jay");
+    texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile("jpg", ".jay");
 
     if (!App->fileSystem->Exists(texturePath))
-        App->textures->SaveTexture("Assets/Format/jpg.png", texturePath.c_str());
+        App->textures->SaveTexture("Assets/Resources/Format/jpg.png", texturePath.c_str());
 
     if (!App->textures->Find(texturePath))
         jpg = App->textures->Load(texturePath);
@@ -128,10 +128,10 @@ bool ModuleEditor::Start()
 
 
     TextureObject fbx;
-    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("fbx", ".jay");
+    texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile("fbx", ".jay");
 
     if (!App->fileSystem->Exists(texturePath))
-        App->textures->SaveTexture("Assets/Format/fbx.png", texturePath.c_str());
+        App->textures->SaveTexture("Assets/Resources/Format/fbx.png", texturePath.c_str());
 
     if (!App->textures->Find(texturePath))
         fbx = App->textures->Load(texturePath);
@@ -423,7 +423,7 @@ void ModuleEditor::MenuBar()
         {
             if (ImGui::MenuItem("Save", "Ctrl + S"))
             {
-                App->import->SaveScene("Library/Scenes/");
+                App->import->SaveScene("Library/Resources/Scenes/");
             }
             if (ImGui::MenuItem("Load", "Ctrl + L"))
                 showLoadScene = true;
@@ -523,12 +523,12 @@ void ModuleEditor::MenuBar()
 
             if (play == false)
             {
-                App->import->SaveScene("Library/Scenes/");
+                App->import->SaveScene("Library/Resources/Scenes/");
             }
             if (play == true)
             {
                 App->scene->CleanUp();
-                App->import->LoadScene("Library/Scenes/scene.jiy");
+                App->import->LoadScene("Library/Resources/Scenes/scene.jiy");
             }
         }
         if (ImGui::MenuItem("Pause")) if (play == false) pause = !pause;
@@ -537,7 +537,7 @@ void ModuleEditor::MenuBar()
             if (play == false)
             {
                 App->scene->CleanUp();
-                App->import->LoadScene("Library/Scenes/scene.jiy");
+                App->import->LoadScene("Library/Resources/Scenes/scene.jiy");
                 play = true;
                 pause = true;
             }
@@ -901,7 +901,7 @@ void ModuleEditor::UpdateWindowStatus()
             if (ImGui::Button("Ok", ImVec2(50, 20)))
             {
                 App->scene->CleanUp();
-                App->import->LoadScene("Library/Scenes/scene.jiy");
+                App->import->LoadScene("Library/Resources/Scenes/scene.jiy");
                 showLoadScene = false;
             }
             ImGui::SameLine();
@@ -976,7 +976,7 @@ void ModuleEditor::DrawID(uint id, const char* text, int numID)
             if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
                 App->fileSystem->HasExtension(str.c_str(), "png"))
             {
-                std::string texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(str.c_str(), ".jay");
+                std::string texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile(str.c_str(), ".jay");
 
                 if (!App->fileSystem->Exists(texturePath))
                     App->textures->SaveTexture(str.c_str(), texturePath.c_str());

@@ -118,7 +118,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 						texturePath = App->fileSystem->SetNameFile(texturePath.c_str());
 						std::string textureFile(texturePath);
 
-						texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
+						texturePath = "Library/Resources/Materials/" + App->fileSystem->SetNameFile(textureFile.c_str(), ".jay");
 
 						if (!App->fileSystem->Exists(texturePath))
 							App->textures->SaveTexture(textureFile.c_str(), texturePath.c_str());
@@ -170,7 +170,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			}
 
 			// -- Save file --//
-			std::string pathShort = "Library/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
+			std::string pathShort = "Library/Resources/Meshes/" + App->fileSystem->SetNameFile(name.c_str(), ".jgg");
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
@@ -489,7 +489,7 @@ void ModuleImport::SaveScene(const char* path)
 
 	sceneFile.Accept(writer);
 	const char* buffer = bufferScene.GetString();
-	std::string pathScene = "Library/Scenes/" + App->fileSystem->SetNameFile("scene", ".jiy");
+	std::string pathScene = "Library/Resources/Scenes/" + App->fileSystem->SetNameFile("scene", ".jiy");
 	App->fileSystem->Save(pathScene.c_str(), &buffer[0], strlen(buffer));
 	LOG("Scene saved at %s", pathScene.c_str());
 }
