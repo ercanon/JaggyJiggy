@@ -14,7 +14,6 @@ public:
 
 	bool Start() override;
 	update_status Update(float dt) override;
-	bool CleanUp() override;
 
 	GameObject* CreateGameObject(GameObject* parent = nullptr);	
 	GameObject* CreateGameObject(const std::string name, GameObject* parent = nullptr);	
@@ -23,5 +22,4 @@ public:
 public:
 	
 	GameObject* root;
-	//GameObject* gameCamera;
 };

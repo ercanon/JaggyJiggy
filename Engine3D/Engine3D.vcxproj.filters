@@ -182,14 +182,11 @@
     <ClCompile Include="Core\ComponentCamera.cpp">
       <Filter>Engine\GameObjects - Components</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ModuleResources.cpp">
-      <Filter>Engine\Modules</Filter>
+    <ClCompile Include="Core\pcg-c\include\pcg_basic.c">
+      <Filter>ExternalLibraries\pcg-c</Filter>
     </ClCompile>
     <ClCompile Include="Core\ImGui\ImGuizmo.cpp">
       <Filter>ExternalLibraries\Gizmos</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\ImGui\ImGuiFileDialog.cpp">
-      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -718,14 +715,11 @@
     <ClInclude Include="Core\ComponentCamera.h">
       <Filter>Engine\GameObjects - Components</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ModuleResources.h">
-      <Filter>Engine\Modules</Filter>
+    <ClInclude Include="Core\pcg-c\include\pcg_basic.h">
+      <Filter>ExternalLibraries\pcg-c</Filter>
     </ClInclude>
     <ClInclude Include="Core\ImGui\ImGuizmo.h">
       <Filter>ExternalLibraries\Gizmos</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ImGui\ImGuiFileDialog.h">
-      <Filter>ExternalLibraries\ImGuiFileDialog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -783,11 +777,11 @@
     <Filter Include="Engine\Tools">
       <UniqueIdentifier>{3b33fd60-8311-4ddf-87d9-d36b91d2b082}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExternalLibraries\pcg-c">
+      <UniqueIdentifier>{fa186cdd-16d0-4c6a-90e1-dc9806a8c0c7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ExternalLibraries\Gizmos">
       <UniqueIdentifier>{907e8ae3-6955-40c0-9c2f-d6f7486e797a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ExternalLibraries\ImGuiFileDialog">
-      <UniqueIdentifier>{4149b09c-a86c-46c5-911e-0f7a0073c049}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -66,7 +66,6 @@
     <ClCompile Include="Core\ModuleImport.cpp" />
     <ClCompile Include="Core\ModuleInput.cpp" />
     <ClCompile Include="Core\ModuleRenderer3D.cpp" />
-    <ClCompile Include="Core\ModuleResources.cpp" />
     <ClCompile Include="Core\ModuleScene.cpp" />
     <ClCompile Include="Core\ModuleTextures.cpp" />
     <ClCompile Include="Core\ModuleWindow.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="Core\ModuleImport.h" />
     <ClInclude Include="Core\ModuleInput.h" />
     <ClInclude Include="Core\ModuleRenderer3D.h" />
-    <ClInclude Include="Core\ModuleResources.h" />
     <ClInclude Include="Core\ModuleScene.h" />
     <ClInclude Include="Core\ModuleTextures.h" />
     <ClInclude Include="Core\ModuleWindow.h" />

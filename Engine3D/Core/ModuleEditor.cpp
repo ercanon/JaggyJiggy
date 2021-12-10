@@ -9,6 +9,7 @@
 #include "ModuleImport.h"
 #include "ModuleScene.h"
 #include "ModuleViewportFrameBuffer.h"
+#include "ModuleFileSystem.h"
 #include "ModuleCamera3D.h"
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
@@ -29,6 +30,8 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showAnotherWindow = false;
     showAboutWindow = false;
     showConfWindow = true;
+    showAssetsListWindow = true;
+    showAssetsWindow = true;
 
     showConsoleWindow = true;
     showHierarchyWindow = true;
@@ -42,6 +45,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
     gameobjectSelected = nullptr;
+    assetselect = nullptr;
     newCam = nullptr;
 }
 
@@ -85,6 +89,22 @@ bool ModuleEditor::Start()
     GameObject* newGameObject = App->scene->CreateGameObject("Camera");
     newCam = new ComponentCamera(newGameObject, true);
 
+    assets = new File("Assets");
+    assets->path = assets->name;
+    assets->Read();
+
+    folderImage = App->textures->Load("Assets/Format/folder.png");
+    pngImage = App->textures->Load("Assets/Format/png.png");
+    jpgImage = App->textures->Load("Assets/Format/jpg.png");
+    tgaImage = App->textures->Load("Assets/Format/tga.png");
+    fbxImage = App->textures->Load("Assets/Format/fbx.png");
+
+    folderID = folderImage.id;
+    pngID = pngImage.id;
+    jpgID = jpgImage.id;
+    tgaID = tgaImage.id;
+    fbxID = fbxImage.id;
+
     return ret;
 }
 
@@ -95,6 +115,8 @@ update_status ModuleEditor::PreUpdate(float dt)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(App->window->window);
     ImGui::NewFrame();
+
+    ImGuizmo::BeginFrame();
 
     return UPDATE_CONTINUE;
 
@@ -109,6 +131,19 @@ update_status ModuleEditor::Update(float dt)
     {
         MenuBar();
         ImGui::End();
+    }
+
+    if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+        gameobjectSelected->parent->RemoveChild(gameobjectSelected);
+
+    assets->child.clear();
+    assetsString.clear();
+    assets->child.shrink_to_fit();
+    assets->Read();
+    if (assetselect != nullptr)
+    {
+        assetselect = assetFile;
+        AssetsArray();
     }
 
     //Update status of each window and shows ImGui elements
@@ -147,7 +182,6 @@ update_status ModuleEditor::PostUpdate(float dt)
 // Called before quitting
 bool ModuleEditor::CleanUp()
 {
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -372,11 +406,11 @@ void ModuleEditor::MenuBar()
 
             if (ImGui::BeginMenu("3D Objects")) 
             {
-                if (ImGui::MenuItem("Cube")) 
+                /*if (ImGui::MenuItem("Cube")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cube");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CUBE);
-                }
+                }*/
                 if (ImGui::MenuItem("Sphere")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
@@ -387,11 +421,11 @@ void ModuleEditor::MenuBar()
                     GameObject* newGameObject = App->scene->CreateGameObject("Plane");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PLANE);
                 }
-                if (ImGui::MenuItem("Pyramid")) 
+                /*if (ImGui::MenuItem("Pyramid")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Pyramid");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PYRAMID);
-                }
+                }*/
                 ImGui::EndMenu();
             }
 
@@ -489,6 +523,162 @@ void ModuleEditor::UpdateWindowStatus()
         ImGui::End();
     }
 
+    //Assets List
+    if (showAssetsListWindow)
+    {
+        ImGui::Begin("Assets List", &showAssetsListWindow);
+
+        static char buf[32] = " "; ImGui::InputText(" ", buf, 32);
+        if (ImGui::Button("Create folder", ImVec2(120, 0)))
+        {
+            std::string path;
+            if (assetselect != nullptr)
+            {
+                path = assetselect->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(path.c_str());
+            }
+            else
+            {
+                path = assets->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(path.c_str());
+            }
+        }
+        ImGui::Separator();
+
+        std::stack<File*> F;
+        std::stack<uint> indents;
+
+        F.push(assets);
+        indents.push(0);
+
+        File* file;
+
+        while (!F.empty())
+        {
+            file = F.top();
+            uint max = indents.top();
+            F.pop();
+            indents.pop();
+
+            ImGuiTreeNodeFlags nodeFlags = 0;
+            if (file->selected)  nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            if (file->child.size() == 0)   nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+
+            for (uint i = 0; i < max; ++i)
+            {
+                ImGui::Indent();
+            }
+
+            if (ImGui::TreeNodeEx(file->name.c_str(), nodeFlags))
+            {
+                /*if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+                {
+                    ImGui::SetDragDropPayload("DragDropHierarchy", &assetFile, sizeof(File*), ImGuiCond_Once);
+                    ImGui::Text("%s", assetFile->name.c_str());
+                    ImGui::EndDragDropSource();
+                }
+
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragDropHierarchy"))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(File*));
+                        File* droppedGo = (File*)*(const int*)payload->Data;
+                        if (droppedGo)
+                        {
+                            // Remove Child
+                            //auto it = std::find(droppedGo->child.begin(), droppedGo->child.end(), droppedGo->child);
+
+                            //if (it != droppedGo->child.end()) droppedGo->child.erase(it);
+                            
+                            // Attach Child
+                            assetFile->child.push_back(droppedGo);
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }*/
+
+                if (ImGui::IsItemClicked())
+                {
+                    assetselect ? assetselect->selected = !assetselect->selected : 0;
+                    assetselect = file;
+                    assetselect->selected = !assetselect->selected;
+
+                    if (assetselect->selected)
+                    {
+                        assetsString.clear();
+                        AssetsArray();
+                    }
+                }
+
+                if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+                    if (assetselect != nullptr) CleanUpObject();
+
+                for (File* child : file->child)
+                {
+                    F.push(child);
+                    indents.push(max + 1);
+                }
+
+                for (uint i = 0; i < max; ++i) ImGui::Unindent();
+
+                ImGui::TreePop();
+            }
+        }
+        ImGui::End();
+    }
+
+    //Assets
+    if (showAssetsWindow)
+    {
+        ImGui::Begin("Assets", &showAssetsWindow);
+
+        if (assetselect != nullptr)
+        {
+            std::stack<File*> F;
+            F.push(assetselect);
+
+            while (!F.empty())
+            {
+                assetFile = F.top();
+                F.pop();
+                ImGuiTreeNodeFlags nodeFlags = 0;
+
+                if (assetFile->selected && assetselect)
+                    nodeFlags |= ImGuiTreeNodeFlags_Selected;
+                if (assetFile->child.size() == 0)
+                    nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+
+                if (assetFile->selected && assetselect)
+                {
+                    if (assetsString.size() > 0)
+                    {
+                        ImGui::Columns(assetsString.size(), NULL, false);
+                        for (int i = 0; i < assetsString.size(); i++)
+                        {
+                            if (!App->fileSystem->HasExtension(assetsString.at(i).c_str()))
+                            {
+                                DrawID(folderID, assetsString.at(i).c_str(), i);
+                            }
+                            if (assetsString.size() > 0 && i < assetsString.size())
+                            {
+                                std::string str = assetselect->path + assetsString.at(i);
+
+                                if (App->fileSystem->HasExtension(str.c_str(), "png")) DrawID(pngID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "jpg")) DrawID(jpgID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "tga")) DrawID(tgaID, assetsString.at(i).c_str(), i);
+                                if (App->fileSystem->HasExtension(str.c_str(), "fbx")) DrawID(fbxID, assetsString.at(i).c_str(), i);
+                            }
+                            ImGui::NextColumn();
+                        }
+                    }
+                }
+            }
+        }
+
+        ImGui::End();
+    }
+
     //Inspector
     if (showInspectorWindow) 
     {
@@ -504,18 +694,6 @@ void ModuleEditor::UpdateWindowStatus()
     if (showHierarchyWindow) 
     {
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
-
-        //Just cleaning gameObjects(not textures,buffers...)
-        /*if (ImGui::Button("Clear", {60,20}))
-        {
-            App->editor->gameobjectSelected = nullptr;
-            App->scene->CleanUp(); //Clean GameObjects 
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("New", { 60,20 }))
-        {
-            App->scene->CreateGameObject();
-        }*/
         
         S.push(App->scene->root);
         indents.push(0);
@@ -562,7 +740,17 @@ void ModuleEditor::UpdateWindowStatus()
 
                 if (ImGui::IsItemClicked()) 
                 {
-                    SelectItem(gameobjectSelected);
+                    gameobjectSelected ? gameobjectSelected->isSelected = !gameobjectSelected->isSelected : 0;
+                    gameobjectSelected = go;
+                    gameobjectSelected->isSelected = !gameobjectSelected->isSelected;
+                    if (gameobjectSelected->isSelected)
+                    {
+                        LOG("GameObject selected name: %s", gameobjectSelected->name.c_str());
+                    }
+                    else
+                    {
+                        LOG("GameObject unselected name: %s", gameobjectSelected->name.c_str());
+                    }
                 }
                 for (GameObject* child : go->children)
                 {
@@ -576,7 +764,7 @@ void ModuleEditor::UpdateWindowStatus()
                 }
 
                 ImGui::TreePop();
-            }
+            }       
         }
         ImGui::End();
     }
@@ -605,6 +793,12 @@ void ModuleEditor::UpdateWindowStatus()
     {
         ImGui::Begin("Scene", &showSceneWindow, ImGuiWindowFlags_NoScrollbar);
 
+        if (App->editor->gameobjectSelected != nullptr)
+        {
+            App->camera->cornerPos = ImGui::GetWindowPos();
+            App->camera->size = ImGui::GetContentRegionMax();
+        }
+
         ImVec2 viewportSize = ImGui::GetCurrentWindow()->Size;
         if (viewportSize.x != lastViewportSize.x || viewportSize.y != lastViewportSize.y)
         {
@@ -614,14 +808,15 @@ void ModuleEditor::UpdateWindowStatus()
 
         lastViewportSize = viewportSize;
         ImGui::Image((ImTextureID)App->viewportBufferScene->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-        
+
         if (ImGui::IsWindowFocused()) App->camera->isMouseFocused = true;
         else App->camera->isMouseFocused = false;
         
         // Mouse clicking ----------------
-        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT) {
-            App->camera->IsMouseClicked();
-        }
+        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) App->camera->IsMouseClicked();
+
+        // Gizmo -------------------------
+        if (gameobjectSelected != nullptr) App->camera->EditTransform();
 
         ImGui::End();
     } 
@@ -671,21 +866,87 @@ void ModuleEditor::UpdateWindowStatus()
     }
 }
 
-void ModuleEditor::SelectItem(GameObject* Selected)
+void ModuleEditor::AssetsArray()
 {
-    Selected ? Selected->isSelected = !Selected->isSelected : 0;
-    Selected = go;
-    Selected->isSelected = !Selected->isSelected;
-    if (Selected->isSelected)
-    {
-        LOG("GameObject selected name: %s", Selected->name.c_str());
-    }
-    else
-    {
-        LOG("GameObject unselected name: %s", Selected->name.c_str());
-    }
+    std::stack<File*> F;
+    F.push(assetselect);
 
-    gameobjectSelected = Selected;
+    while (!F.empty())
+    {
+        assetFile = F.top();
+        F.pop();
+
+        if (!App->fileSystem->HasExtension(assetFile->name.c_str()))
+        {
+            for (int i = assetFile->child.size() - 1; i >= 0; i--)
+            {
+                std::string str = assetFile->child.at(i)->name;
+                assetsString.push_back(str);
+            }
+        }
+
+        for (int i = assetFile->files.size() - 1; i >= 0; i--)
+        {
+            if (App->fileSystem->HasExtension(assetFile->files.at(i).c_str()))
+            {
+                std::string str = assetFile->files.at(i);
+                assetsString.push_back(str);
+            }
+        }
+    }
+}
+
+void ModuleEditor::DrawID(uint id, const char* text, int numID)
+{
+    ImGui::PushID(numID);
+
+    if (ImGui::ImageButton((ImTextureID)id, ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0), 1))
+    {
+        std::string str = assetselect->path + std::string(text);
+        if (!App->fileSystem->HasExtension(str.c_str()))
+        {
+            assetselect->selected = false;
+            for (uint i = 0; i < assetselect->child.size(); i++)
+            {
+                if (assetselect->child.at(i)->name == text)
+                {
+                    assetsString.clear();
+                    assetselect = assetselect->child.at(i);
+                    assetFile = assetselect;
+                    assetselect->selected = true;
+                    AssetsArray();
+                }
+            }
+            LOG("Open folder: %s", assetselect->path.c_str());
+        }
+        else
+        {
+            ShellExecute(NULL, "open", App->fileSystem->NormalizePath(str.c_str()).c_str(), NULL, NULL, SW_SHOWNORMAL);
+            LOG("File Path: %s", str.c_str());
+
+            if (App->fileSystem->HasExtension(str.c_str(), "fbx")) App->import->LoadGeometry(str.c_str());
+            if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
+                App->fileSystem->HasExtension(str.c_str(), "png") ||
+                App->fileSystem->HasExtension(str.c_str(), "tga")) App->textures->Load(str.c_str());
+        }
+    }
+    ImGui::Text(text);
+
+    ImGui::PopID();
+}
+
+void ModuleEditor::CleanUpObject()
+{
+   if (assetselect->child.size() > 0)
+    {
+        for (int i = 0; i < assetselect->files.size(); i++)
+        {
+            std::string file = assetselect->path + std::string(assetselect->files.at(i));
+            App->fileSystem->DeleteDir(file.c_str());
+        }
+    }
+    App->fileSystem->DeleteDir(assetselect->path.c_str());
+    assetselect = nullptr;
 }
 
 void ModuleEditor::InspectorGameObject() 

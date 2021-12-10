@@ -174,6 +174,11 @@ bool ModuleFileSystem::CreateDir(const char* dir)
 	return false;
 }
 
+void ModuleFileSystem::DeleteDir(const char* dir) 
+{ 
+	PHYSFS_delete(dir); 
+}
+
 // Check if a file is a directory
 bool ModuleFileSystem::IsDirectory(const char* file) const
 {
@@ -478,41 +483,7 @@ uint ModuleFileSystem::Save(const char* file, const void* buffer, unsigned int s
 
 	return ret;
 }
-/*
-bool ModuleFileSystem::Remove(const char * file)
-{
-	bool ret = false;
 
-	if (file != nullptr)
-	{
-		//If it is a directory, we need to recursively remove all the files inside
-		if (IsDirectory(file))
-		{
-			std::vector<std::string> containedFiles, containedDirs;
-			PathNode rootDirectory = GetAllFiles(file);
-			
-			for (uint i = 0; i < rootDirectory.children.size(); ++i)
-				Remove(rootDirectory.children[i].path.c_str());
-		}
-		
-		if (PHYSFS_delete(file) != 0)
-		{
-			LOG("File deleted: [%s]", file);
-			ret = true;
-		}
-		else
-			LOG("File System error while trying to delete [%s]: %s", file, PHYSFS_getLastError());
-	}
-
-	return ret;
-}
-*/
-/*
-uint64 ModuleFileSystem::GetLastModTime(const char* filename)
-{
-	return PHYSFS_getLastModTime(filename);
-}
-*/
 std::string ModuleFileSystem::GetUniqueName(const char* path, const char* name) const
 {
 	//TODO: modify to distinguix files and dirs?
@@ -584,4 +555,26 @@ std::string ModuleFileSystem::SetNameFile(const char* path, const char* type)
 	}
 
 	return new_name;
+}
+
+void File::Read() 
+{
+	std::vector<std::string> direction;
+
+	App->fileSystem->DiscoverFiles(this->path.c_str(), this->files, direction);
+
+	if (direction.size() > 0)
+	{
+		for (uint i = 0; i < direction.size(); i++)
+		{
+			std::string _path = this->path + std::string("/") + direction.at(i) + std::string("/");
+			App->fileSystem->file = new File(direction.at(i).c_str());
+			App->fileSystem->file->path = _path;
+			this->child.push_back(App->fileSystem->file);
+			App->fileSystem->file->owner = this;
+			App->fileSystem->file->Read();
+		}
+	}
+
+	direction.clear();
 }

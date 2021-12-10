@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Light.h"
+#include "Geometry/LineSegment.h"
 
 
 #define MAX_LIGHTS 8

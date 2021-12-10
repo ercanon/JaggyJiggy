@@ -24,11 +24,7 @@ bool ModuleScene::Start()
 	root = new GameObject("Root");
 
 	//Loading house and textures since beginning
-	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
-	
-	//gameCamera = new GameObject; 
-	//gameCamera->CreateComponent<ComponentCamera>();
-	//gameCamera->GetComponent<ComponentCamera>()->frambuffer->Start();
+	App->import->LoadGeometry("Assets/Models/street2.fbx");
 
 	return ret;
 }

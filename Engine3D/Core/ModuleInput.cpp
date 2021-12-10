@@ -6,6 +6,7 @@
 #include "ModuleTextures.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "ModuleFileSystem.h"
 #include "ComponentMaterial.h"
 #include "ImGui/imgui_impl_sdl.h"
@@ -147,6 +148,7 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				filePath = event.drop.file;
 				std::string fileName(filePath);
+
 				if (fileName.substr(fileName.find_last_of(".")) == ".fbx" || fileName.substr(fileName.find_last_of(".")) == ".FBX" || fileName.substr(fileName.find_last_of(".")) == ".OBJ" || fileName.substr(fileName.find_last_of(".")) == ".obj")
 				{
 					LOG("Path of file dropped will be %s", filePath);

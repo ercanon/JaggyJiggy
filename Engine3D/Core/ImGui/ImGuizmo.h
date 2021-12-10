@@ -40,6 +40,7 @@
 // - finish local/world matrix application
 // - OPERATION as bitmask
 // 
+#include "imgui.h"
 // -------------------------------------------------------------------------------------------
 // Example 
 #if 0
