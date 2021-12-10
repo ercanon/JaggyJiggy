@@ -21,15 +21,15 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	SDL_free(basePath);
 		
 	AddPath(".");
-	AddPath("./Assets");
-	AddPath("./Assets/Models");
-	AddPath("./Assets/Textures");
-	AddPath("./Assets/Animation");
-	AddPath("./Library");
-	AddPath("./Library/Meshes");
-	AddPath("./Library/Materials");
-	AddPath("./Library/Animation");
-	AddPath("./Library/Scenes");
+	AddPath("./Assets/Resources/");
+	AddPath("./Assets/Resources/Models");
+	AddPath("./Assets/Resources/Textures");
+	AddPath("./Assets/Resources/Animation");
+	AddPath("./Library/Resources/");
+	AddPath("./Library/Resources/Meshes");
+	AddPath("./Library/Resources/Materials");
+	AddPath("./Library/Resources/Animation");
+	AddPath("./Library/Resources/Scenes");
 	AddPath("./Settings");
 }
 
@@ -135,13 +135,13 @@ unsigned ModuleFileSystem::Size(const std::string& path) const
 
 void ModuleFileSystem::CreateLibraryDirectories()
 {
-	CreateDir("Assets/Models/");
-	CreateDir("Assets/Textures/");
-	CreateDir("Assets/Animation/");
-	CreateDir("Library/Meshes/");
-	CreateDir("Library/Materials/");
-	CreateDir("Library/Animation/");
-	CreateDir("/Library/Scenes");
+	CreateDir("Assets/Resources/Models/");
+	CreateDir("Assets/Resources/Textures/");
+	CreateDir("Assets/Resources/Animation/");
+	CreateDir("Library/Resources/Meshes/");
+	CreateDir("Library/Resources/Materials/");
+	CreateDir("Library/Resources/Animation/");
+	CreateDir("/Library/Resources/Scenes");
 }
 
 // Add a new zip file or folder
