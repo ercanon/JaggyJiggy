@@ -91,26 +91,64 @@ bool ModuleEditor::Start()
     assets->path = assets->name;
     assets->Read();
 
-    folderImage = App->textures->Load("Assets/Resources/Format/folder.png");
-    App->import->SaveTexture(folderImage);
+    TextureObject folder;
+    std::string texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("folder", ".jay");
 
-    pngImage = App->textures->Load("Assets/Resources/Format/png.png");
-    App->import->SaveTexture(pngImage);
+    if (!App->fileSystem->Exists(texturePath))
+        App->textures->SaveTexture("Assets/Format/folder.png", texturePath.c_str());
 
-    jpgImage = App->textures->Load("Assets/Resources/Format/jpg.png");
-    App->import->SaveTexture(jpgImage);
+    if (!App->textures->Find(texturePath))
+        folder = App->textures->Load(texturePath);
 
-    tgaImage = App->textures->Load("Assets/Resources/Format/tga.png");
-    App->import->SaveTexture(tgaImage);
+    folderID = folder.id;
 
-    fbxImage = App->textures->Load("Assets/Resources/Format/fbx.png");
-    App->import->SaveTexture(fbxImage);
 
-    folderID = folderImage.id;
-    pngID = pngImage.id;
-    jpgID = jpgImage.id;
-    tgaID = tgaImage.id;
-    fbxID = fbxImage.id;
+    TextureObject png;
+    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("png", ".jay");
+
+    if (!App->fileSystem->Exists(texturePath))
+        App->textures->SaveTexture("Assets/Format/png.png", texturePath.c_str());
+
+    if (!App->textures->Find(texturePath))
+        png = App->textures->Load(texturePath);
+
+    pngID = png.id;
+
+
+    TextureObject jpg;
+    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("jpg", ".jay");
+
+    if (!App->fileSystem->Exists(texturePath))
+        App->textures->SaveTexture("Assets/Format/jpg.png", texturePath.c_str());
+
+    if (!App->textures->Find(texturePath))
+        jpg = App->textures->Load(texturePath);
+
+    jpgID = jpg.id;
+
+
+    TextureObject tga;
+    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("tga", ".jay");
+
+    if (!App->fileSystem->Exists(texturePath))
+        App->textures->SaveTexture("Assets/Format/tga.png", texturePath.c_str());
+
+    if (!App->textures->Find(texturePath))
+        tga = App->textures->Load(texturePath);
+
+    tgaID = tga.id;
+
+
+    TextureObject fbx;
+    texturePath = "Library/Materials/" + App->fileSystem->SetNameFile("fbx", ".jay");
+
+    if (!App->fileSystem->Exists(texturePath))
+        App->textures->SaveTexture("Assets/Format/fbx.png", texturePath.c_str());
+
+    if (!App->textures->Find(texturePath))
+        fbx = App->textures->Load(texturePath);
+
+    fbxID = fbx.id;
 
     return ret;
 }
@@ -954,8 +992,13 @@ void ModuleEditor::DrawID(uint id, const char* text, int numID)
                 App->fileSystem->HasExtension(str.c_str(), "png") ||
                 App->fileSystem->HasExtension(str.c_str(), "tga"))
             {
-                TextureObject texture = App->textures->Load(str.c_str());
-                App->import->SaveTexture(texture);
+                std::string texturePath = "Library/Materials/" + App->fileSystem->SetNameFile(str.c_str(), ".jay");
+
+                if (!App->fileSystem->Exists(texturePath))
+                    App->textures->SaveTexture(str.c_str(), texturePath.c_str());
+
+                if (!App->textures->Find(texturePath))
+                    App->textures->Load(texturePath);
             }
         }
     }

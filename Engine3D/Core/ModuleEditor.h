@@ -102,9 +102,6 @@ public:
 	// Assets ID
 	uint folderID, pngID, jpgID, tgaID, fbxID;
 
-	// Assets Image
-	TextureObject folderImage, pngImage, jpgImage, tgaImage, fbxImage;
-
 	std::vector<std::string> assetsString;
 
 	// Time Managment

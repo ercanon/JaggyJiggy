@@ -479,8 +479,7 @@ void ModuleImport::LoadScene(const char* path)
 		{
 			std::string texturePath = sceneFile["Textures"][t].GetString();
 
-			TextureObject texture;
-			if (!App->textures->Find(texturePath))
+			if (texturePath.size() > 0)
 			{
 				std::string name = App->fileSystem->SetNameFile(texturePath.c_str(), ".png");
 				if (!App->textures->SaveTexture(name, texturePath))
@@ -490,7 +489,8 @@ void ModuleImport::LoadScene(const char* path)
 				}
 			}
 
-			App->textures->Load(texturePath);
+			if (!App->textures->Find(texturePath))
+				App->textures->Load(texturePath);
 		}
 		for (int go = 0; go < sceneFile["GameObjects"].Size(); go++)
 		{
