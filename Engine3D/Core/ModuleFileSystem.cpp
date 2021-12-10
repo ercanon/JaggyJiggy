@@ -546,7 +546,7 @@ std::string ModuleFileSystem::SetNameFile(const char* path, const char* type)
 
 	if (type != nullptr)
 	{
-		size_t end = new_name.find_last_of('.');
+		size_t end = new_name.length() - new_name.find_last_of('.');
 		if (end > 0)
 			new_name = new_name.substr(0, new_name.length() - end);
 

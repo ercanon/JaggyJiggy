@@ -227,7 +227,6 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		char charTexturePath[1024];
 		memcpy(&charTexturePath[0], &buffer[textureOffset], sizeof(char) * 1024);
 		std::string texturePath(charTexturePath);
-		newMesh->texturePath = texturePath;
 
 		if (texturePath.size() > 0)
 		{
@@ -478,7 +477,20 @@ void ModuleImport::LoadScene(const char* path)
 
 		for (int t = 0; t < sceneFile["Textures"].Size(); t++)
 		{
+			std::string texturePath = sceneFile["Textures"][t].GetString();
 
+			TextureObject texture;
+			if (!App->textures->Find(texturePath))
+			{
+				std::string name = App->fileSystem->SetNameFile(texturePath.c_str(), ".png");
+				if (!App->textures->SaveTexture(name, texturePath))
+				{
+					name = App->fileSystem->SetNameFile(texturePath.c_str(), ".jpg");
+					App->textures->SaveTexture(name, texturePath);
+				}
+			}
+
+			App->textures->Load(texturePath);
 		}
 		for (int go = 0; go < sceneFile["GameObjects"].Size(); go++)
 		{

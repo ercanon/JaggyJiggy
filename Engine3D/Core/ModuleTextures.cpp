@@ -95,7 +95,7 @@ bool ModuleTextures::CleanUp() //can be called to reset stored textures
 }
 
 // Load new texture from file path
-const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std::string& pathDestiny, bool useMipMaps)
+const bool ModuleTextures::SaveTexture(const std::string& pathOrigin, const std::string& pathDestiny, bool useMipMaps)
 {
 	LOG("Loading texture -> %s", pathOrigin.c_str());
 
@@ -121,11 +121,14 @@ const void ModuleTextures::SaveTexture(const std::string& pathOrigin, const std:
 			ilDeleteImages(1, &imageId);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
-
 		}
 
 		delete[] data;
+
+		return true;
 	}
+
+	return false;
 }
 
 // Load new texture from file path

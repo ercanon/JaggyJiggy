@@ -17,7 +17,6 @@
     <ClCompile Include="Core\ComponentMaterial.cpp" />
     <ClCompile Include="Core\ComponentMesh.cpp" />
     <ClCompile Include="Core\GameObject.cpp" />
-    <ClCompile Include="Core\ImGui\ImGuiFileDialog.cpp" />
     <ClCompile Include="Core\ImGui\ImGuizmo.cpp" />
     <ClCompile Include="Core\ModuleFileSystem.cpp" />
     <ClCompile Include="Core\ImGui\imgui.cpp" />
@@ -128,7 +127,6 @@
     <ClInclude Include="Core\DevIL\include\ilu_region.h" />
     <ClInclude Include="Core\DevIL\include\il_wrap.h" />
     <ClInclude Include="Core\GameObject.h" />
-    <ClInclude Include="Core\ImGui\ImGuiFileDialog.h" />
     <ClInclude Include="Core\ImGui\ImGuizmo.h" />
     <ClInclude Include="Core\ModuleFileSystem.h" />
     <ClInclude Include="Core\Globals.h" />

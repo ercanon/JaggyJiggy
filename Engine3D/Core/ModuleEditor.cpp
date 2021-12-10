@@ -22,7 +22,6 @@
 #include "ImGui/imgui_internal.h"
 #include "glew.h"
 #include <gl/GL.h>
-#include "ImGui/ImGuiFileDialog.h"
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
