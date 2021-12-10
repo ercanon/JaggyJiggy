@@ -532,15 +532,14 @@ void ModuleEditor::MenuBar()
         if (ImGui::MenuItem("Play"))
         {
             play = !play;
-            // Save
+
             if (play == false)
             {
-
+                App->import->SaveScene("Library/Scenes/");
             }
-            // Load
             if (play == true)
             {
-
+                App->import->LoadScene("Library/Scenes/scene.jiy");
             }
         }
         if (ImGui::MenuItem("Pause")) if (play == false) pause = !pause;
@@ -548,9 +547,7 @@ void ModuleEditor::MenuBar()
         {
             if (play == false)
             {
-                // Load
-
-
+                App->import->LoadScene("Library/Scenes/scene.jiy");
                 play = true;
                 pause = true;
             }
