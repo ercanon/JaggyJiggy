@@ -9,6 +9,7 @@
 #include "ModuleEditor.h"
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
+#include "ComponentTransform.h"
 #include "GameObject.h"
 
 #include <vector>
@@ -173,7 +174,7 @@ bool ModuleImport::LoadGeometry(const char* path)
 			App->fileSystem->Save(pathShort.c_str(), &bytes[0], bytesPointer);
 
 			// -- Load file --//
-			LoadMeshFile(pathShort.c_str());
+			LoadMeshFile(pathShort.c_str(), scene, i);
 		}
 		aiReleaseImport(scene);
 		RELEASE_ARRAY(buffer);
@@ -193,7 +194,7 @@ void ModuleImport::StoreInBuffer(std::vector<char>& fileBuffer, uint& pointer, u
 	pointer += bytes;
 }
 
-void ModuleImport::LoadMeshFile(const char* pathfile)
+void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, const size_t i)
 {
 	char* buffer;
 	uint bytes = App->fileSystem->Load(pathfile, &buffer);
@@ -272,6 +273,19 @@ void ModuleImport::LoadMeshFile(const char* pathfile)
 		newMesh->GenerateBuffers();
 		newMesh->GenerateBounds(true);
 		newMesh->ComputeNormals();
+
+		// -- Correction Transfrom --//
+		aiMatrix4x4 matrix;
+		TransformCorrection(scene->mMeshes[i], scene->mRootNode, matrix, scene);
+
+		aiVector3D position, scale;
+		aiQuaternion rotation;
+
+		matrix.Decompose(scale, rotation, position);
+
+		newGameObject->transform->SetPosition(float3(position.x, position.y, position.z));
+		newGameObject->transform->SetRotation(Quat(rotation.x, rotation.y, rotation.z, rotation.w).ToEulerXYZ());
+		newGameObject->transform->SetScale(float3(scale.x, scale.y, scale.z));
 	}
 
 	RELEASE(buffer);
@@ -569,6 +583,27 @@ void ModuleImport::LoadScene(const char* path)
 		}
 	}
 	RELEASE(json);
+}
+
+void ModuleImport::TransformCorrection(const aiMesh* mesh, aiNode* node, aiMatrix4x4& matrix, const aiScene* scene)
+{
+	for (int i = 0; i < node->mNumChildren; i++)
+	{
+		if (node->mChildren[i]->mNumMeshes > 0)
+		{
+			for (int j = 0; j < node->mChildren[i]->mNumMeshes; j++)
+			{
+				if (scene->mMeshes[node->mChildren[i]->mMeshes[j]] == mesh)
+				{
+					matrix = node->mChildren[i]->mTransformation;
+				}
+			}
+		}
+		if (node->mChildren[i]->mNumChildren > 0)
+		{
+			TransformCorrection(mesh, node->mChildren[i], matrix, scene);
+		}
+	}
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)
