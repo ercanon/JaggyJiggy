@@ -3,6 +3,7 @@
 #include "Globals.h"
 
 #include "ImGui/imgui.h"
+#include "ModuleTextures.h"
 #include "ComponentCamera.h"
 #include <string>
 #include <stack>
@@ -52,6 +53,9 @@ public:
 
 	void About_Window();	//Can be done better
 
+	//Assets managment
+	void AssetsArray();
+	void DrawID(uint id, const char* text, int numID);
 	void CleanUpObject();
 
 	void InspectorGameObject();
@@ -68,6 +72,7 @@ public:
 	bool showTextures;
 	bool showConsoleWindow;
 	bool showAssetsListWindow;
+	bool showAssetsWindow;
 
 	std::stack<GameObject*> S;
 	std::stack<uint> indents;
@@ -81,11 +86,22 @@ public:
 	GameObject* gameobjectSelected;
 	GameObject* go;
 
+	// Cam Game
 	ComponentCamera* newCam;
 
 	ImVec2 lastViewportSize;
 	ImVec2 lastViewportSize2;
 
+	// Assets managment
+	File* assets;
 	File* assetFile;
 	File* assetselect;
+
+	// Assets ID
+	uint folderID, pngID, jpgID, tgaID, fbxID;
+
+	// Assets Image
+	TextureObject folderImage, pngImage, jpgImage, tgaImage, fbxImage;
+
+	std::vector<std::string> assetsString;
 };

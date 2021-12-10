@@ -31,6 +31,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showAboutWindow = false;
     showConfWindow = true;
     showAssetsListWindow = true;
+    showAssetsWindow = true;
 
     showConsoleWindow = true;
     showHierarchyWindow = true;
@@ -86,9 +87,21 @@ bool ModuleEditor::Start()
     GameObject* newGameObject = App->scene->CreateGameObject("Camera");
     newCam = new ComponentCamera(newGameObject, true);
 
-    assetFile = new File("Assets");
-    assetFile->path = assetFile->name;
-    assetFile->Read();
+    assets = new File("Assets");
+    assets->path = assets->name;
+    assets->Read();
+
+    folderImage = App->textures->Load("Assets/Format/folder.png");
+    pngImage = App->textures->Load("Assets/Format/png.png");
+    jpgImage = App->textures->Load("Assets/Format/jpg.png");
+    tgaImage = App->textures->Load("Assets/Format/tga.png");
+    fbxImage = App->textures->Load("Assets/Format/fbx.png");
+
+    folderID = folderImage.id;
+    pngID = pngImage.id;
+    jpgID = jpgImage.id;
+    tgaID = tgaImage.id;
+    fbxID = fbxImage.id;
 
     return ret;
 }
@@ -121,8 +134,15 @@ update_status ModuleEditor::Update(float dt)
     if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
         gameobjectSelected->parent->RemoveChild(gameobjectSelected);
 
-    assetFile->child.clear();
-    assetFile->Read();
+    assets->child.clear();
+    assetsString.clear();
+    assets->child.shrink_to_fit();
+    assets->Read();
+    if (assetselect != nullptr)
+    {
+        assetselect = assetFile;
+        AssetsArray();
+    }
 
     //Update status of each window and shows ImGui elements
     UpdateWindowStatus();
@@ -507,16 +527,16 @@ void ModuleEditor::UpdateWindowStatus()
         static char buf[32] = " "; ImGui::InputText(" ", buf, 32);
         if (ImGui::Button("Create folder", ImVec2(120, 0)))
         {
-            std::string newPath;
+            std::string path;
             if (assetselect != nullptr)
             {
-                newPath = assetselect->path.c_str() + std::string("/") + std::string(buf);
-                App->fileSystem->CreateDir(newPath.c_str());
+                path = assetselect->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(path.c_str());
             }
             else
             {
-                newPath = assetFile->path.c_str() + std::string("/") + std::string(buf);
-                App->fileSystem->CreateDir(newPath.c_str());
+                path = assets->path.c_str() + std::string("/") + std::string(buf);
+                App->fileSystem->CreateDir(path.c_str());
             }
         }
         ImGui::Separator();
@@ -524,7 +544,7 @@ void ModuleEditor::UpdateWindowStatus()
         std::stack<File*> F;
         std::stack<uint> indents;
 
-        F.push(assetFile);
+        F.push(assets);
         indents.push(0);
 
         File* file;
@@ -537,8 +557,8 @@ void ModuleEditor::UpdateWindowStatus()
             indents.pop();
 
             ImGuiTreeNodeFlags nodeFlags = 0;
-            if (file->child.size() == 0)   nodeFlags |= ImGuiTreeNodeFlags_Leaf;
             if (file->selected)  nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            if (file->child.size() == 0)   nodeFlags |= ImGuiTreeNodeFlags_Leaf;
 
             for (uint i = 0; i < max; ++i)
             {
@@ -547,11 +567,44 @@ void ModuleEditor::UpdateWindowStatus()
 
             if (ImGui::TreeNodeEx(file->name.c_str(), nodeFlags))
             {
+                /*if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+                {
+                    ImGui::SetDragDropPayload("DragDropHierarchy", &assetFile, sizeof(File*), ImGuiCond_Once);
+                    ImGui::Text("%s", assetFile->name.c_str());
+                    ImGui::EndDragDropSource();
+                }
+
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragDropHierarchy"))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(File*));
+                        File* droppedGo = (File*)*(const int*)payload->Data;
+                        if (droppedGo)
+                        {
+                            // Remove Child
+                            //auto it = std::find(droppedGo->child.begin(), droppedGo->child.end(), droppedGo->child);
+
+                            //if (it != droppedGo->child.end()) droppedGo->child.erase(it);
+                            
+                            // Attach Child
+                            assetFile->child.push_back(droppedGo);
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }*/
+
                 if (ImGui::IsItemClicked())
                 {
                     assetselect ? assetselect->selected = !assetselect->selected : 0;
                     assetselect = file;
                     assetselect->selected = !assetselect->selected;
+
+                    if (assetselect->selected)
+                    {
+                        assetsString.clear();
+                        AssetsArray();
+                    }
                 }
 
                 if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
@@ -568,6 +621,71 @@ void ModuleEditor::UpdateWindowStatus()
                 ImGui::TreePop();
             }
         }
+        ImGui::End();
+    }
+
+    //Assets
+    if (showAssetsWindow)
+    {
+        ImGui::Begin("Assets", &showAssetsWindow);
+
+        if (assetselect != nullptr)
+        {
+            std::stack<File*> F;
+            F.push(assetselect);
+
+            while (!F.empty())
+            {
+                assetFile = F.top();
+                F.pop();
+                ImGuiTreeNodeFlags nodeFlags = 0;
+
+                if (assetFile->selected && assetselect)
+                    nodeFlags |= ImGuiTreeNodeFlags_Selected;
+                if (assetFile->child.size() == 0)
+                    nodeFlags |= ImGuiTreeNodeFlags_Leaf;
+
+                if (assetFile->selected && assetselect)
+                {
+                    if (assetsString.size() > 0)
+                    {
+                        ImGui::Columns(assetsString.size(), NULL, false);
+                        for (int i = 0; i < assetsString.size(); i++)
+                        {
+                            if (!App->fileSystem->HasExtension(assetsString.at(i).c_str()))
+                            {
+                                DrawID(folderID, assetsString.at(i).c_str(), i);
+                            }
+                            if (assetsString.size() > 0 && i < assetsString.size())
+                            {
+                                std::string str = assetselect->path + assetsString.at(i);
+
+                                //Change
+                                if (App->fileSystem->HasExtension(str.c_str(), "png"))
+                                {
+                                    DrawID(pngID, assetsString.at(i).c_str(), i);
+                                }
+                                if (App->fileSystem->HasExtension(str.c_str(), "jpg"))
+                                {
+                                    DrawID(jpgID, assetsString.at(i).c_str(), i);
+                                }
+                                if (App->fileSystem->HasExtension(str.c_str(), "tga"))
+                                {
+                                    DrawID(tgaID, assetsString.at(i).c_str(), i);
+                                }
+                                if (App->fileSystem->HasExtension(str.c_str(), "fbx"))
+                                {
+                                    DrawID(fbxID, assetsString.at(i).c_str(), i);
+                                }
+                                //End
+                            }
+                            ImGui::NextColumn();
+                        }
+                    }
+                }
+            }
+        }
+
         ImGui::End();
     }
 
@@ -705,15 +823,82 @@ void ModuleEditor::UpdateWindowStatus()
         else App->camera->isMouseFocused = false;
         
         // Mouse clicking ----------------
-        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) {
-            App->camera->IsMouseClicked();
-        }
+        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN) App->camera->IsMouseClicked();
 
         // Gizmo -------------------------
         if (gameobjectSelected != nullptr) App->camera->EditTransform();
 
         ImGui::End();
     } 
+}
+
+void ModuleEditor::AssetsArray()
+{
+    std::stack<File*> F;
+    F.push(assetselect);
+
+    while (!F.empty())
+    {
+        assetFile = F.top();
+        F.pop();
+
+        if (!App->fileSystem->HasExtension(assetFile->name.c_str()))
+        {
+            for (int i = assetFile->child.size() - 1; i >= 0; i--)
+            {
+                std::string str = assetFile->child.at(i)->name;
+                assetsString.push_back(str);
+            }
+        }
+
+        for (int i = assetFile->files.size() - 1; i >= 0; i--)
+        {
+            if (App->fileSystem->HasExtension(assetFile->files.at(i).c_str()))
+            {
+                std::string str = assetFile->files.at(i);
+                assetsString.push_back(str);
+            }
+        }
+    }
+}
+
+void ModuleEditor::DrawID(uint id, const char* text, int numID)
+{
+    ImGui::PushID(numID);
+
+    if (ImGui::ImageButton((ImTextureID)id, ImVec2(64, 64), ImVec2(0, 1), ImVec2(1, 0), 1))
+    {
+        std::string str = assetselect->path + std::string(text);
+        if (!App->fileSystem->HasExtension(str.c_str()))
+        {
+            assetselect->selected = false;
+            for (uint i = 0; i < assetselect->child.size(); i++)
+            {
+                if (assetselect->child.at(i)->name == text)
+                {
+                    assetsString.clear();
+                    assetselect = assetselect->child.at(i);
+                    assetFile = assetselect;
+                    assetselect->selected = true;
+                    AssetsArray();
+                }
+            }
+            LOG("Open folder: %s", assetselect->path.c_str());
+        }
+        else
+        {
+            ShellExecute(NULL, "open", App->fileSystem->NormalizePath(str.c_str()).c_str(), NULL, NULL, SW_SHOWNORMAL);
+            LOG("File Path: %s", str.c_str());
+
+            if (App->fileSystem->HasExtension(str.c_str(), "fbx")) App->import->LoadGeometry(str.c_str());
+            if (App->fileSystem->HasExtension(str.c_str(), "jpg") ||
+                App->fileSystem->HasExtension(str.c_str(), "png") ||
+                App->fileSystem->HasExtension(str.c_str(), "tga")) App->textures->Load(str.c_str());
+        }
+    }
+    ImGui::Text(text);
+
+    ImGui::PopID();
 }
 
 void ModuleEditor::CleanUpObject()
