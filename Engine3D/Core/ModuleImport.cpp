@@ -441,11 +441,31 @@ void ModuleImport::SaveScene(const char* path)
 
 			currentObject.AddMember("Mesh", mesh, allocator);
 		}
-		//if (object->GetComponent<ComponentTransform>())	//Crash¿?
-		//{
-		//	Value t;
-		//	currentObject.AddMember("Transform", t, allocator);
-		//}
+		if (object->transform->active)
+		{
+			ComponentTransform* transformObject = object->transform;
+			Value transform(kObjectType);
+			Value position(kArrayType);
+			Value rotation(kArrayType);
+			Value scale(kArrayType);
+
+			position.PushBack(transformObject->GetPosition().x, allocator);
+			position.PushBack(transformObject->GetPosition().y, allocator);
+			position.PushBack(transformObject->GetPosition().z, allocator);
+
+			rotation.PushBack(transformObject->GetRotation().x, allocator);
+			rotation.PushBack(transformObject->GetRotation().y, allocator);
+			rotation.PushBack(transformObject->GetRotation().z, allocator);
+
+			scale.PushBack(transformObject->GetScale().x, allocator);
+			scale.PushBack(transformObject->GetScale().y, allocator);
+			scale.PushBack(transformObject->GetScale().z, allocator);
+
+			transform.AddMember("Position", position, allocator);
+			transform.AddMember("Rotation", rotation, allocator);
+			transform.AddMember("Scale", scale, allocator);
+			currentObject.AddMember("Transform", transform, allocator);
+		}
 		if (ComponentCamera* compCamera = object->GetComponent<ComponentCamera>())
 		{
 			Value camera(kObjectType);
@@ -542,6 +562,21 @@ void ModuleImport::LoadScene(const char* path)
 				
 				newMaterial->SetTexture(texture);
 			}
+			if (sceneFile["GameObjects"][go].HasMember("Transform"))
+			{
+				newGameObject->transform->SetPosition(float3(
+					sceneFile["GameObjects"][go]["Transform"]["Position"][0].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Position"][1].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Position"][2].GetFloat()));
+				newGameObject->transform->SetRotation(float3(
+					sceneFile["GameObjects"][go]["Transform"]["Rotation"][0].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Rotation"][1].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Rotation"][2].GetFloat()));
+				newGameObject->transform->SetScale(float3(
+					sceneFile["GameObjects"][go]["Transform"]["Scale"][0].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Scale"][1].GetFloat(),
+					sceneFile["GameObjects"][go]["Transform"]["Scale"][2].GetFloat()));
+			}
 			if (sceneFile["GameObjects"][go].HasMember("Mesh"))
 			{
 				ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
@@ -549,10 +584,14 @@ void ModuleImport::LoadScene(const char* path)
 				newMesh->numVertices = sceneFile["GameObjects"][go]["Mesh"]["NumVertices"].GetInt();
 				newMesh->numIndices = sceneFile["GameObjects"][go]["Mesh"]["NumIndices"].GetInt();
 
-				newMesh->vertices.resize(newMesh->numVertices);
-				newMesh->indices.resize(newMesh->numIndices);
-				newMesh->normals.resize(newMesh->numVertices);
-				newMesh->texCoords.resize(newMesh->numVertices);
+				if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Vertices"))
+					newMesh->vertices.resize(newMesh->numVertices);
+				if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Indices"))
+					newMesh->indices.resize(newMesh->numIndices);
+				if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Normals"))
+					newMesh->normals.resize(newMesh->numVertices);
+				if (sceneFile["GameObjects"][go]["Mesh"].HasMember("TexCoords"))
+					newMesh->texCoords.resize(newMesh->numVertices);
 				for (size_t v = 0; v < newMesh->numVertices; v++)
 				{
 					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Vertices"))
@@ -578,10 +617,10 @@ void ModuleImport::LoadScene(const char* path)
 				for (size_t i = 0; i < newMesh->numIndices; i++)
 					if (sceneFile["GameObjects"][go]["Mesh"].HasMember("Indices"))
 						newMesh->indices[i] = sceneFile["GameObjects"][go]["Mesh"]["Indices"][i].GetInt();
-			}
-			if (sceneFile["GameObjects"][go].HasMember("Transform"))
-			{
-				//ComponentTransform* newMesh = newGameObject->CreateComponent<ComponentTransform>();	//Crash¿?
+
+				newMesh->GenerateBuffers();
+				newMesh->GenerateBounds(true);
+				newMesh->ComputeNormals();
 			}
 			if (sceneFile["GameObjects"][go].HasMember("Camera"))
 			{
