@@ -109,10 +109,10 @@ bool ModuleImport::LoadGeometry(const char* path)
 				aiMaterial* texture = scene->mMaterials[assimpMesh->mMaterialIndex];
 				if (texture != nullptr)
 				{
-					aiString path;
+					aiString materialPath;
 
-					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &path);
-					texturePath = path.C_Str();
+					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &materialPath);
+					texturePath = materialPath.C_Str();
 					if (texturePath.size() > 0)
 					{
 						texturePath = App->fileSystem->SetNameFile(texturePath.c_str());
