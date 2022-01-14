@@ -1,12 +1,11 @@
 #include "ComponentRB.h"
 
 #include "ImGui/imgui.h"
+#include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
 
 
-ComponentRB::ComponentRB(GameObject* parent) : Component(parent)
-{
-
-}
+ComponentRB::ComponentRB(GameObject* parent) : Component(parent) {}
 
 ComponentRB::~ComponentRB()
 {
