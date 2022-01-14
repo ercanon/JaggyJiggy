@@ -14,6 +14,7 @@
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
+#include "ComponentCollider.h"
 
 //Tools
 #include <string>
@@ -440,11 +441,11 @@ void ModuleEditor::MenuBar()
 
             if (ImGui::BeginMenu("3D Objects")) 
             {
-                /*if (ImGui::MenuItem("Cube")) 
+                if (ImGui::MenuItem("Cube")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cube");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CUBE);
-                }*/
+                }
                 if (ImGui::MenuItem("Sphere")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
@@ -455,11 +456,36 @@ void ModuleEditor::MenuBar()
                     GameObject* newGameObject = App->scene->CreateGameObject("Plane");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PLANE);
                 }
-                /*if (ImGui::MenuItem("Pyramid")) 
+                if (ImGui::MenuItem("Pyramid")) 
                 {
                     GameObject* newGameObject = App->scene->CreateGameObject("Pyramid");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PYRAMID);
-                }*/
+                }
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Collider"))
+            {
+                if (gameobjectSelected != nullptr)
+                {
+                    if (ImGui::MenuItem("Cube"))
+                    {
+                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
+                    }
+                    if (ImGui::MenuItem("Sphere"))
+                    {
+                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
+                    }
+                    if (ImGui::MenuItem("Plane"))
+                    {
+                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PLANE);
+                    }
+                    if (ImGui::MenuItem("Pyramid"))
+                    {
+                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PYRAMID);
+                    }
+                }
+
                 ImGui::EndMenu();
             }
 

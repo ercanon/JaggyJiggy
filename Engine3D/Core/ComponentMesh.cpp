@@ -7,30 +7,38 @@
 #include "ModuleEditor.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
+#include "ComponentCollider.h"
 #include "GameObject.h"
 #include "ImGui/imgui.h"
 #include "MathGeoLib/include/Geometry/Plane.h"
 #include "par_shapes.h"
 
 
-ComponentMesh::ComponentMesh(GameObject* parent) : Component(parent) {}
+ComponentMesh::ComponentMesh(GameObject* parent) : Component(parent) 
+{
+
+}
 
 ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent)
 {
 	switch (shape)
 	{
-	/*case Shape::CUBE:
-		CopyParMesh(par_shapes_create_cube());		
-		break;*/
+	case Shape::CUBE:
+		CopyParMesh(par_shapes_create_cube());
+		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
+		break;
 	case Shape::SPHERE:
 		CopyParMesh(par_shapes_create_parametric_sphere(20, 20));
+		new ComponentCollider(parent, ComponentCollider::Shape::SPHERE);
 		break;
 	case Shape::PLANE:
 		CopyParMesh(par_shapes_create_plane(20, 20));
+		new ComponentCollider(parent, ComponentCollider::Shape::PLANE);
 		break;
-	/*case Shape::PYRAMID:
+	case Shape::PYRAMID:
 		CopyParMesh(par_shapes_create_tetrahedron());
-		break;*/
+		new ComponentCollider(parent, ComponentCollider::Shape::PYRAMID);
+		break;
 	}
 }
 
