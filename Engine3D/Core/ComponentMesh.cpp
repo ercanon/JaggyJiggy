@@ -326,5 +326,3 @@ void ComponentMesh::OnGui()
 		}
 	}
 }
-
-

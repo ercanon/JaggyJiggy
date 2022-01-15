@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include <string.h>
 
+#include "btBulletDynamicsCommon.h"
+
 class ComponentCollider : public Component {
 
 public:
@@ -20,4 +22,9 @@ public:
 
 	bool Update(float dt) override;
 	void OnGui() override;
+
+private:
+	float mass = 1;
+
+	btDiscreteDynamicsWorld* world;
 };
