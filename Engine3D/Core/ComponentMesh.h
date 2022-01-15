@@ -36,6 +36,7 @@ public:
 
 	bool InGameCamView(Frustum* cam);
 	bool Update(float dt) override;
+	void Draw();
 	void OnGui() override;
 
 	uint vertexBufferId = 0, indexBufferId = 0, textureBufferId = 0;

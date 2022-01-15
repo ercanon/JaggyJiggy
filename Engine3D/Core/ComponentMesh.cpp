@@ -233,12 +233,26 @@ bool ComponentMesh::InGameCamView(Frustum* cam)
 
 bool ComponentMesh::Update(float dt)
 {
-	 if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
-		 if ((drawWireframe || App->renderer3D->wireframeMode) && owner->isSelected)
-			 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
-		 else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (!App->editor->play)
+	{
+		if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
+			Draw();
+		}
+	}
+	else {
+		Draw();
+	}
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+	return true;
+}
+
+void ComponentMesh::Draw()
+{
+	if ((drawWireframe || App->renderer3D->wireframeMode) && owner->isSelected)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//--Enable States--//
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -251,15 +265,15 @@ bool ComponentMesh::Update(float dt)
 		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 	}
 
-		glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
-		glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-		if (ComponentMaterial* material = owner->GetComponent<ComponentMaterial>())
-		{
-			(drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode) && owner->isSelected ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
-		}
+	if (ComponentMaterial* material = owner->GetComponent<ComponentMaterial>())
+	{
+		(drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode) && owner->isSelected ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
+	}
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
 
 	//-- Draw --//
 	glPushMatrix();
@@ -279,31 +293,28 @@ bool ComponentMesh::Update(float dt)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-		//--Disables States--//
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//--Disables States--//
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		if ((drawFaceNormals || drawVertexNormals) && owner->isSelected)
-			DrawNormals();
+	if ((drawFaceNormals || drawVertexNormals) && owner->isSelected)
+		DrawNormals();
 
-		if (baabb && owner->isSelected)
-		{
-			float3 points[8];
-			owner->globalAABB.GetCornerPoints(points);
-			DrawAABBOBB(points, float3(0.2f, 1.f, 0.1f));
-		}
-
-		if (bobb && owner->isSelected)
-		{
-			float3 points[8];
-			owner->globalOBB.GetCornerPoints(points);
-			DrawAABBOBB(points, float3(1.f, 0.2f, 0.1f));
-		}
+	if (baabb && owner->isSelected)
+	{
+		float3 points[8];
+		owner->globalAABB.GetCornerPoints(points);
+		DrawAABBOBB(points, float3(0.2f, 1.f, 0.1f));
 	}
 
-	return true;
+	if (bobb && owner->isSelected)
+	{
+		float3 points[8];
+		owner->globalOBB.GetCornerPoints(points);
+		DrawAABBOBB(points, float3(1.f, 0.2f, 0.1f));
+	}
 }
 
 void ComponentMesh::OnGui()
