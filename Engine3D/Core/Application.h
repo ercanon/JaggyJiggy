@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Timer.h"
 #include "PerfTimer.h"
+#include "ModulePhysics3D.h"
 
 //Forward declarations
 
@@ -20,6 +21,7 @@ class ModuleEditor;
 class ModuleImport;
 class ModuleFileSystem;
 class ModuleTextures;
+class ModuelPhysics3D;
 
 class Application
 {
@@ -36,6 +38,7 @@ public:
 	ModuleImport* import { nullptr };
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };
+	ModulePhysics3D* physics { nullptr };
 
 	Application();
 	~Application();

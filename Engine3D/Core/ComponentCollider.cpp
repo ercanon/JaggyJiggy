@@ -5,17 +5,6 @@
 #include "ImGui/imgui.h"
 
 
-#ifdef _DEBUG
-#pragma comment (lib, "BulletDynamics_debug.lib")
-#pragma comment (lib, "BulletCollision_debug.lib")
-#pragma comment (lib, "LinearMath_debug.lib")
-#else
-#pragma comment (lib, "BulletDynamics.lib")
-#pragma comment (lib, "BulletCollision.lib")
-#pragma comment (lib, "LinearMath.lib")
-#endif
-
-
 ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Component(parent) 
 {
 	switch (shape)
@@ -41,11 +30,8 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 		//body->setUserPointer(parent);
 		//world->addRigidBody(body);
 		break;
-	case Shape::PLANE:
-		shapeCollider = "PLANE";
-		break;
-	case Shape::PYRAMID:
-		shapeCollider = "PYRAMID";
+	case Shape::CAPSULE:
+		shapeCollider = "CAPSULE";
 		break;
 	}
 }
@@ -67,7 +53,7 @@ void ComponentCollider::OnGui()
 	if (ImGui::CollapsingHeader("Collider"))
 	{
 		ImGui::Text("Shape %s",	shapeCollider.c_str());
-		ImGui::DragFloat("Masa", &mass);
+		ImGui::InputFloat("Mass", &mass);
 	}
 }
 

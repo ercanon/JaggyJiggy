@@ -12,6 +12,7 @@
 #include "ModuleViewportFrameBuffer.h"
 #include "ModuleFileSystem.h"
 #include "ModuleTextures.h"
+#include "ModulePhysics3D.h"
 #include "Globals.h"
 
 
@@ -30,6 +31,7 @@ Application::Application()
 	import = new ModuleImport(this);
 	fileSystem = new ModuleFileSystem(this);
 	textures = new ModuleTextures(this);
+	physics = new ModulePhysics3D(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -42,7 +44,8 @@ Application::Application()
 	AddModule(input);
 	AddModule(textures);
 	AddModule(import);
-	
+	AddModule(physics);
+
 	// Scenes
 	AddModule(viewportBufferGame);
 	AddModule(viewportBufferScene);

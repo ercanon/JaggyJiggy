@@ -476,13 +476,9 @@ void ModuleEditor::MenuBar()
                     {
                         ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
                     }
-                    if (ImGui::MenuItem("Plane"))
+                    if (ImGui::MenuItem("Capsule"))
                     {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PLANE);
-                    }
-                    if (ImGui::MenuItem("Pyramid"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PYRAMID);
+                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CAPSULE);
                     }
                 }
 

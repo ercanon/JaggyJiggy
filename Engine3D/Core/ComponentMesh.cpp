@@ -33,11 +33,11 @@ ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent
 		break;
 	case Shape::PLANE:
 		CopyParMesh(par_shapes_create_plane(20, 20));
-		new ComponentCollider(parent, ComponentCollider::Shape::PLANE);
+		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	case Shape::PYRAMID:
 		CopyParMesh(par_shapes_create_tetrahedron());
-		new ComponentCollider(parent, ComponentCollider::Shape::PYRAMID);
+		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	}
 }
@@ -235,9 +235,7 @@ bool ComponentMesh::Update(float dt)
 {
 	if (!App->editor->play)
 	{
-		if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
-			Draw();
-		}
+		if (InGameCamView(&App->editor->newCam->cameraFrustum)) Draw();
 	}
 	else {
 		Draw();

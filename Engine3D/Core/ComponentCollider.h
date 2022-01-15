@@ -13,8 +13,7 @@ public:
 	{
 		CUBE,
 		SPHERE,
-		PLANE,
-		PYRAMID
+		CAPSULE
 	};
 
 	ComponentCollider(GameObject* parent, Shape shape);
