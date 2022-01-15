@@ -21,8 +21,10 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 	switch (shape)
 	{
 	case Shape::CUBE:
+		shapeCollider = "CUBE";
 		break;
 	case Shape::SPHERE:
+		shapeCollider = "SPHERE";
 		//btCollisionShape* colShape = new btSphereShape(parent->GetComponent<ComponentTransform>()->GetScale().x);
 		//
 		//btTransform startTransform;
@@ -40,8 +42,10 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 		//world->addRigidBody(body);
 		break;
 	case Shape::PLANE:
+		shapeCollider = "PLANE";
 		break;
 	case Shape::PYRAMID:
+		shapeCollider = "PYRAMID";
 		break;
 	}
 }
@@ -62,6 +66,7 @@ void ComponentCollider::OnGui()
 {
 	if (ImGui::CollapsingHeader("Collider"))
 	{
+		ImGui::Text("Shape %s",	shapeCollider.c_str());
 		ImGui::DragFloat("Masa", &mass);
 	}
 }

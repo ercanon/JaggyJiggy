@@ -23,6 +23,9 @@ public:
 	bool Update(float dt) override;
 	void OnGui() override;
 
+public:
+	std::string shapeCollider;
+
 private:
 	float mass = 1;
 
