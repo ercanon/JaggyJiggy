@@ -10,6 +10,7 @@
 #include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
+#include "ComponentCollider.h"
 #include "GameObject.h"
 
 #include <vector>
@@ -223,6 +224,7 @@ void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, cons
 
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
 		ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
+		new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 
 
 		char charTexturePath[1024];
@@ -441,6 +443,14 @@ void ModuleImport::SaveScene(const char* path)
 
 			currentObject.AddMember("Mesh", mesh, allocator);
 		}
+		if (ComponentCollider* coll = object->GetComponent<ComponentCollider>())
+		{
+			Value collider(kObjectType);
+			Value collision;
+
+			collision.SetString(coll->shapeCollider.c_str(), coll->shapeCollider.length(), allocator);
+			currentObject.AddMember("Collider", collision, allocator);
+		}
 		if (object->transform->active)
 		{
 			ComponentTransform* transformObject = object->transform;
@@ -621,6 +631,19 @@ void ModuleImport::LoadScene(const char* path)
 				newMesh->GenerateBuffers();
 				newMesh->GenerateBounds(true);
 				newMesh->ComputeNormals();
+			}
+			if (sceneFile["GameObjects"][go].HasMember("Collider"))
+			{
+				std::string shape = sceneFile["GameObjects"][go]["Collider"].GetString();
+
+				if		(shape == "CUBE")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
+				else if (shape == "SPHERE")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
+				else if (shape == "PLANE")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::PLANE);
+				else if (shape == "PYRAMID")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::PYRAMID);
 			}
 			if (sceneFile["GameObjects"][go].HasMember("Camera"))
 			{
