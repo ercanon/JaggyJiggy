@@ -14,10 +14,10 @@ Has a family friendly interface and you use your knowloadge in C and C++ to prog
 ![Image11](docs/raul.jpg)
 Raul Cano:  https://github.com/ercanon
 
-![Image12](docs/alex.jpg)
+![Image12](docs/alex.png)
 Alex Gesti: https://github.com/alexgesti
 
-![Image13](docs/pau.jpeg)
+![Image13](docs/pau.png)
 Pau Motta: https://github.com/paumotta
 
 # Core Sub-systems
