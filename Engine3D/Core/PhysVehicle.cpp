@@ -16,7 +16,7 @@ PhysVehicle::~PhysVehicle()
 // ----------------------------------------------------------------------------
 void PhysVehicle::Render()
 {
-	CylinderP wheel;
+	PrimitiveCylinder wheel;
 
 	wheel.color = Blue;
 
@@ -31,7 +31,7 @@ void PhysVehicle::Render()
 		wheel.Render();
 	}
 
-	CubeP chassis(info.chassis_size.x, info.chassis_size.y, info.chassis_size.z);
+	PrimitiveCube chassis(info.chassis_size.x, info.chassis_size.y, info.chassis_size.z);
 	vehicle->getChassisWorldTransform().getOpenGLMatrix(&chassis.transform);
 	btQuaternion q = vehicle->getChassisWorldTransform().getRotation();
 	btVector3 offset(info.chassis_offset.x, info.chassis_offset.y, info.chassis_offset.z);
@@ -89,7 +89,7 @@ float PhysVehicle::GetKmh() const
 vec3 PhysVehicle::GetPosition() {
 	vec3 pos;
 
-	CubeP chassis(info.chassis_size.x, info.chassis_size.y, info.chassis_size.z);
+	PrimitiveCube chassis(info.chassis_size.x, info.chassis_size.y, info.chassis_size.z);
 	vehicle->getChassisWorldTransform().getOpenGLMatrix(&chassis.transform);
 
 	pos.x = chassis.transform.M[12];

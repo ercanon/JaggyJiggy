@@ -7,6 +7,7 @@
 
 class Component;
 class ComponentTransform;
+class ComponentCollider;
 
 class GameObject {
 
@@ -14,7 +15,6 @@ public:
 
 	GameObject();
 	GameObject(const std::string name);
-	GameObject(std::string name, GameObject* parent = nullptr, bool loadingScene = false);
 
 	~GameObject();
 
@@ -48,6 +48,7 @@ public:
 	std::string name;
 	GameObject* parent = nullptr;
 	ComponentTransform* transform = nullptr;
+	ComponentCollider* collider = nullptr;
 	std::vector<GameObject*> children;
 	std::vector<Component*> components;
 	

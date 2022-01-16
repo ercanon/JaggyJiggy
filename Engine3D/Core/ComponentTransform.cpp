@@ -65,6 +65,7 @@ void ComponentTransform::OnGui()
 void ComponentTransform::Move(float3 positionIncrease)
 {
 	position += positionIncrease;
+	isDirty = true;
 }
 
 void ComponentTransform::SetPosition(const float3& newPosition)
@@ -95,6 +96,7 @@ void ComponentTransform::SetLocalTransform(const mat4x4& transform)
 
 	newTransform.Decompose(position, rotation, scale);
 	rotationEuler = rotation.ToEulerXYZ().Abs();
+	isDirty = true;
 }
 
 void ComponentTransform::NewAttachment()

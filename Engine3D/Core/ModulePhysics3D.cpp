@@ -1,5 +1,5 @@
-#include "SDL/include/SDL_opengl.h"
 #include "glew.h"
+#include "SDL/include/SDL_opengl.h"
 #include "PhysVehicle.h"
 #include "Globals.h"
 #include "Application.h"
@@ -64,8 +64,8 @@ bool ModulePhysics3D::Start()
 	//world->setDebugDrawer(debug_draw); // Necesidad de un debug drawer de colliders?
 
 	// Creating cubes for the test constraint
-	right_cube = new CubeP(3, 4, 3);
-	left_cube = new CubeP(3, 4, 3);
+	right_cube = new PrimitiveCube(3, 4, 3);
+	left_cube = new PrimitiveCube(3, 4, 3);
 	right_cube->SetPos(5, 2, 25);
 	left_cube->SetPos(-5, 2, 25);
 	right_cube->color.Set(Red.r, Red.g, Red.b);
@@ -82,37 +82,38 @@ bool ModulePhysics3D::Start()
 // ---------------------------------------------------------
 update_status ModulePhysics3D::PreUpdate(float dt)
 {
-	//if (App->editor->play)
-
-	world->stepSimulation(dt, 15);
-	
-	int numManifolds = world->getDispatcher()->getNumManifolds();
-	for(int i = 0; i<numManifolds; i++)
+	if (App->editor->play)
 	{
-		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-		btCollisionObject* obA = (btCollisionObject*)(contactManifold->getBody0());
-		btCollisionObject* obB = (btCollisionObject*)(contactManifold->getBody1());
+		world->stepSimulation(dt, 15);
 
-		int numContacts = contactManifold->getNumContacts();
-		if(numContacts > 0)
+		int numManifolds = world->getDispatcher()->getNumManifolds();
+		for (int i = 0; i < numManifolds; i++)
 		{
-			ComponentCollider* pbodyA = (ComponentCollider*)obA->getUserPointer();
-			ComponentCollider* pbodyB = (ComponentCollider*)obB->getUserPointer();
+			btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+			btCollisionObject* obA = (btCollisionObject*)(contactManifold->getBody0());
+			btCollisionObject* obB = (btCollisionObject*)(contactManifold->getBody1());
 
-			if(pbodyA && pbodyB)
+			int numContacts = contactManifold->getNumContacts();
+			if (numContacts > 0)
 			{
-				std::vector<Module*>::iterator item = pbodyA->collision_listeners.begin();
-				while (item != pbodyA->collision_listeners.end())
-				{
-					(*item)->OnCollision(pbodyA, pbodyB);
-					item++;
-				}
+				ComponentCollider* pbodyA = (ComponentCollider*)obA->getUserPointer();
+				ComponentCollider* pbodyB = (ComponentCollider*)obB->getUserPointer();
 
-				item = pbodyA->collision_listeners.begin();
-				while (item != pbodyA->collision_listeners.end())
+				if (pbodyA && pbodyB)
 				{
-					(*item)->OnCollision(pbodyA, pbodyB);
-					item++;
+					std::vector<Module*>::iterator item = pbodyA->collision_listeners.begin();
+					while (item != pbodyA->collision_listeners.end())
+					{
+						(*item)->OnCollision(pbodyA, pbodyB);
+						item++;
+					}
+
+					item = pbodyA->collision_listeners.begin();
+					while (item != pbodyA->collision_listeners.end())
+					{
+						(*item)->OnCollision(pbodyA, pbodyB);
+						item++;
+					}
 				}
 			}
 		}
@@ -271,7 +272,7 @@ ComponentCollider* ModulePhysics3D::AddRigidBody(Capsule& capsule, GameObject* g
 }
 
 // Creates primitive cubes, just for debug purpouses
-ComponentCollider* ModulePhysics3D::AddCube(const CubeP& cube, float mass)
+ComponentCollider* ModulePhysics3D::AddCube(const PrimitiveCube& cube, float mass)
 {
 	btCollisionShape* colShape = new btBoxShape(btVector3(cube.size.x * 0.5f, cube.size.y * 0.5f, cube.size.z * 0.5f));
 	shapes.push_back(colShape);
@@ -302,7 +303,7 @@ ComponentCollider* ModulePhysics3D::AddCube(const CubeP& cube, float mass)
 // Shoots a ball
 void ModulePhysics3D::ShootBall()
 {
-	SphereP* sphere = new SphereP(0.5);
+	PrimitiveSphere* sphere = new PrimitiveSphere(0.5);
 	sphere->color.Set(Red.r, Red.g, Red.b);
 	sphere->SetPos(App->camera->cameraFrustum.pos.x + App->camera->cameraFrustum.front.x,
 		App->camera->cameraFrustum.pos.y + App->camera->cameraFrustum.front.y,

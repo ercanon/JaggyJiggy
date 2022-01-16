@@ -6,7 +6,7 @@
 
 #include "ImGui/imgui.h"
 
-ComponentCollider::ComponentCollider(GameObject* parent, bool active) : Component(parent)
+ComponentCollider::ComponentCollider(GameObject* parent) : Component(parent)
 {
 }
 
@@ -23,19 +23,19 @@ bool ComponentCollider::Update(float dt)
 {
 	if (owner != nullptr)
 	{
-		if (active == false)
+		if (active == true)
 		{
 			mat4x4 bodyTransform, parentTransform, newTransform;
 			body->getWorldTransform().getOpenGLMatrix(&bodyTransform);
 
-			if (owner->parent != nullptr)
-				parentTransform = owner->parent->transform->GetGlobalGLTransform();
+			if (owner != nullptr)
+				parentTransform = owner->transform->GetGlobalGLTransform();
 			else
 				parentTransform = IdentityMatrix;
 
-			newTransform = parentTransform.inverse() * bodyTransform;
+			newTransform = parentTransform * bodyTransform;
 
-			owner->transform->SetLocalTransform(newTransform);
+			owner->transform->SetLocalTransform(parentTransform);
 			owner->transform->Move(-localPosition);
 		}
 	}
@@ -43,11 +43,9 @@ bool ComponentCollider::Update(float dt)
 	return true;
 }
 
-// Maybe need to clean "body". 
-
 void ComponentCollider::OnGui()
 {
-	if (ImGui::CollapsingHeader("RigidBody"))
+	if (ImGui::CollapsingHeader("Collider"))
 	{
 		ImGui::Checkbox("Enabled", &active);
 		if (ImGui::Button("Set to zero"))
@@ -85,7 +83,7 @@ void ComponentCollider::OnGui()
 
 		if (dynamicObject)
 		{
-			if (ImGui::DragFloat("Mass of the building: %.2f", &mass))
+			if (ImGui::DragFloat("Mass: %.2f", &mass))
 			{
 				App->physics->world->removeRigidBody(body);
 

@@ -3,6 +3,7 @@
 #include "ModuleScene.h"
 #include "ModuleFileSystem.h"
 #include "ComponentTransform.h"
+#include "ComponentCollider.h"
 #include "ImGui/imgui.h"
 
 GameObject::GameObject() {
@@ -11,6 +12,8 @@ GameObject::GameObject() {
 	parent = nullptr;
 
 	transform = CreateComponent<ComponentTransform>();
+	collider = CreateComponent<ComponentCollider>();
+	if (collider) App->physics->AddRigidBody(globalOBB, this, collider->mass);
 
 	active = true;
 }
@@ -18,6 +21,8 @@ GameObject::GameObject() {
 GameObject::GameObject(const std::string name) : name(name) 
 {
 	transform = CreateComponent<ComponentTransform>();
+	collider = CreateComponent<ComponentCollider>();
+	if (collider) App->physics->AddRigidBody(globalOBB, this, collider->mass);
 
 	active = true;
 }

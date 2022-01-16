@@ -2,7 +2,10 @@
 #include "Module.h"
 #include "Globals.h"
 #include "glmath.h"
+#include "Math/float4x4.h"
 #include "Primitive.h"
+#include "Geometry/Sphere.h"
+#include "Geometry/Capsule.h"
 #include "Bullet/include/btBulletDynamicsCommon.h"
 
 // Recommended scale is 1.0f == 1 meter, no less than 0.2 objects
@@ -12,7 +15,7 @@
 class GameObject;
 class ComponentMesh;
 class ComponentCollider;
-struct PhysVehicle3D;
+struct PhysVehicle;
 struct VehicleInfo;
 
 enum class SHAPE_TYPE {
@@ -20,7 +23,7 @@ enum class SHAPE_TYPE {
 	BOX,
 	CAPSULE,
 	SPHERE,
-	CONVEX
+	CONVEX_HULL
 };
 
 class ModulePhysics3D : public Module
@@ -43,7 +46,7 @@ public:
 	ComponentCollider* AddRigidBody(Sphere& sphere, GameObject* gameObject, float mass = 1.0f);
 	ComponentCollider* AddRigidBody(Capsule& capsule, GameObject* gameObject, float mass = 1.0f);
 
-	ComponentCollider* AddCube(const CubeP& cube, float mass);
+	ComponentCollider* AddCube(const PrimitiveCube& cube, float mass);
 	PhysVehicle* AddVehicle(const VehicleInfo& info);
 
 	void CreateTestConstraint();
@@ -62,7 +65,7 @@ public:
 	std::vector<ComponentCollider*> rigidBodies;
 
 	std::vector<ComponentCollider*> balls;
-	std::vector<SphereP*> spheres;
+	std::vector<PrimitiveSphere*> spheres;
 	std::vector<btRigidBody*> physBalls;
 
 	btDiscreteDynamicsWorld*	world;
@@ -89,8 +92,8 @@ private:
 	ComponentCollider* tester = nullptr;
 
 	// Elements for the test constraints
-	CubeP* right_cube = nullptr;
-	CubeP* left_cube = nullptr;
+	PrimitiveCube* right_cube = nullptr;
+	PrimitiveCube* left_cube = nullptr;
 	ComponentCollider* right_body = nullptr;
 	ComponentCollider* left_body = nullptr;
 };

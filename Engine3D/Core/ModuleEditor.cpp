@@ -468,18 +468,18 @@ void ModuleEditor::MenuBar()
             {
                 if (gameobjectSelected != nullptr)
                 {
-                    if (ImGui::MenuItem("Cube"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
-                    }
-                    if (ImGui::MenuItem("Sphere"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
-                    }
-                    if (ImGui::MenuItem("Capsule"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CAPSULE);
-                    }
+                    //if (ImGui::MenuItem("Cube"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
+                    //}
+                    //if (ImGui::MenuItem("Sphere"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
+                    //}
+                    //if (ImGui::MenuItem("Capsule"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CAPSULE);
+                    //}
                 }
 
                 ImGui::EndMenu();

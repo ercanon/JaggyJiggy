@@ -1,5 +1,9 @@
 #pragma once
 #include "Component.h"
+#include "Math/float3.h"
+#include "Math/float4x4.h"
+#include "Math/TransformOps.h"
+#include "glmath.h"
 
 class btRigidBody;
 class btQuaternion;
@@ -9,9 +13,9 @@ class ComponentCollider : public Component {
 
 public:
 
-	ComponentCollider(GameObject* parent, bool active);
+	ComponentCollider(GameObject* parent);
 	ComponentCollider(btRigidBody* body);
-	~ComponentCollider() {}
+	~ComponentCollider();
 
 	// Methods
 	bool Update(float dt) override;
