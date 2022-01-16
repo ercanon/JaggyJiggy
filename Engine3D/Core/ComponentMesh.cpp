@@ -25,19 +25,19 @@ ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent
 	{
 	case Shape::CUBE:
 		CopyParMesh(par_shapes_create_cube());
-		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
+		//new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	case Shape::SPHERE:
 		CopyParMesh(par_shapes_create_parametric_sphere(20, 20));
-		new ComponentCollider(parent, ComponentCollider::Shape::SPHERE);
+		//new ComponentCollider(parent, ComponentCollider::Shape::SPHERE);
 		break;
 	case Shape::PLANE:
 		CopyParMesh(par_shapes_create_plane(20, 20));
-		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
+		//new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	case Shape::PYRAMID:
 		CopyParMesh(par_shapes_create_tetrahedron());
-		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
+		//new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	}
 }

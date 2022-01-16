@@ -66,7 +66,7 @@ public:
 
 	virtual void OnGui() {}
 
-	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2) {}
+	virtual void OnCollision(ComponentCollider* body1, ComponentCollider* body2) {}
 
 };
 

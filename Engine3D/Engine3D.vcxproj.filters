@@ -191,13 +191,13 @@
     <ClCompile Include="Core\ModulePhysics3D.cpp">
       <Filter>Engine\Modules</Filter>
     </ClCompile>
-    <ClCompile Include="Core\PhysBody3D.cpp">
-      <Filter>Engine\Modules</Filter>
-    </ClCompile>
     <ClCompile Include="Core\glmath.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Core\Primitive.cpp">
+      <Filter>Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PhysVehicle.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
   </ItemGroup>
@@ -736,9 +736,6 @@
     <ClInclude Include="Core\ModulePhysics3D.h">
       <Filter>Engine\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Core\PhysBody3D.h">
-      <Filter>Engine\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="Core\glmath.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
@@ -746,6 +743,9 @@
       <Filter>Engine\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Core\Primitive.h">
+      <Filter>Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PhysVehicle.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
   </ItemGroup>

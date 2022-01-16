@@ -14,6 +14,7 @@ public:
 
 	GameObject();
 	GameObject(const std::string name);
+	GameObject(std::string name, GameObject* parent = nullptr, bool loadingScene = false);
 
 	~GameObject();
 

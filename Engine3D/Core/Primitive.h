@@ -2,7 +2,7 @@
 #pragma once
 #include "glmath.h"
 #include "Color.h"
-#include "PhysBody3D.h"
+#include "ComponentCollider.h"
 
 enum PrimitiveTypes
 {
@@ -35,7 +35,7 @@ public:
 	mat4x4 transform;
 	bool axis,wire;
 
-    PhysBody3D body;
+    ComponentCollider body;
 
 protected:
 	PrimitiveTypes type;

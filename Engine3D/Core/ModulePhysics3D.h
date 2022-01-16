@@ -1,18 +1,27 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "p2List.h"
+#include "glmath.h"
 #include "Primitive.h"
-
 #include "Bullet/include/btBulletDynamicsCommon.h"
 
 // Recommended scale is 1.0f == 1 meter, no less than 0.2 objects
 #define GRAVITY btVector3(0.0f, -10.0f, 0.0f) 
+#define MASS 0
 
-class DebugDrawer;
-struct PhysBody3D;
+class GameObject;
+class ComponentMesh;
+class ComponentCollider;
 struct PhysVehicle3D;
 struct VehicleInfo;
+
+enum class SHAPE_TYPE {
+	none = -1,
+	BOX,
+	CAPSULE,
+	SPHERE,
+	CONVEX
+};
 
 class ModulePhysics3D : public Module
 {
@@ -24,54 +33,64 @@ public:
 	bool Start();
 	update_status PreUpdate(float dt);
 	update_status Update(float dt);
-	update_status PostUpdate(float dt);
 	bool CleanUp();
 
     void AddBodyToWorld(btRigidBody* body);
 
     void RemoveBodyFromWorld(btRigidBody* body);
 
-	PhysBody3D* AddBody(const SphereP& sphere, float mass = 1.0f);
-	PhysBody3D* AddBody(const CubeP& cube, float mass = 1.0f);
-	PhysBody3D* AddBody(const CylinderP& cylinder, float mass = 1.0f);
-	PhysVehicle3D* AddVehicle(const VehicleInfo& info);
+	ComponentCollider* AddRigidBody(OBB& box, GameObject* gameObject, float mass = 1.0f);
+	ComponentCollider* AddRigidBody(Sphere& sphere, GameObject* gameObject, float mass = 1.0f);
+	ComponentCollider* AddRigidBody(Capsule& capsule, GameObject* gameObject, float mass = 1.0f);
 
-	void AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB);
-	void AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB, const vec3& axisS, const vec3& axisB, bool disable_collision = false);
+	ComponentCollider* AddCube(const CubeP& cube, float mass);
+	PhysVehicle* AddVehicle(const VehicleInfo& info);
+
+	void CreateTestConstraint();
+	void DeleteTestConstraint();
+	void ShootBall();
+	void ClearBalls();
+
+	void PhysicalizeScene(GameObject* root);
+	void AddConstraintP2P(ComponentCollider& bodyA, ComponentCollider& bodyB, const vec3& anchorA, const vec3& anchorB);
+	void AddConstraintHinge(ComponentCollider& bodyA, ComponentCollider& bodyB, const vec3& anchorA, const vec3& anchorB, const vec3& axisS, const vec3& axisB, bool disable_collision = false);
+
+	std::vector<btCollisionShape*> shapes;
+	std::vector<btDefaultMotionState*> motions;
+	std::vector<PhysVehicle*> vehicles;
+	std::vector<btTypedConstraint*> constraints;
+	std::vector<ComponentCollider*> rigidBodies;
+
+	std::vector<ComponentCollider*> balls;
+	std::vector<SphereP*> spheres;
+	std::vector<btRigidBody*> physBalls;
+
+	btDiscreteDynamicsWorld*	world;
+	bool debug = false;
+
+	// Debug Drawer
+	//void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+	//void reportErrorWarning(const char* warningString);
+	//void draw3dText(const btVector3& location, const char* textString);
+	//void setDebugMode(int debugMode);
+	//int	 getDebugMode() const;
+	//
+	//btIDebugDraw::DebugDrawModes mode;
+	//Line* line;
 
 private:
 
-	bool debug;
+	btDefaultCollisionConfiguration*	collision_conf = nullptr;
+	btCollisionDispatcher*				dispatcher = nullptr;
+	btBroadphaseInterface*				broad_phase = nullptr;
+	btSequentialImpulseConstraintSolver* solver = nullptr;
+	btDefaultVehicleRaycaster*			vehicle_raycaster = nullptr;
 
-	btDefaultCollisionConfiguration*	collision_conf;
-	btCollisionDispatcher*				dispatcher;
-	btBroadphaseInterface*				broad_phase;
-	btSequentialImpulseConstraintSolver* solver;
-	btDiscreteDynamicsWorld*			world;
-	btDefaultVehicleRaycaster*			vehicle_raycaster;
-	DebugDrawer*						debug_draw;
+	ComponentCollider* tester = nullptr;
 
-	p2List<btCollisionShape*> shapes;
-	p2List<PhysBody3D*> bodies;
-	p2List<btDefaultMotionState*> motions;
-	p2List<btTypedConstraint*> constraints;
-	p2List<PhysVehicle3D*> vehicles;
-};
-
-class DebugDrawer : public btIDebugDraw
-{
-public:
-	DebugDrawer() : line(0,0,0)
-	{}
-
-	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
-	void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
-	void reportErrorWarning(const char* warningString);
-	void draw3dText(const btVector3& location, const char* textString);
-	void setDebugMode(int debugMode);
-	int	 getDebugMode() const;
-
-	DebugDrawModes mode;
-	LineP line;
-	Primitive point;
+	// Elements for the test constraints
+	CubeP* right_cube = nullptr;
+	CubeP* left_cube = nullptr;
+	ComponentCollider* right_body = nullptr;
+	ComponentCollider* left_body = nullptr;
 };

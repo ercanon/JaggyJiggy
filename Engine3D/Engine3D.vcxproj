@@ -73,7 +73,7 @@
     <ClCompile Include="Core\ModuleWindow.cpp" />
     <ClCompile Include="Core\par_shapes.cpp" />
     <ClCompile Include="Core\PerfTimer.cpp" />
-    <ClCompile Include="Core\PhysBody3D.cpp" />
+    <ClCompile Include="Core\PhysVehicle.cpp" />
     <ClCompile Include="Core\Primitive.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Core\ComponentTransform.cpp" />
@@ -221,8 +221,8 @@
     <ClInclude Include="Core\par_shapes.h" />
     <ClInclude Include="Core\PathNode.h" />
     <ClInclude Include="Core\PerfTimer.h" />
-    <ClInclude Include="Core\PhysBody3D.h" />
     <ClInclude Include="Core\PhysFS\include\physfs.h" />
+    <ClInclude Include="Core\PhysVehicle.h" />
     <ClInclude Include="Core\Primitive.h" />
     <ClInclude Include="Core\rapidjson-1.1.0\include\rapidjson\allocators.h" />
     <ClInclude Include="Core\rapidjson-1.1.0\include\rapidjson\document.h" />
