@@ -12,15 +12,15 @@ Github: <a href="https://github.com/ercanon/3D-Motor-2021">3D-Motor-2021 engine<
 
 ![Image11](docs/raul.jpg)
 
-Raul Cano:  https://github.com/ercanon
+Raul Cano: <a href=" https://github.com/ercanon"> https://github.com/ercanon</a>
 
 ![Image12](docs/alex.png)
 
-Alex Gesti: https://github.com/alexgesti
+Alex Gesti:<a href="https://github.com/alexgesti">  https://github.com/alexgesti</a>
 
 ![Image13](docs/pau.png)
 
-Pau Motta: https://github.com/paumotta
+Pau Motta:<a href=" https://github.com/paumotta"> https://github.com/paumotta</a>
 
 # Core Sub-systems
 
