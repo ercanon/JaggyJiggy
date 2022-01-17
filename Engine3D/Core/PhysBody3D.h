@@ -35,6 +35,8 @@ public:
 
     void SetBody(btCollisionShape* shape, Primitive* parent, float mass);
 
+	void RemoveBody();
+
 private:
 	btRigidBody* body = nullptr;
     btCollisionShape* colShape;

@@ -87,6 +87,9 @@ void GameObject::AttachChild(GameObject* child)
 
 void GameObject::RemoveChild(GameObject* child)
 {
+	if (child->GetComponent<ComponentCollider>()->shapeCol == ComponentCollider::Shape::CUBE) child->GetComponent<ComponentCollider>()->c->body.RemoveBody();
+	else if (child->GetComponent<ComponentCollider>()->shapeCol == ComponentCollider::Shape::SPHERE) child->GetComponent<ComponentCollider>()->s->body.RemoveBody();
+
 	auto it = std::find(children.begin(), children.end(), child);
 	if (it != children.end())
 	{

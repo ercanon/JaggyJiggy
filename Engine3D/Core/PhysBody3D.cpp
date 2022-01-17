@@ -105,3 +105,14 @@ void PhysBody3D::SetBody(btCollisionShape* shape, Primitive* parent, float mass)
 
     App->physics->AddBodyToWorld(body);
 }
+
+void PhysBody3D::RemoveBody()
+{
+    if (body != nullptr)
+    {
+        App->physics->RemoveBodyFromWorld(body);
+        delete body;
+        delete colShape;
+        delete motionState;
+    }
+}
