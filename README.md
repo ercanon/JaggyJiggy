@@ -78,6 +78,10 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 # Assigment sub-systems
 
+Each element in the town generate a box collider.
+The camera shoot sphere colliders that interact with other colliders correctly from a physics view.
+A car is generated in the engine, wich can be controlled by a person. This car interacts with other colliders in the scene.
+
 # Showcase
 
 # How to use
