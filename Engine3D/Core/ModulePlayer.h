@@ -29,8 +29,6 @@ public:
 	float acceleration;
 	float brake;
 
-	bool counterstart;
-	bool countercantspeed;
 	float counter_speed_go_go;
 	float counter_cant_go_speed;
 

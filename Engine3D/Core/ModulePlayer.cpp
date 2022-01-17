@@ -103,7 +103,6 @@ bool ModulePlayer::Start()
 	vehicle = App->physics->AddVehicle(car);
 	vehicle->SetPos(5, 1, 0);
 
-	counterstart = false;
 	counter_cant_go_speed = 0;
 
 	live = 3;
@@ -126,7 +125,7 @@ update_status ModulePlayer::Update(float dt)
 
 	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
 	{
-		if (counterstart == false && vehicle->GetKmh() < 75) acceleration = MAX_ACCELERATION;
+		if (vehicle->GetKmh() < 75) acceleration = MAX_ACCELERATION;
 
 		if (vehicle->GetKmh() <= -1)
 		{
@@ -166,14 +165,6 @@ update_status ModulePlayer::Update(float dt)
 		acceleration = MAX_ACCELERATION;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
-	{
-		if (countercantspeed == false)
-		{
-			counterstart = true;
-		}
-	}
-
 	// Apply controls to vehicle
 	vehicle->ApplyEngineForce(acceleration);
 	vehicle->Turn(turn);
@@ -184,6 +175,3 @@ update_status ModulePlayer::Update(float dt)
 
 	return UPDATE_CONTINUE;
 }
-
-
-
