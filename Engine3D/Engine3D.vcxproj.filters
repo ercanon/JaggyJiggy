@@ -203,6 +203,9 @@
     <ClCompile Include="Core\PhysVehicle3D.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ModulePlayer.cpp">
+      <Filter>Engine\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ImGui\imconfig.h">
@@ -756,6 +759,12 @@
     </ClInclude>
     <ClInclude Include="Core\glut\glut.h">
       <Filter>ExternalLibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ModulePlayer.h">
+      <Filter>Engine\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\p2Point.h">
+      <Filter>Engine\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
