@@ -3,7 +3,10 @@
 #include "ModulePhysics3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "ComponentCamera.h"
+#include "ComponentTransform.h"
+#include "ComponentCollider.h"
 #include "PhysBody3D.h"
 #include "PhysVehicle3D.h"
 #include "Primitive.h"
@@ -125,11 +128,12 @@ update_status ModulePhysics3D::Update(float dt)
 
 	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
 	{
-		SphereP* s = new SphereP(1);
-		s->SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
-		s->body.SetBody(s, 1);
+		GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
+		newGameObject->GetComponent<ComponentTransform>()->SetPosition({ App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z });
+		ComponentCollider* newColl = new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
+
 		float force = 50.00f;
-		s->body.Push((App->editor->newCam->front.x * force), (App->editor->newCam->front.y * force), (App->editor->newCam->front.z * force));
+		newColl->body.Push((App->editor->newCam->front.x * force), (App->editor->newCam->front.y * force), (App->editor->newCam->front.z * force));
 	}
 
 	return UPDATE_CONTINUE;

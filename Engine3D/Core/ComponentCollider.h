@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "ModulePhysics3D.h"
 #include <string.h>
+#include "PhysBody3D.h"
 
 #include "btBulletDynamicsCommon.h"
 
@@ -23,11 +24,9 @@ public:
 	void OnGui() override;
 
 public:
-
-	std::string shapeCollider;
 	Shape shapeCol;
-	CubeP* c;
-	SphereP* s;
+	std::string shapeCollider;
+	PhysBody3D body;
 
 private:
 	float mass = 1;

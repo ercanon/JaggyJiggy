@@ -13,15 +13,18 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 
 	if (shape == Shape::CUBE)
 	{
-		c = new CubeP(1, 1, 1);
-		c->SetPos(parent->GetComponent<ComponentTransform>()->GetPosition().x, parent->GetComponent<ComponentTransform>()->GetPosition().y, parent->GetComponent<ComponentTransform>()->GetPosition().z);
+		CubeP* c = new CubeP(1, 1, 1);
+		float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+		c->SetPos(pos.x, pos.y, pos.z);
 		c->body.SetBody(c, mass);
 	}
 	else if (shape == Shape::SPHERE)
 	{
-		s = new SphereP(1);
-		s->SetPos(parent->GetComponent<ComponentTransform>()->GetPosition().x, parent->GetComponent<ComponentTransform>()->GetPosition().y, parent->GetComponent<ComponentTransform>()->GetPosition().z);
-		s->body.SetBody(s, mass);
+		SphereP* s = new SphereP(1);
+		float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+		s->SetPos(pos.x, pos.y, pos.z);
+		body = s->body;
+		body.SetBody(s, mass);
 	}
 }
 
