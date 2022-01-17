@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Globals.h"
+#include "ModulePhysics3D.h"
 #include <string.h>
 
 #include "btBulletDynamicsCommon.h"
@@ -22,10 +23,14 @@ public:
 	void OnGui() override;
 
 public:
+
 	std::string shapeCollider;
+	Shape shapeCol;
+	CubeP* c;
+	SphereP* s;
 
 private:
 	float mass = 1;
-
+	
 	btDiscreteDynamicsWorld* world;
 };

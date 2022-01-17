@@ -3,6 +3,7 @@
 #include "ModuleScene.h"
 #include "ModuleFileSystem.h"
 #include "ComponentTransform.h"
+#include "ComponentCollider.h"
 #include "ImGui/imgui.h"
 
 GameObject::GameObject() {
