@@ -48,6 +48,7 @@ class CubeP : public Primitive
 public :
 	CubeP();
 	CubeP(float sizeX, float sizeY, float sizeZ);
+	vec3 GetSize() const;
 	void InnerRender() const;
 public:
 	vec3 size;

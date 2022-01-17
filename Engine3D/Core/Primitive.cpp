@@ -115,6 +115,11 @@ CubeP::CubeP(float sizeX, float sizeY, float sizeZ) : Primitive(), size(sizeX, s
 	type = PrimitiveTypes::Primitive_Cube;
 }
 
+vec3 CubeP::GetSize() const
+{
+	return size;
+}
+
 void CubeP::InnerRender() const
 {	
 	float sx = size.x * 0.5f;

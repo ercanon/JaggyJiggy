@@ -640,10 +640,6 @@ void ModuleImport::LoadScene(const char* path)
 					new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 				else if (shape == "SPHERE")
 					new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
-				else if (shape == "PLANE")
-					new ComponentCollider(newGameObject, ComponentCollider::Shape::PLANE);
-				else if (shape == "PYRAMID")
-					new ComponentCollider(newGameObject, ComponentCollider::Shape::PYRAMID);
 			}
 			if (sceneFile["GameObjects"][go].HasMember("Camera"))
 			{

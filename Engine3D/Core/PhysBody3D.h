@@ -26,6 +26,7 @@ public:
 	~PhysBody3D();
 
     void SetBody(SphereP* primitive, float mass);
+	void SetBody(CubeP* primitive, float mass);
 
 	void Push(float x, float y, float z);
 	void GetTransform(float* matrix) const;

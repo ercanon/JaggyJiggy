@@ -10,56 +10,17 @@
 
 ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Component(parent) 
 {
-	switch (shape)
+	if (shape == Shape::CUBE)
 	{
-	//case Shape::CUBE:
-	//	shapeCollider = "CUBE";
-		/*if (mesh != nullptr)
-		{
-			AABB bbox = parent->globalAABB;
-			float3 corners[8];
-			bbox.GetCornerPoints(corners);
-			float width = corners[0].Distance(corners[4]);
-			float height = corners[1].Distance(corners[3]);
-			float depth = corners[3].Distance(corners[2]);
-			const btVector3 vec(width / 2, height / 2, depth / 2);
-			btBoxShape* bs = new btBoxShape(btVector3(vec));
-			App->physics->AddBody(bs, parent);
-		}
-		else
-		{
-			const btVector3 vec(1 / 2, 1 / 2, 1 / 2);
-			new btBoxShape(btVector3(vec));
-		}*/
-
-		//break;
-	case Shape::SPHERE:
-		shapeCollider = "SPHERE";
+		CubeP* c = new CubeP(1, 1, 1);
+		c->SetPos(parent->GetComponent<ComponentTransform>()->GetPosition().x, parent->GetComponent<ComponentTransform>()->GetPosition().y, parent->GetComponent<ComponentTransform>()->GetPosition().z);
+		c->body.SetBody(c, mass);
+	}
+	else if (shape == Shape::SPHERE)
+	{
 		SphereP* s = new SphereP(1);
-		s->SetPos(owner->GetComponent<ComponentTransform>()->GetPosition().x, owner->GetComponent<ComponentTransform>()->GetPosition().y, owner->GetComponent<ComponentTransform>()->GetPosition().z);
-		s->body.SetBody(s, 1);
-		//btCollisionShape* colShape = new btSphereShape(parent->GetComponent<ComponentTransform>()->GetScale().x);
-		//
-		//btTransform startTransform;
-		//startTransform.setFromOpenGLMatrix(&sphere.transform);
-		//
-		//btVector3 localInertia(0, 0, 0);
-		//colShape->calculateLocalInertia(mass, localInertia);
-		//
-		//btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-		//btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-		//
-		//btRigidBody* body = new btRigidBody(rbInfo);
-		//
-		//body->setUserPointer(parent);
-		//world->addRigidBody(body);
-		break;
-	//case Shape::PLANE:
-	//	shapeCollider = "PLANE";
-	//	break;
-	//case Shape::PYRAMID:
-	//	shapeCollider = "PYRAMID";
-	//	break;
+		s->SetPos(parent->GetComponent<ComponentTransform>()->GetPosition().x, parent->GetComponent<ComponentTransform>()->GetPosition().y, parent->GetComponent<ComponentTransform>()->GetPosition().z);
+		s->body.SetBody(s, mass);
 	}
 }
 
@@ -70,8 +31,6 @@ ComponentCollider::~ComponentCollider()
 
 bool ComponentCollider::Update(float dt)
 {
-
-
 	return true;
 }
 

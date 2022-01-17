@@ -12,9 +12,7 @@ public:
 	enum class Shape
 	{
 		CUBE,
-		SPHERE,
-		PLANE,
-		PYRAMID
+		SPHERE
 	};
 
 	ComponentCollider(GameObject* parent, Shape shape);

@@ -43,6 +43,12 @@ void PhysBody3D::SetBody(SphereP* primitive, float mass)
         primitive, mass);
 }
 
+void PhysBody3D::SetBody(CubeP* primitive, float mass)
+{
+    SetBody(new btBoxShape(btVector3(primitive->GetSize().x, primitive->GetSize().y, primitive->GetSize().z)),
+        primitive, mass);
+}
+
 // ---------------------------------------------------------
 void PhysBody3D::Push(float x, float y, float z)
 {
