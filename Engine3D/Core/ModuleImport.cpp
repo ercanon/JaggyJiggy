@@ -224,7 +224,6 @@ void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, cons
 
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
 		ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
-		//new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 
 
 		char charTexturePath[1024];
@@ -288,6 +287,8 @@ void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, cons
 		newGameObject->transform->SetPosition(float3(position.x, position.y, position.z));
 		newGameObject->transform->SetRotation(Quat(rotation.x, rotation.y, rotation.z, rotation.w).ToEulerXYZ());
 		newGameObject->transform->SetScale(float3(scale.x, scale.y, scale.z));
+
+		new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 	}
 
 	RELEASE(buffer);
@@ -443,14 +444,14 @@ void ModuleImport::SaveScene(const char* path)
 
 			currentObject.AddMember("Mesh", mesh, allocator);
 		}
-		//if (ComponentCollider* coll = object->GetComponent<ComponentCollider>())
-		//{
-		//	Value collider(kObjectType);
-		//	Value collision;
-		//
-		//	collision.SetString(coll->shapeCollider.c_str(), coll->shapeCollider.length(), allocator);
-		//	currentObject.AddMember("Collider", collision, allocator);
-		//}
+		if (ComponentCollider* coll = object->GetComponent<ComponentCollider>())
+		{
+			Value collider(kObjectType);
+			Value collision;
+
+			collision.SetString(coll->shapeCollider.c_str(), coll->shapeCollider.length(), allocator);
+			currentObject.AddMember("Collider", collision, allocator);
+		}
 		if (object->transform->active)
 		{
 			ComponentTransform* transformObject = object->transform;
@@ -463,9 +464,9 @@ void ModuleImport::SaveScene(const char* path)
 			position.PushBack(transformObject->GetPosition().y, allocator);
 			position.PushBack(transformObject->GetPosition().z, allocator);
 
-			rotation.PushBack(-transformObject->GetRotation().x, allocator);
-			rotation.PushBack(-transformObject->GetRotation().y, allocator);
-			rotation.PushBack(-transformObject->GetRotation().z, allocator);
+			rotation.PushBack(transformObject->GetRotation().x, allocator);
+			rotation.PushBack(transformObject->GetRotation().y, allocator);
+			rotation.PushBack(transformObject->GetRotation().z, allocator);
 
 			scale.PushBack(transformObject->GetScale().x, allocator);
 			scale.PushBack(transformObject->GetScale().y, allocator);
@@ -636,10 +637,10 @@ void ModuleImport::LoadScene(const char* path)
 			{
 				std::string shape = sceneFile["GameObjects"][go]["Collider"].GetString();
 
-				//if		(shape == "CUBE" || shape == "PLANE" || shape == "PYRAMID")
-				//	new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
-				//else if (shape == "SPHERE")
-				//	new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
+				if		(shape == "CUBE")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
+				else if (shape == "SPHERE")
+					new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
 			}
 			if (sceneFile["GameObjects"][go].HasMember("Camera"))
 			{

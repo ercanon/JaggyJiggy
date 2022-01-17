@@ -1,45 +1,76 @@
-#include "Application.h"
-#include "ModulePhysics3D.h"
 #include "ComponentCollider.h"
 #include "GameObject.h"
 #include "ComponentTransform.h"
+#include "ComponentMesh.h"
+#include "Application.h"
 
 #include "ImGui/imgui.h"
 
-ComponentCollider::ComponentCollider(GameObject* parent) : Component(parent)
-{
-}
 
-ComponentCollider::ComponentCollider(btRigidBody* body) : body(body)
+ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Component(parent)
 {
-	body->setUserPointer(this);
+	shapeCol = shape;
+
+	if (shape == Shape::CUBE)
+	{
+		if (parent->GetComponent<ComponentMesh>() != nullptr)
+		{
+			AABB bbox = parent->globalAABB;
+			float3 corners[8];
+			bbox.GetCornerPoints(corners);
+			float width = corners[0].Distance(corners[4]) / 2;
+			float heigth = corners[1].Distance(corners[3]) / 2;
+			float depth = corners[3].Distance(corners[2]) / 2;
+
+			CubeP* c = new CubeP(width, depth, heigth);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			float3 rot = parent->GetComponent<ComponentTransform>()->GetRotation();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
+		}
+		else
+		{
+			CubeP* c = new CubeP(1, 1, 1);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
+		}
+	}
+	else if (shape == Shape::SPHERE)
+	{
+		if (parent->GetComponent<ComponentMesh>() != nullptr)
+		{
+			AABB bbox = parent->globalAABB;
+			float3 corners[8];
+			bbox.GetCornerPoints(corners);
+			float width = corners[0].Distance(corners[4]);
+
+			SphereP* s = new SphereP(width);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
+		}
+		else
+		{
+			SphereP* s = new SphereP(1);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
+		}
+	}
 }
 
 ComponentCollider::~ComponentCollider()
 {
+
 }
 
 bool ComponentCollider::Update(float dt)
 {
-	if (owner != nullptr)
-	{
-		if (active == true)
-		{
-			mat4x4 bodyTransform, parentTransform, newTransform;
-			body->getWorldTransform().getOpenGLMatrix(&bodyTransform);
-
-			if (owner != nullptr)
-				parentTransform = owner->transform->GetGlobalGLTransform();
-			else
-				parentTransform = IdentityMatrix;
-
-			newTransform = parentTransform * bodyTransform;
-
-			owner->transform->SetLocalTransform(parentTransform);
-			owner->transform->Move(-localPosition);
-		}
-	}
-
 	return true;
 }
 
@@ -47,119 +78,32 @@ void ComponentCollider::OnGui()
 {
 	if (ImGui::CollapsingHeader("Collider"))
 	{
-		ImGui::Checkbox("Enabled", &active);
-		if (ImGui::Button("Set to zero"))
+		ImGui::Text("Shape %s",	shapeCollider.c_str());
+		if(ImGui::Button("Collider Box"))
 		{
-			localPosition = float3(0.0f, 0.0f, 0.0f);
-			OnUpdateTransform();
+			body.RemoveBody();
+			body = nullptr;
+
+			shapeCol = Shape::CUBE;
+			CubeP* c = new CubeP(1, 1, 1);
+			float3 pos = owner->parent->GetComponent<ComponentTransform>()->GetPosition();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
 		}
-
-		if (ImGui::DragFloat3("Local Position", (float*)&localPosition, 0.1))
-			OnUpdateTransform();
-
-		if (ImGui::Checkbox("Dynamic object", &dynamicObject))
+		if(ImGui::Button("Collider Sphere"))
 		{
-			if (!dynamicObject)
-			{
-				App->physics->world->removeRigidBody(body);
+			body.RemoveBody();
+			body = nullptr;
 
-				btVector3 localInertia(0, 0, 0);
-				body->getCollisionShape()->calculateLocalInertia(0.0f, localInertia);
-				body->setMassProps(0.0f, localInertia);
+			shapeCol = Shape::SPHERE;
 
-				App->physics->world->addRigidBody(body);
-			}
-			else
-			{
-				App->physics->world->removeRigidBody(body);
-
-				btVector3 localInertia(0, 0, 0);
-				body->getCollisionShape()->calculateLocalInertia(mass, localInertia);
-				body->setMassProps(mass, localInertia);
-
-				App->physics->world->addRigidBody(body);
-			}
+			SphereP* s = new SphereP(1);
+			float3 pos = owner->parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
 		}
-
-		if (dynamicObject)
-		{
-			if (ImGui::DragFloat("Mass: %.2f", &mass))
-			{
-				App->physics->world->removeRigidBody(body);
-
-				btVector3 localInertia(0, 0, 0);
-				body->getCollisionShape()->calculateLocalInertia(mass, localInertia);
-				body->setMassProps(mass, localInertia);
-
-				App->physics->world->addRigidBody(body);
-			}
-		}
-	}
-}
-
-void ComponentCollider::CreateBody(btRigidBody* body)
-{
-	this->body = body;
-	body->setUserPointer(this);
-}
-
-// Pushes the rigidbody with velocity determined by a vector
-void ComponentCollider::Push(float x, float y, float z)
-{
-	body->applyCentralImpulse(btVector3(x, y, z));
-}
-
-// Gets the transform of the Rigidbody
-void ComponentCollider::GetTransform(float* matrix) const
-{
-	if (body != NULL && matrix != NULL)
-	{
-		body->getWorldTransform().getOpenGLMatrix(matrix);
-	}
-}
-
-// Sets the transform of the Rigidbody
-void ComponentCollider::SetTransform(const float* matrix) const
-{
-	if (body != NULL && matrix != NULL)
-	{
-		btTransform t;
-		t.setFromOpenGLMatrix(matrix);
-		body->setWorldTransform(t);
-	}
-}
-
-// Sets the position of the Rigidbody
-void ComponentCollider::SetPos(float x, float y, float z)
-{
-	btTransform t = body->getWorldTransform();
-	t.setOrigin(btVector3(x, y, z));
-	body->setWorldTransform(t);
-}
-
-// Rotates the Rigidbody
-void ComponentCollider::RotateBody(btQuaternion rotationQuaternion) {
-
-	btTransform t = body->getWorldTransform();
-	t.setRotation(rotationQuaternion);
-	body->setWorldTransform(t);
-}
-
-void ComponentCollider::OnUpdateTransform()
-{
-	if (followObject)
-	{
-		float4x4 objectTransform = owner->transform->transformMatrix;
-		objectTransform = objectTransform * objectTransform.Translate(localPosition);
-
-		mat4x4 glTransform;
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				glTransform.M[i * 4 + j] = objectTransform[j][i];
-
-		btTransform newTransform;
-		newTransform.setFromOpenGLMatrix(&glTransform);
-		body->setWorldTransform(newTransform);
 	}
 }
 

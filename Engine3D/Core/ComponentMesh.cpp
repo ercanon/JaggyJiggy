@@ -4,7 +4,6 @@
 #include "SDL/include/SDL_opengl.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
-#include "ModulePhysics3D.h"
 #include "ModuleEditor.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
@@ -26,15 +25,11 @@ ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent
 	{
 	case Shape::CUBE:
 		CopyParMesh(par_shapes_create_cube());
+		new ComponentCollider(parent, ComponentCollider::Shape::CUBE);
 		break;
 	case Shape::SPHERE:
 		CopyParMesh(par_shapes_create_parametric_sphere(20, 20));
-		break;
-	case Shape::PLANE:
-		CopyParMesh(par_shapes_create_plane(20, 20));
-		break;
-	case Shape::PYRAMID:
-		CopyParMesh(par_shapes_create_tetrahedron());
+		new ComponentCollider(parent, ComponentCollider::Shape::SPHERE);
 		break;
 	}
 }
@@ -232,7 +227,9 @@ bool ComponentMesh::Update(float dt)
 {
 	if (!App->editor->play)
 	{
-		if (InGameCamView(&App->editor->newCam->cameraFrustum)) Draw();
+		if (InGameCamView(&App->editor->newCam->cameraFrustum)) {
+			Draw();
+		}
 	}
 	else {
 		Draw();

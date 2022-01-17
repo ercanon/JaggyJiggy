@@ -168,7 +168,9 @@ update_status ModuleEditor::Update(float dt)
     }
 
     if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+    {
         gameobjectSelected->parent->RemoveChild(gameobjectSelected);
+    }
 
     assets->child.clear();
     assetsString.clear();
@@ -464,10 +466,10 @@ void ModuleEditor::MenuBar()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Collider"))
-            {
-                if (gameobjectSelected != nullptr)
-                {
+            //if (gameobjectSelected != nullptr)
+             //{
+                //if (ImGui::BeginMenu("Collider"))
+                //{
                     //if (ImGui::MenuItem("Cube"))
                     //{
                     //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
@@ -476,14 +478,18 @@ void ModuleEditor::MenuBar()
                     //{
                     //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
                     //}
-                    //if (ImGui::MenuItem("Capsule"))
+                    //if (ImGui::MenuItem("Plane"))
                     //{
-                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CAPSULE);
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PLANE);
                     //}
-                }
+                    //if (ImGui::MenuItem("Pyramid"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PYRAMID);
+                    //}
 
-                ImGui::EndMenu();
-            }
+                    //ImGui::EndMenu();
+                //}
+            //}
 
             ImGui::EndMenu();
         }
@@ -877,6 +883,9 @@ void ModuleEditor::UpdateWindowStatus()
             lastViewportSize2 = viewportSize;
             ImGui::Image((ImTextureID)App->viewportBufferGame->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         }
+
+        if (ImGui::IsWindowFocused()) newCam->isMouseFocusedGame = true;
+        else newCam->isMouseFocusedGame = false;
 
         ImGui::End();
     }

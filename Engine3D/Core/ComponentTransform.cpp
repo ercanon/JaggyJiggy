@@ -62,12 +62,6 @@ void ComponentTransform::OnGui()
 	}
 }
 
-void ComponentTransform::Move(float3 positionIncrease)
-{
-	position += positionIncrease;
-	isDirty = true;
-}
-
 void ComponentTransform::SetPosition(const float3& newPosition)
 {
 	position = newPosition;
@@ -84,18 +78,6 @@ void ComponentTransform::SetRotation(const float3& newRotation)
 void ComponentTransform::SetScale(const float3& newScale)
 {
 	scale = newScale;
-	isDirty = true;
-}
-
-void ComponentTransform::SetLocalTransform(const mat4x4& transform)
-{
-	float4x4 newTransform;
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			newTransform[j][i] = transform.M[i * 4 + j];
-
-	newTransform.Decompose(position, rotation, scale);
-	rotationEuler = rotation.ToEulerXYZ().Abs();
 	isDirty = true;
 }
 
@@ -128,14 +110,4 @@ void ComponentTransform::RecomputeGlobalMatrix()
 	//Update Globals Bounding Boxes
 	if (owner->GetComponent<ComponentMesh>() != nullptr)
 		owner->GetComponent<ComponentMesh>()->GenerateBounds(false);
-}
-
-const mat4x4 ComponentTransform::GetGlobalGLTransform() const
-{
-	mat4x4 ret;
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			ret.M[i * 4 + j] = transformMatrix[j][i];
-
-	return ret;
 }

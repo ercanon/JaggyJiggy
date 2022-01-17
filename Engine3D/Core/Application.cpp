@@ -15,8 +15,6 @@
 #include "ModulePhysics3D.h"
 #include "Globals.h"
 
-
-
 Application::Application()
 {
 	PERF_START(ptimer);
@@ -45,7 +43,7 @@ Application::Application()
 	AddModule(textures);
 	AddModule(import);
 	AddModule(physics);
-
+	
 	// Scenes
 	AddModule(viewportBufferGame);
 	AddModule(viewportBufferScene);

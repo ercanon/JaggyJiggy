@@ -6,7 +6,7 @@
 #include "rapidjson-1.1.0/include/rapidjson/document.h"
 
 class Application;
-class ComponentCollider;
+struct PhysBody3D;
 
 typedef rapidjson::PrettyWriter<rapidjson::StringBuffer> JSONWriter;
 typedef rapidjson::Value JSONReader;
@@ -66,8 +66,7 @@ public:
 
 	virtual void OnGui() {}
 
-	virtual void OnCollision(ComponentCollider* body1, ComponentCollider* body2) {}
-
+	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2) {}
 };
 
 #endif

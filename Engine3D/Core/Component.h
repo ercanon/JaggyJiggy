@@ -9,7 +9,7 @@ class Component {
 
 public:
 
-	Component() {}
+
 	Component(GameObject* parent) : owner(parent)
 	{
 		if (parent)

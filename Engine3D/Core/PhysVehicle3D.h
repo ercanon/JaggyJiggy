@@ -1,28 +1,30 @@
-#ifndef	__PhysVehicle_H__
-#define	__PhysVehicle_H__
+#pragma once
 
-#include "ComponentCollider.h"
+#include "PhysBody3D.h"
 #include "glmath.h"
+#include "Primitive.h"
 
 class btRaycastVehicle;
+struct PhysBody3D;
 
 struct Wheel
 {
-	vec3 connection; // Origin of the ray, must come from within the chassis
-	vec3 direction;
+	vec3 connection; // origin of the ray. Must come from within the chassis
+	vec3 direction; 
 	vec3 axis;
-	float suspensionRestLength; // Max length for suspension in meters
+	float suspensionRestLength; // max length for suspension in meters
 	float radius;
 	float width;
-
-	bool front; // Cheks if is front wheel
-	bool drive; // Cheks if the wheel received engine power
-	bool brake; // Cheks if breakes affect this wheel
-	bool steering; // Cheks if this wheel turns
+	bool front; // is front wheel ?
+	bool drive; // does this wheel received engine power ?
+	bool brake; // does breakes affect this wheel ?
+	bool steering; // does this wheel turns ?
 };
 
 struct VehicleInfo
 {
+	~VehicleInfo();
+	
 	vec3 chassis_size;
 	vec3 chassis_offset;
 	float mass;
@@ -32,28 +34,31 @@ struct VehicleInfo
 	float maxSuspensionTravelCm; // default to 500 cm suspension can be compressed
 	float frictionSlip; // defaults to 10.5 / friction with the ground. 0.8 should be good but high values feels better (kart 1000.0)
 	float maxSuspensionForce; // defaults to 6000 / max force to the chassis
+	Color color;
 
 	Wheel* wheels;
 	int num_wheels;
 };
 
-struct PhysVehicle : public ComponentCollider
+
+struct PhysVehicle3D : public PhysBody3D
 {
 public:
-	PhysVehicle(btRigidBody* body, btRaycastVehicle* vehicle, const VehicleInfo& info);
-	~PhysVehicle();
+	PhysVehicle3D(btRigidBody* body, btRaycastVehicle* vehicle, const VehicleInfo& info);
+	~PhysVehicle3D();
 
 	void Render();
 	void ApplyEngineForce(float force);
 	void Brake(float force);
 	void Turn(float degrees);
 	float GetKmh() const;
-	vec3 GetPosition();
-	vec3 GetForwardVector();
+
+    vec3 GetPos();
+    vec3 GetFwdAxis();
 
 public:
+
+	CubeP chassis;
 	VehicleInfo info;
 	btRaycastVehicle* vehicle;
 };
-
-#endif
