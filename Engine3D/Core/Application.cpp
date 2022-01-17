@@ -13,6 +13,7 @@
 #include "ModuleFileSystem.h"
 #include "ModuleTextures.h"
 #include "ModulePhysics3D.h"
+#include "ModulePlayer.h"
 #include "Globals.h"
 
 Application::Application()
@@ -30,6 +31,7 @@ Application::Application()
 	fileSystem = new ModuleFileSystem(this);
 	textures = new ModuleTextures(this);
 	physics = new ModulePhysics3D(this);
+	player = new ModulePlayer(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -49,6 +51,7 @@ Application::Application()
 	AddModule(viewportBufferScene);
 	AddModule(scene);
 	AddModule(editor);
+	AddModule(player);
 
 	// Renderer last!
 	AddModule(renderer3D);

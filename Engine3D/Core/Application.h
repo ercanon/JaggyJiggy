@@ -21,6 +21,7 @@ class ModuleImport;
 class ModuleFileSystem;
 class ModuleTextures;
 class ModulePhysics3D;
+class ModulePlayer;
 
 class Application
 {
@@ -38,6 +39,7 @@ public:
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };
 	ModulePhysics3D* physics { nullptr };
+	ModulePlayer* player { nullptr };
 
 	Application();
 	~Application();
