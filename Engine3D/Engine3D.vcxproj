@@ -135,6 +135,7 @@
     <ClInclude Include="Core\DevIL\include\il_wrap.h" />
     <ClInclude Include="Core\GameObject.h" />
     <ClInclude Include="Core\glmath.h" />
+    <ClInclude Include="Core\glut\glut.h" />
     <ClInclude Include="Core\ImGui\ImGuizmo.h" />
     <ClInclude Include="Core\ModuleFileSystem.h" />
     <ClInclude Include="Core\Globals.h" />
@@ -319,7 +320,7 @@
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Core\MathGeoLib\include;$(SolutionDir)\Core\glew\include;$(SolutionDir)\Core\Bullet\include;$(SolutionDir)\Core\JSONObject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Core\MathGeoLib\include;$(SolutionDir)\Core\glew\include;$(SolutionDir)\Core\Bullet\include;$(SolutionDir)\Core\glut;$(SolutionDir)\Core\JSONObject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <UndefinePreprocessorDefinitions>MATH_SSE;</UndefinePreprocessorDefinitions>
@@ -329,8 +330,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Core\Bullet\libx86;$(SolutionDir)\Core\Assimp\libx86;$(SolutionDir)\Core\SDL\libx86;$(SolutionDir)\Core\glew\libx86;$(SolutionDir)\Core\DevIL\libx86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;assimp.lib;ILUT.lib;ILU.lib;DevIL.lib;glew32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Core\glut\libx86;$(SolutionDir)\Core\Bullet\libx86;$(SolutionDir)\Core\Assimp\libx86;$(SolutionDir)\Core\SDL\libx86;$(SolutionDir)\Core\glew\libx86;$(SolutionDir)\Core\DevIL\libx86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;assimp.lib;ILUT.lib;ILU.lib;DevIL.lib;glew32.lib;opengl32.lib;glut32.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;LinearMath_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

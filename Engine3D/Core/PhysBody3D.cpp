@@ -4,7 +4,7 @@
 #include "ModulePhysics3D.h"
 #include "Primitive.h"
 #include "glmath.h"
-#include "Bullet/include/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 // =================================================
 PhysBody3D::PhysBody3D()

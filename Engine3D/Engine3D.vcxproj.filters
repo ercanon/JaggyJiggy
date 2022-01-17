@@ -754,6 +754,9 @@
     <ClInclude Include="Core\PhysVehicle3D.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Core\glut\glut.h">
+      <Filter>ExternalLibraries</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ExternalLibraries">
