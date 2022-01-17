@@ -882,6 +882,9 @@ void ModuleEditor::UpdateWindowStatus()
             ImGui::Image((ImTextureID)App->viewportBufferGame->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         }
 
+        if (ImGui::IsWindowFocused()) newCam->isMouseFocusedGame = true;
+        else newCam->isMouseFocusedGame = false;
+
         ImGui::End();
     }
 

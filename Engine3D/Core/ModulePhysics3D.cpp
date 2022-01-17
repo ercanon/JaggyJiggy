@@ -128,7 +128,7 @@ update_status ModulePhysics3D::Update(float dt)
 
 	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
 	{
-		SphereP* s = new SphereP(5);
+		SphereP* s = new SphereP(1);
 		s->SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
 		s->body.SetBody(s, 1);
 		float force = 50.00f;
