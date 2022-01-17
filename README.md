@@ -4,8 +4,9 @@ JaggyJiggy is an 3D engine ispired in Unity, developed for an motors asigment by
 With this engine you can make your own games from scratch! 
 Has a family friendly interface in which a small physics engine has been developed in which you can see the collisions between different objects, forces which are applied to it, etc.
 
-Github: <a href="https://https://github.com/ercanon/JaggyJiggy">Jaggy Jiggy</a>
- 
+Github: https://github.com/ercanon/JaggyJiggy
+Webpage:  https://ercanon.github.io/JaggyJiggy/
+
 # Team: Chaotic Evil
 
 ![Image11](docs/raul.jpg)
