@@ -4,7 +4,7 @@ JaggyJiggy is an 3D engine ispired in Unity, developed for an motors asigment by
 With this engine you can make your own games from scratch! 
 Has a family friendly interface in which a small physics engine has been developed in which you can see the collisions between different objects, forces which are applied to it, etc.
 
-Github: <a href="https://github.com/ercanon/3D-Motor-2021">3D-Motor-2021 engine</a>
+Github: <a href="https://https://github.com/ercanon/JaggyJiggy">Jaggy Jiggy</a>
  
 # Team: Chaotic Evil
 
@@ -53,6 +53,7 @@ Pau Motta:<a href=" https://github.com/paumotta">
 
 + README
 + Web designer
++ Mesh Renderer
 
 # Core Subsystems
 
@@ -82,9 +83,11 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 # Assigment sub-systems
 
-Each element in the town generate a box collider.
-The camera shoot sphere colliders that interact with other colliders correctly from a physics view.
-A car is generated in the engine, wich can be controlled by a person. This car interacts with other colliders in the scene.
++ Each element in the town generate a Box Collider.
+
++ The Game camera shoot Sphere Colliders that interact with other colliders correctly from a physics view.
+
++ A car is generated in the engine, which can be controlled by a the player. This car interacts with other colliders in the scene.
 
 # Showcase
 
