@@ -12,11 +12,9 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 {
 	switch (shape)
 	{
-	case Shape::CUBE:
-		shapeCollider = "CUBE";
-
-		ComponentMesh* mesh = parent->GetComponent<ComponentMesh>();
-		if (mesh != nullptr)
+	//case Shape::CUBE:
+	//	shapeCollider = "CUBE";
+		/*if (mesh != nullptr)
 		{
 			AABB bbox = parent->globalAABB;
 			float3 corners[8];
@@ -32,11 +30,14 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 		{
 			const btVector3 vec(1 / 2, 1 / 2, 1 / 2);
 			new btBoxShape(btVector3(vec));
-		}
+		}*/
 
-		break;
-	//case Shape::SPHERE:
-	//	shapeCollider = "SPHERE";
+		//break;
+	case Shape::SPHERE:
+		shapeCollider = "SPHERE";
+		SphereP* s = new SphereP(1);
+		s->SetPos(owner->GetComponent<ComponentTransform>()->GetPosition().x, owner->GetComponent<ComponentTransform>()->GetPosition().y, owner->GetComponent<ComponentTransform>()->GetPosition().z);
+		s->body.SetBody(s, 1);
 		//btCollisionShape* colShape = new btSphereShape(parent->GetComponent<ComponentTransform>()->GetScale().x);
 		//
 		//btTransform startTransform;
@@ -52,7 +53,7 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 		//
 		//body->setUserPointer(parent);
 		//world->addRigidBody(body);
-	//	break;
+		break;
 	//case Shape::PLANE:
 	//	shapeCollider = "PLANE";
 	//	break;
