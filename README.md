@@ -33,21 +33,25 @@ Pau Motta:<a href=" https://github.com/paumotta">
 + Buffer administration 
 + Importer
 + Files Systems
-+ Serialization
-+ Fisics
++ Custom file format
++ Scene serialization
++ Fisics Logic
 
 ## Alex Gesti
 
-+ Guid configuration
++ Interface Configuration
++ Windows Administration
++ Camera Configuration
++ Game viewport & Editor viewport
 + Frustum Culling
-+ Windows and Interface
-+ Start/Pause/Stop
-+ Fisics
++ GameObject System
++ Resource Management
++ Time Controls
++ Fisics Logic
 
 ## Pau Motta
 
-+ 
-+ ReadMe
++ README
 + Web designer
 
 # Core Subsystems
