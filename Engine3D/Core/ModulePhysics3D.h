@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "p2List.h"
 #include "Primitive.h"
+#include "GameObject.h"
 
 #include "Bullet/include/btBulletDynamicsCommon.h"
 
@@ -31,6 +32,7 @@ public:
 
 	void RemoveBodyFromWorld(btRigidBody* body);
 
+	PhysBody3D* AddBody(btCollisionShape* colShape, GameObject* object, float mass = 1.0f);
 	PhysBody3D* AddBody(const SphereP& sphere, float mass = 1.0f);
 	PhysBody3D* AddBody(const CubeP& cube, float mass = 1.0f);
 	PhysBody3D* AddBody(const CylinderP& cylinder, float mass = 1.0f);

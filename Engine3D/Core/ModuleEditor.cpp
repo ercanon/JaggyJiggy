@@ -464,30 +464,30 @@ void ModuleEditor::MenuBar()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Collider"))
-            {
-                if (gameobjectSelected != nullptr)
-                {
-                    if (ImGui::MenuItem("Cube"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
-                    }
-                    if (ImGui::MenuItem("Sphere"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
-                    }
-                    if (ImGui::MenuItem("Plane"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PLANE);
-                    }
-                    if (ImGui::MenuItem("Pyramid"))
-                    {
-                        ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PYRAMID);
-                    }
-                }
+            //if (gameobjectSelected != nullptr)
+             //{
+                //if (ImGui::BeginMenu("Collider"))
+                //{
+                    //if (ImGui::MenuItem("Cube"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::CUBE);
+                    //}
+                    //if (ImGui::MenuItem("Sphere"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::SPHERE);
+                    //}
+                    //if (ImGui::MenuItem("Plane"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PLANE);
+                    //}
+                    //if (ImGui::MenuItem("Pyramid"))
+                    //{
+                    //    ComponentCollider* newColl = new ComponentCollider(gameobjectSelected, ComponentCollider::Shape::PYRAMID);
+                    //}
 
-                ImGui::EndMenu();
-            }
+                    //ImGui::EndMenu();
+                //}
+            //}
 
             ImGui::EndMenu();
         }

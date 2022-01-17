@@ -107,8 +107,10 @@ update_status ModulePhysics3D::PreUpdate(float dt)
 // ---------------------------------------------------------
 update_status ModulePhysics3D::Update(float dt)
 {
-	if (App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+	{
 		debug = !debug;
+	}
 
 	if (debug == true)
 	{
@@ -122,11 +124,11 @@ update_status ModulePhysics3D::Update(float dt)
 			item = item->next;
 		}
 
-		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_DOWN)
 		{
 			SphereP s(1);
 			s.SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
-			float force = 30.0f;
+			float force = 500.00f;
 			AddBody(s)->Push(-(App->editor->newCam->front.x * force), -(App->editor->newCam->front.y * force), -(App->editor->newCam->front.z * force));
 		}
 	}
@@ -197,6 +199,32 @@ void ModulePhysics3D::RemoveBodyFromWorld(btRigidBody* body)
 }
 
 // ---------------------------------------------------------
+PhysBody3D* ModulePhysics3D::AddBody(btCollisionShape* colShape, GameObject* object, float mass)
+{
+	shapes.add(colShape);
+
+	btTransform startTransform;
+	//startTransform.setFromOpenGLMatrix();
+
+	btVector3 localInertia(0, 0, 0);
+	if (mass != 0.f)
+		colShape->calculateLocalInertia(mass, localInertia);
+
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+	motions.add(myMotionState);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+
+	btRigidBody* body = new btRigidBody(rbInfo);
+	PhysBody3D* pbody = new PhysBody3D(body);
+
+	body->setUserPointer(pbody);
+	world->addRigidBody(body);
+	bodies.add(pbody);
+
+	return pbody;
+}
+
+// ---------------------------------------------------------
 PhysBody3D* ModulePhysics3D::AddBody(const SphereP& sphere, float mass)
 {
 	btCollisionShape* colShape = new btSphereShape(sphere.radius);
@@ -222,7 +250,6 @@ PhysBody3D* ModulePhysics3D::AddBody(const SphereP& sphere, float mass)
 
 	return pbody;
 }
-
 
 // ---------------------------------------------------------
 PhysBody3D* ModulePhysics3D::AddBody(const CubeP& cube, float mass)
