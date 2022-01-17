@@ -38,9 +38,17 @@ Pau Motta:<a href=" https://github.com/paumotta">
 
 ## Alex Gesti
 
++ Guid configuration
++ Frustum Culling
++ Windows and Interface
++ Start/Pause/Stop
++ Fisics
+
 ## Pau Motta
 
-+ Web designer.
++ 
++ ReadMe
++ Web designer
 
 # Core Subsystems
 
