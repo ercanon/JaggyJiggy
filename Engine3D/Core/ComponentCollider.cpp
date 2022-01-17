@@ -5,17 +5,6 @@
 #include "ImGui/imgui.h"
 
 
-#ifdef _DEBUG
-#pragma comment (lib, "BulletDynamics_debug.lib")
-#pragma comment (lib, "BulletCollision_debug.lib")
-#pragma comment (lib, "LinearMath_debug.lib")
-#else
-#pragma comment (lib, "BulletDynamics.lib")
-#pragma comment (lib, "BulletCollision.lib")
-#pragma comment (lib, "LinearMath.lib")
-#endif
-
-
 ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Component(parent) 
 {
 	switch (shape)

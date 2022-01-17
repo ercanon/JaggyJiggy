@@ -188,6 +188,21 @@
     <ClCompile Include="Core\ComponentCollider.cpp">
       <Filter>Engine\GameObjects - Components</Filter>
     </ClCompile>
+    <ClCompile Include="Core\ModulePhysics3D.cpp">
+      <Filter>Engine\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Primitive.cpp">
+      <Filter>Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\glmath.cpp">
+      <Filter>Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PhysBody3D.cpp">
+      <Filter>Engine\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PhysVehicle3D.cpp">
+      <Filter>Engine\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ImGui\imconfig.h">
@@ -720,6 +735,24 @@
     </ClInclude>
     <ClInclude Include="Core\ComponentCollider.h">
       <Filter>Engine\GameObjects - Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ModulePhysics3D.h">
+      <Filter>Engine\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Primitive.h">
+      <Filter>Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\glmath.h">
+      <Filter>Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PhysBody3D.h">
+      <Filter>Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\p2List.h">
+      <Filter>Engine\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PhysVehicle3D.h">
+      <Filter>Engine\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@ class ModuleEditor;
 class ModuleImport;
 class ModuleFileSystem;
 class ModuleTextures;
+class ModulePhysics3D;
 
 class Application
 {
@@ -36,6 +37,7 @@ public:
 	ModuleImport* import { nullptr };
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };
+	ModulePhysics3D* physics { nullptr };
 
 	Application();
 	~Application();
