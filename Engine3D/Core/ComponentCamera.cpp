@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "ModuleCamera3D.h"
+#include "ModuleInput.h"
 #include "ComponentTransform.h"
 #include "SDL/include/SDL_opengl.h"
 
@@ -32,6 +33,112 @@ void ComponentCamera::LookAt(const float3& point) {
 	up = front.Cross(right);
 
 	CalculateViewMatrix();
+}
+
+bool ComponentCamera::Update(float dt)
+{
+	if (isMouseFocusedGame)
+	{
+		if (!ImGuizmo::IsUsing())
+		{
+			float3 newPos(0, 0, 0);
+			float speed = cameraSpeed * dt;
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+				speed *= 4.f;
+
+			if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+				newPos.y += speed;
+			if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+				newPos.y -= speed;
+
+			if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+				newPos += front * speed;
+			if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+				newPos -= front * speed;
+
+
+			if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+				newPos += right * speed;
+			if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+				newPos -= right * speed;
+
+			if (App->input->GetMouseZ() > 0)
+				newPos += front * speed * 2;
+			if (App->input->GetMouseZ() < 0)
+				newPos -= front * speed * 2;
+
+			position += newPos;
+			owner->transform->SetPosition(position);
+
+			// Recalculate matrix -------------
+			if (!newPos.Equals(float3::zero)) CalculateViewMatrix();
+		}
+
+		// Mouse motion ----------------
+		bool hasRotated = false;
+
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+		{
+			int dx = -App->input->GetMouseXMotion();
+			int dy = -App->input->GetMouseYMotion();
+
+			if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) {
+
+				const float newDeltaX = (float)dx * cameraSensitivity;
+				const float newDeltaY = (float)dy * cameraSensitivity;
+
+				reference = owner->transform->GetPosition();
+				Quat orbitMat = Quat::RotateY(newDeltaX * .1f);
+
+				if (abs(up.y) < 0.3f) // Avoid gimball lock on up & down apex
+				{
+					if (position.y > reference.y && newDeltaY < 0.f)
+						orbitMat = orbitMat * math::Quat::RotateAxisAngle(right, newDeltaY * .1f);
+					if (position.y < reference.y && newDeltaY > 0.f)
+						orbitMat = orbitMat * math::Quat::RotateAxisAngle(right, newDeltaY * .1f);
+				}
+				else
+				{
+					orbitMat = orbitMat * math::Quat::RotateAxisAngle(right, newDeltaY * .1f);
+				}
+
+				position = orbitMat * (position - reference) + reference;
+
+				CalculateViewMatrix();
+				LookAt(reference);
+			}
+			else
+			{
+				if (dx != 0)
+				{
+					const float newDeltaX = (float)dx * cameraSensitivity;
+					float deltaX = newDeltaX + 0.95f * (lastDeltaX - newDeltaX); //lerp for smooth rotation acceleration to avoid jittering
+					lastDeltaX = deltaX;
+					Quat rotateY = Quat::RotateY(up.y >= 0.f ? deltaX * .1f : -deltaX * .1f);
+					up = rotateY * up;
+					front = rotateY * front;
+					CalculateViewMatrix();
+					hasRotated = true;
+				}
+
+				if (dy != 0)
+				{
+					const float newDeltaY = (float)dy * cameraSensitivity;
+					float deltaY = newDeltaY + 0.95f * (lastDeltaY - newDeltaY); //lerp for smooth rotation acceleration to avoid jittering
+					lastDeltaY = deltaY;
+					Quat rotateX = Quat::RotateAxisAngle(right, -deltaY * .1f);
+					up = rotateX * up;
+					front = rotateX * front;
+					CalculateViewMatrix();
+					hasRotated = true;
+				}
+			}
+		}
+
+		!hasRotated ? lastDeltaX = lastDeltaY = 0.f : 0.f;
+	}
+
+	return true;
 }
 
 void ComponentCamera::CalculateViewMatrix() {

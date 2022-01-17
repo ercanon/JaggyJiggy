@@ -15,6 +15,7 @@ public:
 	ComponentCamera(GameObject* parent, bool CanCam);
 	~ComponentCamera();
 	
+	bool Update(float dt) override;
 	void LookAt(const float3& point);
 	void CalculateViewMatrix();
 	void RecalculateProjection();
@@ -29,6 +30,9 @@ public:
 	float nearPlaneDistance = 1.f;
 	float farPlaneDistance = 5000.f;
 	bool projectionIsDirty = false;
+	bool isMouseFocusedGame = false;
+	float cameraSensitivity = .005f;
+	float cameraSpeed = 60.f;
 
 private:
 
