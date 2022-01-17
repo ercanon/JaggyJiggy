@@ -125,15 +125,16 @@ update_status ModulePhysics3D::Update(float dt)
 			item->data->Render();
 			item = item->next;
 		}
+	}
 
-		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_DOWN)
-		{
-			SphereP* s = new SphereP(20);
-			s->SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
-			s->body.SetBody(s, 1);
-			float force = 900.00f;
-			s->body.Push(-(App->editor->newCam->front.x * force), -(App->editor->newCam->front.y * force), -(App->editor->newCam->front.z * force));
-		}
+	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+		SphereP* s = new SphereP(5);
+		s->SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
+		//s->SetRotation(App->editor->newCam->)
+		s->body.SetBody(s, 1);
+		float force = 50.00f;
+		s->body.Push((App->editor->newCam->front.x * force), (App->editor->newCam->front.y * force), (App->editor->newCam->front.z * force));
 	}
 
 	return UPDATE_CONTINUE;
