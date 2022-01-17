@@ -25,6 +25,7 @@ bool ModuleScene::Start()
 
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Resources/Models/street2.fbx");
+	App->import->LoadGeometry("Assets/Resources/Models/street2_floor.fbx");
 
 	return ret;
 }
