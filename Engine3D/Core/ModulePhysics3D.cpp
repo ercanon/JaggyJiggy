@@ -46,6 +46,7 @@ bool ModulePhysics3D::Start()
 	LOG("Creating Physics environment");
 
 	world = new btDiscreteDynamicsWorld(dispatcher, broad_phase, solver, collision_conf);
+	debug_draw->setDebugMode(1);
 	world->setDebugDrawer(debug_draw);
 	world->setGravity(GRAVITY);
 	vehicle_raycaster = new btDefaultVehicleRaycaster(world);
@@ -110,6 +111,7 @@ update_status ModulePhysics3D::Update(float dt)
 	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		debug = !debug;
+		LOG("DEBUG PHYSICS");
 	}
 
 	if (debug == true)
@@ -126,10 +128,11 @@ update_status ModulePhysics3D::Update(float dt)
 
 		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_DOWN)
 		{
-			SphereP s(1);
-			s.SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
-			float force = 500.00f;
-			AddBody(s)->Push(-(App->editor->newCam->front.x * force), -(App->editor->newCam->front.y * force), -(App->editor->newCam->front.z * force));
+			SphereP* s = new SphereP(20);
+			s->SetPos(App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z);
+			s->body.SetBody(s, 1);
+			float force = 900.00f;
+			s->body.Push(-(App->editor->newCam->front.x * force), -(App->editor->newCam->front.y * force), -(App->editor->newCam->front.z * force));
 		}
 	}
 
