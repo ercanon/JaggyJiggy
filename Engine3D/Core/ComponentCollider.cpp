@@ -13,18 +13,54 @@ ComponentCollider::ComponentCollider(GameObject* parent, Shape shape) : Componen
 
 	if (shape == Shape::CUBE)
 	{
-		CubeP* c = new CubeP(1, 1, 1);
-		float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
-		c->SetPos(pos.x, pos.y, pos.z);
-		c->body.SetBody(c, mass);
+		if (parent->GetComponent<ComponentMesh>() != nullptr)
+		{
+			AABB bbox = parent->globalAABB;
+			float3 corners[8];
+			bbox.GetCornerPoints(corners);
+			float width = corners[0].Distance(corners[4]) / 2;
+			float heigth = corners[1].Distance(corners[3]) / 2;
+			float depth = corners[3].Distance(corners[2]) / 2;
+
+			CubeP* c = new CubeP(width, depth, heigth);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			float3 rot = parent->GetComponent<ComponentTransform>()->GetRotation();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
+		}
+		else
+		{
+			CubeP* c = new CubeP(1, 1, 1);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
+		}
 	}
 	else if (shape == Shape::SPHERE)
 	{
-		SphereP* s = new SphereP(1);
-		float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
-		s->SetPos(pos.x, pos.y, pos.z);
-		body = s->body;
-		body.SetBody(s, mass);
+		if (parent->GetComponent<ComponentMesh>() != nullptr)
+		{
+			AABB bbox = parent->globalAABB;
+			float3 corners[8];
+			bbox.GetCornerPoints(corners);
+			float width = corners[0].Distance(corners[4]);
+
+			SphereP* s = new SphereP(width);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
+		}
+		else
+		{
+			SphereP* s = new SphereP(1);
+			float3 pos = parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
+		}
 	}
 }
 
@@ -45,23 +81,28 @@ void ComponentCollider::OnGui()
 		ImGui::Text("Shape %s",	shapeCollider.c_str());
 		if(ImGui::Button("Collider Box"))
 		{
-			s->body.RemoveBody();
-			s = nullptr;
+			body.RemoveBody();
+			body = nullptr;
 
 			shapeCol = Shape::CUBE;
-			c = new CubeP(1, 1, 1);
-			c->SetPos(owner->parent->GetComponent<ComponentTransform>()->GetPosition().x, owner->parent->GetComponent<ComponentTransform>()->GetPosition().y, owner->parent->GetComponent<ComponentTransform>()->GetPosition().z);
-			c->body.SetBody(c, mass);
+			CubeP* c = new CubeP(1, 1, 1);
+			float3 pos = owner->parent->GetComponent<ComponentTransform>()->GetPosition();
+			c->SetPos(pos.x, pos.y, pos.z);
+			body = c->body;
+			body.SetBody(c, mass);
 		}
 		if(ImGui::Button("Collider Sphere"))
 		{
-			c->body.RemoveBody();
-			c = nullptr;
+			body.RemoveBody();
+			body = nullptr;
 
 			shapeCol = Shape::SPHERE;
-			s = new SphereP(1);
-			s->SetPos(owner->parent->GetComponent<ComponentTransform>()->GetPosition().x, owner->parent->GetComponent<ComponentTransform>()->GetPosition().y, owner->parent->GetComponent<ComponentTransform>()->GetPosition().z);
-			s->body.SetBody(s, mass);
+
+			SphereP* s = new SphereP(1);
+			float3 pos = owner->parent->GetComponent<ComponentTransform>()->GetPosition();
+			s->SetPos(pos.x, pos.y, pos.z);
+			body = s->body;
+			body.SetBody(s, mass);
 		}
 	}
 }
