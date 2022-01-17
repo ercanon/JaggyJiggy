@@ -224,7 +224,6 @@ void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, cons
 
 		GameObject* newGameObject = App->scene->CreateGameObject(name.c_str());
 		ComponentMesh* newMesh = newGameObject->CreateComponent<ComponentMesh>();
-		new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 
 
 		char charTexturePath[1024];
@@ -288,6 +287,8 @@ void ModuleImport::LoadMeshFile(const char* pathfile, const aiScene* scene, cons
 		newGameObject->transform->SetPosition(float3(position.x, position.y, position.z));
 		newGameObject->transform->SetRotation(Quat(rotation.x, rotation.y, rotation.z, rotation.w).ToEulerXYZ());
 		newGameObject->transform->SetScale(float3(scale.x, scale.y, scale.z));
+
+		new ComponentCollider(newGameObject, ComponentCollider::Shape::CUBE);
 	}
 
 	RELEASE(buffer);
