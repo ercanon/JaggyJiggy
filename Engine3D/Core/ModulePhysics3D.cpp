@@ -15,8 +15,6 @@
 
 ModulePhysics3D::ModulePhysics3D(Application* app, bool start_enabled) : Module(app, start_enabled), world(nullptr)
 {
-	debug = false;
-
 	collision_conf = new btDefaultCollisionConfiguration();
 	dispatcher = new btCollisionDispatcher(collision_conf);
 	broad_phase = new btDbvtBroadphase();
@@ -71,35 +69,38 @@ bool ModulePhysics3D::Start()
 // ---------------------------------------------------------
 update_status ModulePhysics3D::PreUpdate(float dt)
 {
-	world->stepSimulation(dt, 15);
-
-	int numManifolds = world->getDispatcher()->getNumManifolds();
-	for (int i = 0; i < numManifolds; i++)
+	if (!App->editor->play)
 	{
-		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-		btCollisionObject* obA = (btCollisionObject*)(contactManifold->getBody0());
-		btCollisionObject* obB = (btCollisionObject*)(contactManifold->getBody1());
+		world->stepSimulation(dt, 15);
 
-		int numContacts = contactManifold->getNumContacts();
-		if (numContacts > 0)
+		int numManifolds = world->getDispatcher()->getNumManifolds();
+		for (int i = 0; i < numManifolds; i++)
 		{
-			PhysBody3D* pbodyA = (PhysBody3D*)obA->getUserPointer();
-			PhysBody3D* pbodyB = (PhysBody3D*)obB->getUserPointer();
+			btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+			btCollisionObject* obA = (btCollisionObject*)(contactManifold->getBody0());
+			btCollisionObject* obB = (btCollisionObject*)(contactManifold->getBody1());
 
-			if (pbodyA && pbodyB)
+			int numContacts = contactManifold->getNumContacts();
+			if (numContacts > 0)
 			{
-				p2List_item<Module*>* item = pbodyA->collision_listeners.getFirst();
-				while (item)
-				{
-					item->data->OnCollision(pbodyA, pbodyB);
-					item = item->next;
-				}
+				PhysBody3D* pbodyA = (PhysBody3D*)obA->getUserPointer();
+				PhysBody3D* pbodyB = (PhysBody3D*)obB->getUserPointer();
 
-				item = pbodyB->collision_listeners.getFirst();
-				while (item)
+				if (pbodyA && pbodyB)
 				{
-					item->data->OnCollision(pbodyB, pbodyA);
-					item = item->next;
+					p2List_item<Module*>* item = pbodyA->collision_listeners.getFirst();
+					while (item)
+					{
+						item->data->OnCollision(pbodyA, pbodyB);
+						item = item->next;
+					}
+
+					item = pbodyB->collision_listeners.getFirst();
+					while (item)
+					{
+						item->data->OnCollision(pbodyB, pbodyA);
+						item = item->next;
+					}
 				}
 			}
 		}
@@ -111,29 +112,27 @@ update_status ModulePhysics3D::PreUpdate(float dt)
 // ---------------------------------------------------------
 update_status ModulePhysics3D::Update(float dt)
 {
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+	if (!App->editor->play)
 	{
-		debug = !debug;
-	}
+		world->debugDrawWorld();
 
-	world->debugDrawWorld();
+		// Render vehicles
+		p2List_item<PhysVehicle3D*>* item = vehicles.getFirst();
+		while (item)
+		{
+			item->data->Render();
+			item = item->next;
+		}
 
-	// Render vehicles
-	p2List_item<PhysVehicle3D*>* item = vehicles.getFirst();
-	while (item)
-	{
-		item->data->Render();
-		item = item->next;
-	}
+		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+		{
+			GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
+			newGameObject->GetComponent<ComponentTransform>()->SetPosition({ App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z });
+			ComponentCollider* newColl = new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
 
-	if (App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-		GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
-		newGameObject->GetComponent<ComponentTransform>()->SetPosition({ App->editor->newCam->position.x, App->editor->newCam->position.y, App->editor->newCam->position.z });
-		ComponentCollider* newColl = new ComponentCollider(newGameObject, ComponentCollider::Shape::SPHERE);
-
-		float force = 50.00f;
-		newColl->body.Push((App->editor->newCam->front.x * force), (App->editor->newCam->front.y * force), (App->editor->newCam->front.z * force));
+			float force = 50.00f;
+			newColl->body.Push((App->editor->newCam->front.x * force), (App->editor->newCam->front.y * force), (App->editor->newCam->front.z * force));
+		}
 	}
 
 	return UPDATE_CONTINUE;
