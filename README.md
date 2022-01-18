@@ -97,7 +97,9 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 # Showcase
 
-![Image16](docs/videos/quickshowcase.mp4)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/WTIeg-THomE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### If dosen't work, check'it with this link: https://www.youtube.com/embed/WTIeg-THomE
 
 # How to use
 
