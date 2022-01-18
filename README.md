@@ -97,9 +97,9 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 # Showcase
 
-<p.align = "center">
-<iframe = "560" height = "315" src = "https://www.youtube.com/watch?v=WTIeg-THomE&ab_channel=Mr.Luigi001" title = "Quick Showcase - JaggyJiggy Engine" frameborder = "0" allow = "acceleromete; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/WTIeg-THomE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### If dosen't work, check'it with this link: https://www.youtube.com/embed/WTIeg-THomE
 
 # How to use
 
