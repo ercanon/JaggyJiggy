@@ -4,28 +4,29 @@ JaggyJiggy is an 3D engine ispired in Unity, developed for an motors asigment by
 With this engine you can make your own games from scratch! 
 Has a family friendly interface in which a small physics engine has been developed in which you can see the collisions between different objects, forces which are applied to it, etc.
 
-Github: https://github.com/ercanon/JaggyJiggy
-Webpage:  https://ercanon.github.io/JaggyJiggy/
++ Github: https://github.com/ercanon/JaggyJiggy
++ Release: https://github.com/ercanon/JaggyJiggy/releases/tag/0.85
++ Webpage:  https://ercanon.github.io/JaggyJiggy/
 
 # Team: Chaotic Evil
 
-![Image11](docs/raul.jpg)
+![Image11](docs/photos/raul.jpg)
 
-Raul Cano: <a href=" https://github.com/ercanon"> 
-+ Github: https://github.com/ercanon</a>
+Raul Cano:
++ Github: https://github.com/ercanon
 + Role: Code
 
-![Image12](docs/alex.png)
+![Image12](docs/photos/alex.png)
 
-Alex Gesti:<a href="https://github.com/alexgesti">  
-+ Github: https://github.com/alexgesti</a>
+Alex Gesti:
++ Github: https://github.com/alexgesti
 + Role: Code
 
-![Image13](docs/pau.png)
+![Image13](docs/photos/pau.png)
 
-Pau Motta:<a href=" https://github.com/paumotta"> 
-+ Github: https://github.com/paumotta</a>
-+ Role: Designer.
+Pau Motta:
++ Github: https://github.com/paumotta
++ Role: Designer
 
 # Task completed
 
@@ -88,9 +89,15 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 + The Game camera shoot Sphere Colliders that interact with other colliders correctly from a physics view.
 
+![Image14](docs/gif/ball_show.gif)
+
 + A car is generated in the engine, which can be controlled by a the player. This car interacts with other colliders in the scene.
 
+![Image15](docs/gif/car_show.gif)
+
 # Showcase
+
+![Image16](docs/videos/quickshowcase.mp4)
 
 # How to use
 
