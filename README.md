@@ -89,11 +89,11 @@ The UI was done using ImGui and provides an editor to use and tweak all the faci
 
 + The Game camera shoot Sphere Colliders that interact with other colliders correctly from a physics view.
 
-![Image14](docs/gif/ball_show.gif)
+![Image14](docs/gifs/ball_show.gif)
 
 + A car is generated in the engine, which can be controlled by a the player. This car interacts with other colliders in the scene.
 
-![Image15](docs/gif/car_show.gif)
+![Image15](docs/gifs/car_show.gif)
 
 # Showcase
 
